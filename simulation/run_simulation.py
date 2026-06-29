@@ -1,14 +1,20 @@
-"""Abstract intersection simulation mirroring the FCFS TraCI controller structure.
+"""Intersection simulation and visualization.
 
-The loop follows the same pattern as traci_runner.py:
-  - simulationStep() → advance time by dt
-  - get_approaching_vehicles() → build vehicle records
-  - build_jssp_graph() → construct graph
-  - scheduler.schedule() → HGT policy or iGreedy
-  - apply_control() → release/hold vehicles
-  - print_debug_step() → same console format
+Architecture (mirrors traci_runner.py / graph_debugger.py):
 
-No SUMO required. Vehicles move through the abstract 3×3 zone grid.
+  Phase 1 — Schedule:
+    Run the env episode exactly as training does:
+      build_hetero_graph → policy → env.step()   (HGT)
+      feasibility mask  → iGreedy rule → env.step()
+    After all operations scheduled, each op has:
+      start_time = earliest_finish - processing_time
+      finish_time = earliest_finish
+
+  Phase 2 — Animate:
+    Replay the solved schedule as a time-stepped animation.
+    Left panel   — 3×3 intersection map (vehicles moving through zones)
+    Centre panel — JSSP timing-conflict graph (Type-1/2/3 edges)
+    Right panel  — debug stats
 
 Usage:
     PYTHONPATH=. python simulation/run_simulation.py --checkpoint results/checkpoint_best.pt
@@ -19,540 +25,590 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
 import matplotlib
 matplotlib.use("MacOSX")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 import matplotlib.animation as animation
 import numpy as np
 import torch
 
+try:
+    import networkx as nx
+    HAS_NX = True
+except ImportError:
+    HAS_NX = False
+
 from intersection_scheduler.data.scenario_generator import (
-    ZONE_POSITIONS, ROUTES, ScenarioGenerator, Scenario,
+    ZONE_POSITIONS, ROUTES, SAME_LANE_GROUPS, ScenarioGenerator, Scenario,
 )
-from intersection_scheduler.environment.intersection import IntersectionEnv, Operation, Vehicle
+from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.environment.feasibility import compute_feasible_set
 from intersection_scheduler.environment.graph_builder import build_hetero_graph
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.utils.metrics import episode_waiting_time, episode_makespan
 
 
-# ── Simulation constants (mirror traci_runner.py) ────────────────────────────
+# ── Constants ─────────────────────────────────────────────────────────────────
 
-SIM_STEP_SECONDS = 0.1          # dt per simulationStep()
-DETECTION_DISTANCE = 999.0      # all vehicles always detected (abstract env)
-HOLD_DISTANCE      = 999.0
+SIM_STEP_SECONDS = 0.05
 
 VEHICLE_COLORS = [
     "#e74c3c", "#2ecc71", "#3498db", "#f39c12",
     "#9b59b6", "#1abc9c", "#e67e22", "#34495e",
 ]
 
+TYPE1_COLOR   = "#2f2f2f"
+TYPE2_COLOR   = "#1f77b4"
+TYPE3_COLOR   = "#d62728"
+ACTIVE_COLOR  = "#f2c94c"
+STOPPED_COLOR = "#d94f45"
+
 CENTRE_ZONES = {5}
 EDGE_ZONES   = {2, 4, 6, 8}
-CORNER_ZONES = {1, 3, 7, 9}
+
+_MANOEUVRE_TO_LANE: Dict[str, str] = {
+    m: lane
+    for lane, manoeuvres in SAME_LANE_GROUPS.items()
+    for m in manoeuvres
+}
 
 
-# ── Vehicle state (mirrors LiveVehicleRecord) ─────────────────────────────────
-
-@dataclass
-class SimVehicleRecord:
-    vehicle_id: str
-    vehicle_idx: int            # index into scenario.vehicles
-    route: List[int]            # zone ids
-    arrival_time: float
-    velocity: float
-    processing_times: List[float]
-    # Dynamic
-    status: str = "waiting"     # waiting | crossing | done
-    current_zone_idx: int = -1  # index into route (-1 = not yet entered)
-    zone_enter_time: float = 0.0
-    zone_exit_time: float = 0.0
-
+# ── Scheduled operation (output of phase 1) ───────────────────────────────────
 
 @dataclass
-class ControllerState:
-    """Mirrors traci_runner.ControllerState."""
-    released_vehicles: Set[str] = field(default_factory=set)
-    cleared_vehicles:  Set[str] = field(default_factory=set)
-    stopped_vehicles:  Set[str] = field(default_factory=set)
-    # zone_id -> vehicle_id currently crossing it
-    zone_occupants: Dict[int, str] = field(default_factory=dict)
-    # vehicle_id -> zone_exit_time for current zone
-    zone_exit_times: Dict[str, float] = field(default_factory=dict)
-    # which operation (zone_idx) each vehicle is on next
-    next_op_idx: Dict[str, int] = field(default_factory=dict)
-    # scheduled decisions: vehicle_id -> list of (zone_id, start, finish)
-    schedule: Dict[str, List[Tuple[int, float, float]]] = field(default_factory=dict)
+class ScheduledOp:
+    vehicle_id: int       # integer id
+    zone_id: int
+    route_position: int
+    start_time: float
+    finish_time: float
+    processing_time: float
 
 
-# ── Scheduler interface (mirrors BaseScheduler) ───────────────────────────────
+# ── Phase 1: run episode and extract schedule ──────────────────────────────────
 
-class AbstractScheduler:
-    name = "abstract"
-
-    def next_action(
-        self,
-        records: List[SimVehicleRecord],
-        state: ControllerState,
-        sim_time: float,
-    ) -> Optional[str]:
-        """Return vehicle_id to release next, or None."""
-        raise NotImplementedError
-
-
-class HGTScheduler(AbstractScheduler):
-    name = "hgt"
-
-    def __init__(self, policy: SchedulingPolicy, env: IntersectionEnv) -> None:
-        self.policy = policy
-        self.env = env
-        self._scheduled = False
-
-    def set_scenario(self, scenario: Scenario) -> None:
-        self.env.reset(scenario.vehicles)
-        self._scheduled = False
-        self._action_queue: List[int] = []  # pre-computed full schedule
-
-    def next_action(self, records, state, sim_time):
-        if not self._action_queue:
-            return None
-        return f"v{self._action_queue.pop(0)}"
-
-    def precompute(self) -> None:
-        """Run full HGT episode and store the action order."""
-        env = self.env
-        self._action_queue = []
-        done = False
-        while not done:
-            data = build_hetero_graph(env)
-            mask = compute_feasible_set(env)
-            if not mask.any():
-                break
-            with torch.no_grad():
-                dist, _ = self.policy(data, mask)
-            action = int(dist.probs.argmax().item())
-            self._action_queue.append(env.operations[action].vehicle_id)
-            env, _, done = env.step(action)
-
-
-class IGreedyScheduler(AbstractScheduler):
-    name = "igreedy"
-
-    def __init__(self, env: IntersectionEnv) -> None:
-        self.env = env
-        self._action_queue: List[int] = []
-
-    def set_scenario(self, scenario: Scenario) -> None:
-        self.env.reset(scenario.vehicles)
-        self._action_queue = []
-
-    def precompute(self) -> None:
-        env = self.env
-        self._action_queue = []
-        done = False
-        while not done:
-            mask = compute_feasible_set(env)
-            if not mask.any():
-                break
-            best_idx, best_key = None, None
-            for idx, op in enumerate(env.operations):
-                if not mask[idx].item():
-                    continue
-                v = next(v for v in env.vehicles if v.id == op.vehicle_id)
-                key = (v.arrival_time, op.route_position, op.vehicle_id)
-                if best_key is None or key < best_key:
-                    best_key, best_idx = key, idx
-            self._action_queue.append(env.operations[best_idx].vehicle_id)
-            env, _, done = env.step(best_idx)
-
-    def next_action(self, records, state, sim_time):
-        if not self._action_queue:
-            return None
-        return f"v{self._action_queue.pop(0)}"
-
-
-# ── Simulation step functions (mirror traci_runner.py) ────────────────────────
-
-def get_approaching_vehicles(
-    records: List[SimVehicleRecord],
-    sim_time: float,
-) -> List[SimVehicleRecord]:
-    """Return vehicles that have arrived and aren't done yet."""
-    return [
-        r for r in records
-        if r.arrival_time <= sim_time and r.status != "done"
-    ]
-
-
-def apply_control(
-    approaching: List[SimVehicleRecord],
-    all_records: List[SimVehicleRecord],
-    state: ControllerState,
-    scheduler: AbstractScheduler,
-    sim_time: float,
-) -> Dict:
-    """Mirror apply_sumo_control() — release/hold vehicles each step."""
-
-    stopped_now:  List[str] = []
-    released_now: List[str] = []
-    cleared_now:  List[str] = []
-
-    # 1. Advance vehicles that are currently crossing a zone
-    for rec in all_records:
-        if rec.status != "crossing":
+def run_hgt_episode(policy: SchedulingPolicy, env: IntersectionEnv, scenario: Scenario) -> List[ScheduledOp]:
+    """Run HGT exactly as training does — no precomputation, online decisions."""
+    env.reset(scenario.vehicles)
+    done = False
+    while not done:
+        data = build_hetero_graph(env)
+        mask = compute_feasible_set(env)
+        if not mask.any():
+            # Advance time to the earliest moment an op becomes schedulable.
+            # This handles cases where all feasible ops are blocked only by
+            # zone_free or arrival_time being in the near future.
+            next_event = _next_feasible_time(env)
+            if next_event is None:
+                break  # genuine deadlock — shouldn't happen in valid scenarios
+            env.current_time = next_event
             continue
-        if sim_time >= rec.zone_exit_time:
-            # Finished this zone
-            zone_id = rec.route[rec.current_zone_idx]
-            if state.zone_occupants.get(zone_id) == rec.vehicle_id:
-                del state.zone_occupants[zone_id]
-            state.zone_exit_times.pop(rec.vehicle_id, None)
-
-            next_idx = rec.current_zone_idx + 1
-            if next_idx >= len(rec.route):
-                # Vehicle has cleared the intersection
-                rec.status = "done"
-                state.cleared_vehicles.add(rec.vehicle_id)
-                cleared_now.append(rec.vehicle_id)
-            else:
-                # Move to waiting for next zone
-                rec.status = "waiting"
-                rec.current_zone_idx = next_idx
-                state.stopped_vehicles.add(rec.vehicle_id)
-
-    # 2. Ask scheduler who to release next
-    next_vid = scheduler.next_action(approaching, state, sim_time)
-
-    # 3. Release the chosen vehicle into its next zone
-    if next_vid is not None:
-        rec = next((r for r in all_records if r.vehicle_id == next_vid), None)
-        if rec is not None and rec.status in ("waiting", "arriving"):
-            if rec.current_zone_idx < 0:
-                rec.current_zone_idx = 0
-            zone_id = rec.route[rec.current_zone_idx]
-
-            # Only release if zone is free
-            if zone_id not in state.zone_occupants:
-                pt = rec.processing_times[rec.current_zone_idx]
-                rec.zone_enter_time = sim_time
-                rec.zone_exit_time  = sim_time + pt
-                rec.status = "crossing"
-                state.zone_occupants[zone_id] = rec.vehicle_id
-                state.zone_exit_times[rec.vehicle_id] = rec.zone_exit_time
-                state.released_vehicles.add(rec.vehicle_id)
-                state.stopped_vehicles.discard(rec.vehicle_id)
-                released_now.append(next_vid)
-
-    # 4. Hold vehicles that aren't released
-    for rec in approaching:
-        if rec.status == "waiting" and rec.vehicle_id not in state.released_vehicles:
-            state.stopped_vehicles.add(rec.vehicle_id)
-            if rec.vehicle_id not in released_now:
-                stopped_now.append(rec.vehicle_id)
-
-    return {
-        "released_now": released_now,
-        "stopped_now":  list(set(stopped_now)),
-        "cleared_now":  cleared_now,
-        "zone_occupants": dict(state.zone_occupants),
-        "active_vehicles": [r.vehicle_id for r in all_records if r.status == "crossing"],
-    }
+        with torch.no_grad():
+            dist, _ = policy(data, mask)
+        action = int(dist.probs.argmax().item())
+        env, _, done = env.step(action)
+    return _extract_schedule(env)
 
 
-def print_debug_step(
-    sim_time: float,
-    approaching: List[SimVehicleRecord],
-    control_result: Dict,
-    decision_number: int,
-) -> None:
-    """Mirror print_debug_step() from traci_runner.py."""
-    print(
-        f"\n[t={sim_time:.1f}s | decision={decision_number}] "
-        f"approaching={len(approaching)}  "
-        f"active={control_result['active_vehicles']}  "
-        f"released={control_result['released_now']}"
-    )
-    for rec in approaching:
-        status_str = f"{rec.status:8s}"
-        zone_str = (
-            f"zone=z{rec.route[rec.current_zone_idx]}"
-            if rec.current_zone_idx >= 0 and rec.status == "crossing"
-            else "zone=---"
-        )
-        print(
-            f"  {rec.vehicle_id:<6}  arr={rec.arrival_time:.2f}s  "
-            f"vel={rec.velocity:.1f}m/s  {status_str}  {zone_str}"
-        )
-    if control_result["stopped_now"]:
-        print(f"  Held:    {control_result['stopped_now']}")
-    if control_result["cleared_now"]:
-        print(f"  Cleared: {control_result['cleared_now']}")
+def _next_feasible_time(env: IntersectionEnv) -> Optional[float]:
+    """Return the earliest time at which any unscheduled op could become schedulable."""
+    candidates = []
+    for op in env.operations:
+        if op.scheduled:
+            continue
+        v = next((v for v in env.vehicles if v.id == op.vehicle_id), None)
+        if v is None:
+            continue
+        # Predecessor must be scheduled for this op to ever be considered
+        if op.route_position > 0:
+            pred = next((o for o in env.operations
+                         if o.vehicle_id == op.vehicle_id and o.route_position == op.route_position - 1), None)
+            if pred is None or not pred.scheduled:
+                continue
+        # Earliest this op can start = max(arrival, zone_free, pred finish)
+        zone = env.zones.get(op.zone_id)
+        zone_free = zone.time_free if zone else 0.0
+        pred_finish = 0.0
+        if op.route_position > 0:
+            pred = next((o for o in env.operations
+                         if o.vehicle_id == op.vehicle_id and o.route_position == op.route_position - 1), None)
+            pred_finish = pred.earliest_finish if pred else 0.0
+        earliest = max(v.arrival_time, zone_free, pred_finish)
+        candidates.append(earliest)
+    # Also consider vehicles whose first op's predecessor constraint is arrival_time
+    for op in env.operations:
+        if op.scheduled or op.route_position != 0:
+            continue
+        v = next((v for v in env.vehicles if v.id == op.vehicle_id), None)
+        if v is None:
+            continue
+        zone = env.zones.get(op.zone_id)
+        zone_free = zone.time_free if zone else 0.0
+        earliest = max(v.arrival_time, zone_free)
+        candidates.append(earliest)
+    return min(candidates) if candidates else None
 
 
-# ── Simulation runner ─────────────────────────────────────────────────────────
+def run_igreedy_episode(env: IntersectionEnv, scenario: Scenario) -> List[ScheduledOp]:
+    """Run iGreedy: earliest arrival first, tie-break by route position."""
+    env.reset(scenario.vehicles)
+    done = False
+    while not done:
+        mask = compute_feasible_set(env)
+        if not mask.any():
+            next_event = _next_feasible_time(env)
+            if next_event is None:
+                break
+            env.current_time = next_event
+            continue
+        best_idx, best_key = None, None
+        for idx, op in enumerate(env.operations):
+            if not mask[idx].item():
+                continue
+            v = next(v for v in env.vehicles if v.id == op.vehicle_id)
+            key = (v.arrival_time, op.route_position, op.vehicle_id)
+            if best_key is None or key < best_key:
+                best_key, best_idx = key, idx
+        env, _, done = env.step(best_idx)
+    return _extract_schedule(env)
+
+
+def _extract_schedule(env: IntersectionEnv) -> List[ScheduledOp]:
+    ops = []
+    for op in env.operations:
+        if op.scheduled:
+            ops.append(ScheduledOp(
+                vehicle_id=op.vehicle_id,
+                zone_id=op.zone_id,
+                route_position=op.route_position,
+                start_time=op.earliest_finish - op.processing_time,
+                finish_time=op.earliest_finish,
+                processing_time=op.processing_time,
+            ))
+    return ops
+
+
+def print_schedule(schedule: List[ScheduledOp], scenario: Scenario, scheduler_name: str, env: IntersectionEnv) -> None:
+    wt = episode_waiting_time(env)
+    ms = episode_makespan(env)
+    print(f"\n{'='*60}")
+    print(f"Scheduler: {scheduler_name.upper()}  |  {len(scenario.vehicles)} vehicles")
+    print(f"{'='*60}")
+    by_vehicle: Dict[int, List[ScheduledOp]] = {}
+    for op in sorted(schedule, key=lambda o: o.start_time):
+        by_vehicle.setdefault(op.vehicle_id, []).append(op)
+    for vid in sorted(by_vehicle):
+        man = scenario.manoeuvres[vid]
+        ops = sorted(by_vehicle[vid], key=lambda o: o.route_position)
+        timeline = "  ".join(f"z{o.zone_id}[{o.start_time:.2f}→{o.finish_time:.2f}]" for o in ops)
+        print(f"  v{vid} ({man}): {timeline}")
+    print(f"\n  waiting_time={wt:.3f}s  makespan={ms:.3f}s")
+
+
+# ── Phase 2: time-stepped simulation from schedule ────────────────────────────
 
 @dataclass
 class SimSnapshot:
-    """One frame of simulation state for animation playback."""
     sim_time: float
-    vehicle_statuses: Dict[str, str]          # vehicle_id -> status
-    vehicle_zone: Dict[str, Optional[int]]    # vehicle_id -> current zone_id
-    vehicle_progress: Dict[str, float]        # vehicle_id -> 0..1 within zone
-    zone_occupants: Dict[int, str]            # zone_id -> vehicle_id
+    vehicle_zone: Dict[int, Optional[int]]      # vehicle_id -> zone_id or None
+    vehicle_status: Dict[int, str]              # arriving|crossing|waiting|done
+    zone_occupants: Dict[int, int]              # zone_id -> vehicle_id
+    released_now: List[int]                     # vehicle_ids released this step
+    waiting_vids: List[int]
+    jssp_graph: object                          # nx.DiGraph or None
 
 
-def run_simulation(
+def build_snapshots(
+    schedule: List[ScheduledOp],
     scenario: Scenario,
-    scheduler: AbstractScheduler,
-    decision_period: float = 1.0,
-    max_time: float = 60.0,
-) -> Tuple[List[SimSnapshot], Dict]:
-    """Run the full simulation loop, mirror of run_controller()."""
-
-    # Build vehicle records
-    records: List[SimVehicleRecord] = []
-    for v in scenario.vehicles:
-        rec = SimVehicleRecord(
-            vehicle_id=f"v{v.id}",
-            vehicle_idx=v.id,
-            route=v.route,
-            arrival_time=v.arrival_time,
-            velocity=v.velocity,
-            processing_times=v.processing_times,
-        )
-        records.append(rec)
-
-    # Pre-compute full schedule from policy/igreedy
-    scheduler.precompute()
-
-    state = ControllerState()
+    max_time: float = 120.0,
+) -> List[SimSnapshot]:
+    """Convert a solved schedule into per-tick snapshots for animation."""
     snapshots: List[SimSnapshot] = []
     sim_time = 0.0
-    step_count = 0
-    decision_number = 0
-    next_decision_time = 0.0
 
-    # Mark initial vehicle status
-    for rec in records:
-        rec.status = "arriving"
-        rec.current_zone_idx = 0
-
-    print(f"\n{'='*60}")
-    print(f"Scheduler: {scheduler.name.upper()}  |  {len(records)} vehicles")
-    print(f"{'='*60}")
+    # Build lookup: vehicle_id -> list of ScheduledOp in route order
+    by_vehicle: Dict[int, List[ScheduledOp]] = {}
+    for op in schedule:
+        by_vehicle.setdefault(op.vehicle_id, []).append(op)
+    for vid in by_vehicle:
+        by_vehicle[vid].sort(key=lambda o: o.route_position)
 
     while sim_time <= max_time:
-        # simulationStep()
         sim_time = round(sim_time + SIM_STEP_SECONDS, 6)
-        step_count += 1
 
-        # Vehicles that have arrived
-        for rec in records:
-            if rec.arrival_time <= sim_time and rec.status == "arriving":
-                rec.status = "waiting"
+        zone_occupants: Dict[int, int] = {}
+        vehicle_zone: Dict[int, Optional[int]] = {}
+        vehicle_status: Dict[int, str] = {}
+        released_now: List[int] = []
+        waiting_vids: List[int] = []
 
-        approaching = get_approaching_vehicles(records, sim_time)
+        for v in scenario.vehicles:
+            vid = v.id
+            ops = by_vehicle.get(vid, [])
+            if not ops:
+                vehicle_status[vid] = "done"
+                vehicle_zone[vid] = None
+                continue
 
-        # Apply control every step
-        control_result = apply_control(approaching, records, state, scheduler, sim_time)
+            if sim_time < v.arrival_time:
+                vehicle_status[vid] = "arriving"
+                vehicle_zone[vid] = None
+                continue
 
-        # Capture snapshot every step for animation
-        snap = SimSnapshot(
+            # Find which op is active right now
+            active_op = None
+            for op in ops:
+                if op.start_time <= sim_time < op.finish_time:
+                    active_op = op
+                    break
+
+            last_op = ops[-1]
+
+            if sim_time >= last_op.finish_time:
+                vehicle_status[vid] = "done"
+                vehicle_zone[vid] = None
+            elif active_op is not None:
+                vehicle_status[vid] = "crossing"
+                vehicle_zone[vid] = active_op.zone_id
+                zone_occupants[active_op.zone_id] = vid
+                # Detect release: just started this op
+                if abs(active_op.start_time - sim_time) < SIM_STEP_SECONDS + 1e-6:
+                    released_now.append(vid)
+            else:
+                # Between ops or before first op but after arrival
+                vehicle_status[vid] = "waiting"
+                vehicle_zone[vid] = None
+                waiting_vids.append(vid)
+
+        # Build JSSP graph from remaining unfinished ops
+        jssp_g = _build_jssp_graph(schedule, sim_time, scenario) if HAS_NX else None
+
+        snapshots.append(SimSnapshot(
             sim_time=sim_time,
-            vehicle_statuses={r.vehicle_id: r.status for r in records},
-            vehicle_zone={
-                r.vehicle_id: (r.route[r.current_zone_idx] if r.status == "crossing" else None)
-                for r in records
-            },
-            vehicle_progress={
-                r.vehicle_id: (
-                    (sim_time - r.zone_enter_time) / max(r.zone_exit_time - r.zone_enter_time, 1e-9)
-                    if r.status == "crossing" else 0.0
-                )
-                for r in records
-            },
-            zone_occupants=dict(state.zone_occupants),
-        )
-        snapshots.append(snap)
+            vehicle_zone=vehicle_zone,
+            vehicle_status=vehicle_status,
+            zone_occupants=zone_occupants,
+            released_now=released_now,
+            waiting_vids=waiting_vids,
+            jssp_graph=jssp_g,
+        ))
 
-        # Debug print at decision_period intervals
-        if sim_time + 1e-9 >= next_decision_time:
-            print_debug_step(sim_time, approaching, control_result, decision_number)
-            next_decision_time = sim_time + decision_period
-            decision_number += 1
-
-        # Done when all vehicles cleared
-        if len(state.cleared_vehicles) == len(records):
-            print(f"\n[t={sim_time:.1f}s] All {len(records)} vehicles cleared.")
+        # Stop once all vehicles are done
+        if all(s == "done" for s in vehicle_status.values()):
             break
 
-    # Compute final metrics using env state
-    env = scheduler.env
-    wt  = episode_waiting_time(env)
-    ms  = episode_makespan(env)
-    stats = {
-        "waiting_time": wt,
-        "makespan":     ms,
-        "steps":        step_count,
-        "sim_time":     sim_time,
-        "scheduler":    scheduler.name,
-    }
-    print(f"\nResults: waiting_time={wt:.3f}s  makespan={ms:.3f}s")
-    return snapshots, stats
+    return snapshots
 
 
-# ── Animation ─────────────────────────────────────────────────────────────────
+def _build_jssp_graph(schedule: List[ScheduledOp], sim_time: float, scenario: Scenario) -> "nx.DiGraph":
+    """Build a JSSP graph showing remaining (unfinished) operations."""
+    g = nx.DiGraph()
+
+    active = [op for op in schedule if op.finish_time > sim_time]
+    if not active:
+        return g
+
+    # Nodes
+    for op in active:
+        node_id = f"v{op.vehicle_id}_z{op.zone_id}"
+        status = "crossing" if op.start_time <= sim_time < op.finish_time else "pending"
+        g.add_node(node_id, vehicle_id=op.vehicle_id, zone_id=op.zone_id,
+                   route_position=op.route_position, processing_time=op.processing_time,
+                   start_time=op.start_time, status=status)
+
+    # Type-1: route order within each vehicle
+    by_vid: Dict[int, List[ScheduledOp]] = {}
+    for op in active:
+        by_vid.setdefault(op.vehicle_id, []).append(op)
+    for vid, ops in by_vid.items():
+        ops_sorted = sorted(ops, key=lambda o: o.route_position)
+        for i in range(len(ops_sorted) - 1):
+            src = f"v{ops_sorted[i].vehicle_id}_z{ops_sorted[i].zone_id}"
+            dst = f"v{ops_sorted[i+1].vehicle_id}_z{ops_sorted[i+1].zone_id}"
+            if g.has_node(src) and g.has_node(dst):
+                g.add_edge(src, dst, edge_type="type1_precedence")
+
+    # Type-2: same-lane ordering
+    man_by_vid = {v.id: scenario.manoeuvres[v.id] for v in scenario.vehicles}
+    by_lane: Dict[str, List[int]] = {}
+    for vid in by_vid:
+        lane = _MANOEUVRE_TO_LANE.get(man_by_vid.get(vid, ""), "")
+        by_lane.setdefault(lane, []).append(vid)
+    for lane_vids in by_lane.values():
+        sorted_vids = sorted(lane_vids, key=lambda vid: next(
+            v.arrival_time for v in scenario.vehicles if v.id == vid))
+        for i in range(len(sorted_vids) - 1):
+            e_ops = sorted(by_vid.get(sorted_vids[i], []), key=lambda o: o.route_position)
+            l_ops = sorted(by_vid.get(sorted_vids[i+1], []), key=lambda o: o.route_position)
+            if e_ops and l_ops:
+                src = f"v{e_ops[0].vehicle_id}_z{e_ops[0].zone_id}"
+                dst = f"v{l_ops[0].vehicle_id}_z{l_ops[0].zone_id}"
+                if g.has_node(src) and g.has_node(dst):
+                    g.add_edge(src, dst, edge_type="type2_same_lane_order")
+
+    # Type-3: zone conflicts
+    zone_to_nodes: Dict[int, List[str]] = {}
+    for node_id, attrs in g.nodes(data=True):
+        zone_to_nodes.setdefault(attrs["zone_id"], []).append(node_id)
+    for zone_id, node_ids in zone_to_nodes.items():
+        for i in range(len(node_ids)):
+            for j in range(i + 1, len(node_ids)):
+                a, b = node_ids[i], node_ids[j]
+                if g.nodes[a]["vehicle_id"] != g.nodes[b]["vehicle_id"]:
+                    g.add_edge(a, b, edge_type="type3_conflict")
+                    g.add_edge(b, a, edge_type="type3_conflict")
+
+    return g
+
+
+# ── Animation ──────────────────────────────────────────────────────────────────
 
 def animate(
     snapshots: List[SimSnapshot],
     scenario: Scenario,
     title: str,
-    fps: int = 30,
-    playback_speed: float = 2.0,
+    fps: int = 15,
+    playback_speed: float = 0.3,
 ) -> None:
-    # Sub-sample snapshots to match fps and playback speed
-    step_dt = SIM_STEP_SECONDS
-    skip = max(1, int(playback_speed / (fps * step_dt)))
+    skip = max(1, int(playback_speed / (fps * SIM_STEP_SECONDS)))
     frames = snapshots[::skip]
 
-    fig, ax = plt.subplots(figsize=(9, 9))
-    fig.patch.set_facecolor("#1a1a2e")
-    ax.set_facecolor("#16213e")
-    ax.set_xlim(-0.8, 2.8)
-    ax.set_ylim(-0.8, 2.8)
-    ax.set_aspect("equal")
-    ax.axis("off")
-    fig.suptitle(title, color="white", fontsize=13, fontweight="bold")
+    has_jssp = HAS_NX and any(f.jssp_graph is not None for f in frames)
+    if has_jssp:
+        fig = plt.figure(figsize=(18, 8))
+        fig.patch.set_facecolor("#1a1a2e")
+        gs = fig.add_gridspec(1, 3, width_ratios=[1.0, 1.6, 0.7], wspace=0.08)
+        ax_map   = fig.add_subplot(gs[0])
+        ax_jssp  = fig.add_subplot(gs[1])
+        ax_panel = fig.add_subplot(gs[2])
+    else:
+        fig = plt.figure(figsize=(13, 8))
+        fig.patch.set_facecolor("#1a1a2e")
+        gs = fig.add_gridspec(1, 2, width_ratios=[1.0, 0.7], wspace=0.08)
+        ax_map   = fig.add_subplot(gs[0])
+        ax_jssp  = None
+        ax_panel = fig.add_subplot(gs[1])
 
-    # Road background
-    ax.fill_between([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
-    ax.fill_betweenx([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
-    # Lane dashes
-    for pos in [0.0, 2.0]:
-        ax.plot([0.95, 1.05], [pos, pos], "--", color="#f39c12", lw=1, alpha=0.5, zorder=2)
-        ax.plot([pos, pos], [0.95, 1.05], "--", color="#f39c12", lw=1, alpha=0.5, zorder=2)
+    fig.suptitle(title, color="white", fontsize=12, fontweight="bold")
 
-    # Zone circles
+    # ── Intersection map ──────────────────────────────────────────────────────
+    ax_map.set_facecolor("#16213e")
+    ax_map.set_xlim(-0.8, 2.8)
+    ax_map.set_ylim(-0.8, 2.8)
+    ax_map.set_aspect("equal")
+    ax_map.axis("off")
+    ax_map.set_title("Intersection", color="white", fontsize=10)
+
+    ax_map.fill_between([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
+    ax_map.fill_betweenx([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
+
+    _draw_lane_arrows(ax_map, scenario)
+
     zone_patches: Dict[int, plt.Circle] = {}
     for zid, (x, y) in ZONE_POSITIONS.items():
         base = "#fadbd8" if zid in CENTRE_ZONES else "#fdebd0" if zid in EDGE_ZONES else "#d6eaf8"
-        c = plt.Circle((x, y), 0.32, color=base, zorder=3, alpha=0.9)
-        ax.add_patch(c)
+        c = plt.Circle((x, y), 0.28, color=base, zorder=3, alpha=0.85)
+        ax_map.add_patch(c)
         zone_patches[zid] = c
-        ax.text(x, y - 0.42, f"z{zid}", ha="center", va="center",
-                fontsize=7, color="#bdc3c7", zorder=4)
+        ax_map.text(x, y, f"z{zid}", ha="center", va="center",
+                    fontsize=7, color="#2c3e50", fontweight="bold", zorder=4)
 
-    # Vehicle circles + labels
-    veh_patches: Dict[str, plt.Circle] = {}
-    veh_texts:   Dict[str, plt.Text]   = {}
+    veh_patches: Dict[int, plt.Circle] = {}
+    veh_texts: Dict[int, plt.Text] = {}
     for v in scenario.vehicles:
-        vid = f"v{v.id}"
         col = VEHICLE_COLORS[v.id % len(VEHICLE_COLORS)]
-        c = plt.Circle((0, 0), 0.13, color=col, zorder=6, visible=False)
-        ax.add_patch(c)
-        veh_patches[vid] = c
-        t = ax.text(0, 0, vid, ha="center", va="center",
-                    fontsize=6, color="white", fontweight="bold", zorder=7, visible=False)
-        veh_texts[vid] = t
+        c = plt.Circle((0, 0), 0.12, color=col, zorder=6, visible=False)
+        ax_map.add_patch(c)
+        veh_patches[v.id] = c
+        t = ax_map.text(0, 0, f"v{v.id}", ha="center", va="center",
+                        fontsize=5, color="white", fontweight="bold", zorder=7, visible=False)
+        veh_texts[v.id] = t
 
-    # Direction labels
-    for label, (x, y) in [("N",(1.0,2.7)),("S",(1.0,-0.7)),("W",(-0.7,1.0)),("E",(2.7,1.0))]:
-        ax.text(x, y, label, ha="center", va="center", color="#95a5a6",
-                fontsize=11, fontweight="bold", zorder=2)
+    for label, (x, y) in [("N",(1.0,2.7)),("S",(1.0,-0.65)),("W",(-0.65,1.0)),("E",(2.65,1.0))]:
+        ax_map.text(x, y, label, ha="center", va="center", color="#95a5a6",
+                    fontsize=11, fontweight="bold", zorder=2)
 
-    # Clock + stats
-    time_text  = ax.text(1.0, -0.6,  "", ha="center", color="white", fontsize=10, zorder=8)
-    stats_text = ax.text(-0.75, 2.72, "", ha="left", color="#ecf0f1",
-                         fontsize=7, va="top", zorder=8, family="monospace")
+    time_text = ax_map.text(1.0, -0.58, "", ha="center", color="white", fontsize=9, zorder=8)
 
-    # Legend
     handles = [
         mpatches.Patch(color=VEHICLE_COLORS[v.id % len(VEHICLE_COLORS)],
-                       label=f"v{v.id} {scenario.manoeuvres[i]} (arr {v.arrival_time:.1f}s)")
-        for i, v in enumerate(scenario.vehicles)
+                       label=f"v{v.id} {scenario.manoeuvres[v.id]} (arr {v.arrival_time:.1f}s)")
+        for v in scenario.vehicles
     ]
-    ax.legend(handles=handles, loc="lower right", fontsize=6,
-              facecolor="#0f3460", edgecolor="#e94560", labelcolor="white")
+    ax_map.legend(handles=handles, loc="lower right", fontsize=5,
+                  facecolor="#0f3460", edgecolor="#e94560", labelcolor="white")
 
-    def _vehicle_display_pos(snap: SimSnapshot, vid: str) -> Optional[Tuple[float, float]]:
-        status = snap.vehicle_statuses.get(vid, "arriving")
-        if status == "arriving":
+    # ── Debug panel ───────────────────────────────────────────────────────────
+    ax_panel.set_facecolor("#16213e")
+    ax_panel.axis("off")
+    ax_panel.set_title("Debug", color="white", fontsize=10)
+    panel_text_obj = ax_panel.text(
+        0.02, 0.98, "", ha="left", va="top",
+        family="monospace", fontsize=7, color="#ecf0f1",
+        transform=ax_panel.transAxes,
+    )
+
+    def _vehicle_map_pos(snap: SimSnapshot, vid: int) -> Optional[Tuple[float, float]]:
+        status = snap.vehicle_status.get(vid, "arriving")
+        if status in ("arriving", "done"):
             return None
-        if status == "done":
-            return None
-        zone_id = snap.vehicle_zone.get(vid)
+        if status == "crossing":
+            zone_id = snap.vehicle_zone.get(vid)
+            if zone_id is not None:
+                return float(ZONE_POSITIONS[zone_id][0]), float(ZONE_POSITIONS[zone_id][1])
+        # waiting — show outside first zone of vehicle's route
+        v = next(v for v in scenario.vehicles if v.id == vid)
+        zone_id = v.route[0]
+        x, y = ZONE_POSITIONS[zone_id]
+        cx, cy = 1.0, 1.0
+        dx, dy = x - cx, y - cy
+        dist = max(np.sqrt(dx**2 + dy**2), 1e-9)
+        return x + dx / dist * 0.55, y + dy / dist * 0.55
 
-        if status == "crossing" and zone_id is not None:
-            x, y = ZONE_POSITIONS[zone_id]
-            return float(x), float(y)
+    def _draw_jssp_frame(snap: SimSnapshot) -> None:
+        if ax_jssp is None:
+            return
+        ax_jssp.clear()
+        ax_jssp.set_facecolor("#16213e")
+        ax_jssp.axis("off")
+        ax_jssp.set_title("JSSP Timing-Conflict Graph", color="white", fontsize=10)
 
-        if status == "waiting":
-            # Show vehicle hovering just outside its next zone
-            vi = next(v for v in scenario.vehicles if f"v{v.id}" == vid)
-            rec_route = vi.route
-            # Find current zone_idx from scenario
-            next_zone = rec_route[0]
-            for other_snap_vid, oz in snap.vehicle_zone.items():
-                if other_snap_vid == vid and oz is not None:
-                    next_zone = oz
-                    break
-            x, y = ZONE_POSITIONS[next_zone]
-            cx, cy = 1.0, 1.0
-            dx, dy = x - cx, y - cy
-            dist = max(np.sqrt(dx**2 + dy**2), 1e-9)
-            return x + dx/dist * 0.55, y + dy/dist * 0.55
+        g = snap.jssp_graph
+        if g is None or g.number_of_nodes() == 0:
+            ax_jssp.text(0.5, 0.5, "No active operations", ha="center", va="center",
+                         color="#95a5a6", transform=ax_jssp.transAxes, fontsize=10)
+            return
 
-        return None
+        # Position: route_position as x, vehicle as y row
+        vid_to_row = {v.id: -float(i) for i, v in enumerate(scenario.vehicles)}
+        pos = {}
+        for node_id, attrs in g.nodes(data=True):
+            pos[node_id] = (float(attrs["route_position"]), vid_to_row.get(attrs["vehicle_id"], 0.0))
+
+        t1, t2, t3_pairs = [], [], set()
+        for src, dst, attrs in g.edges(data=True):
+            et = attrs.get("edge_type", "")
+            if et == "type1_precedence":
+                t1.append((src, dst))
+            elif et == "type2_same_lane_order":
+                t2.append((src, dst))
+            elif et == "type3_conflict":
+                t3_pairs.add(tuple(sorted([src, dst])))
+        t3 = list(t3_pairs)
+
+        node_colors, edge_colors, edge_widths, node_sizes, labels = [], [], [], [], {}
+        for node_id, attrs in g.nodes(data=True):
+            vid = attrs["vehicle_id"]
+            node_colors.append(VEHICLE_COLORS[vid % len(VEHICLE_COLORS)])
+            status = attrs.get("status", "pending")
+            if status == "crossing":
+                edge_colors.append(ACTIVE_COLOR)
+                edge_widths.append(3.5)
+                node_sizes.append(900)
+            elif vid in snap.waiting_vids:
+                edge_colors.append(STOPPED_COLOR)
+                edge_widths.append(2.5)
+                node_sizes.append(800)
+            else:
+                edge_colors.append("#555555")
+                edge_widths.append(1.2)
+                node_sizes.append(700)
+            labels[node_id] = f"v{vid}\nz{attrs['zone_id']}\n{attrs['processing_time']:.1f}s"
+
+        nx.draw_networkx_edges(g, pos, edgelist=t1, edge_color=TYPE1_COLOR,
+                               arrows=True, arrowstyle="-|>", width=2.0,
+                               connectionstyle="arc3,rad=0.05", ax=ax_jssp)
+        nx.draw_networkx_edges(g, pos, edgelist=t2, edge_color=TYPE2_COLOR,
+                               arrows=True, arrowstyle="-|>", style="dashed",
+                               width=1.8, connectionstyle="arc3,rad=0.18", ax=ax_jssp)
+        g_t3 = nx.Graph()
+        g_t3.add_nodes_from(g.nodes())
+        g_t3.add_edges_from(t3)
+        nx.draw_networkx_edges(g_t3, pos, edge_color=TYPE3_COLOR,
+                               style="dotted", width=1.5, alpha=0.8, ax=ax_jssp)
+        nx.draw_networkx_nodes(g, pos, node_color=node_colors, node_size=node_sizes,
+                               edgecolors=edge_colors, linewidths=edge_widths, ax=ax_jssp)
+        nx.draw_networkx_labels(g, pos, labels=labels, font_size=5,
+                                font_color="white", ax=ax_jssp)
+        ax_jssp.margins(x=0.25, y=0.25)
+
+        legend = [
+            mlines.Line2D([0],[0], color=TYPE1_COLOR, lw=2, label="Type-1 route order"),
+            mlines.Line2D([0],[0], color=TYPE2_COLOR, lw=2, ls="--", label="Type-2 lane order"),
+            mlines.Line2D([0],[0], color=TYPE3_COLOR, lw=1.5, ls=":", label="Type-3 conflict"),
+            mlines.Line2D([0],[0], marker="o", color="w", markerfacecolor="#888",
+                          markeredgecolor=ACTIVE_COLOR, markeredgewidth=2.5, markersize=8, label="Crossing"),
+            mlines.Line2D([0],[0], marker="o", color="w", markerfacecolor="#888",
+                          markeredgecolor=STOPPED_COLOR, markeredgewidth=2.5, markersize=8, label="Waiting"),
+        ]
+        ax_jssp.legend(handles=legend, loc="upper left", fontsize=6,
+                       facecolor="#0f3460", edgecolor="#555", labelcolor="white")
 
     def update(frame_idx: int):
         snap = frames[frame_idx]
 
-        # Zone colours
         for zid, patch in zone_patches.items():
             occupant = snap.zone_occupants.get(zid)
             if occupant is not None:
-                vid_idx = int(occupant[1:])
-                patch.set_facecolor(VEHICLE_COLORS[vid_idx % len(VEHICLE_COLORS)])
+                patch.set_facecolor(VEHICLE_COLORS[occupant % len(VEHICLE_COLORS)])
                 patch.set_alpha(0.95)
             else:
                 base = "#fadbd8" if zid in CENTRE_ZONES else "#fdebd0" if zid in EDGE_ZONES else "#d6eaf8"
                 patch.set_facecolor(base)
-                patch.set_alpha(0.9)
+                patch.set_alpha(0.85)
 
-        # Vehicle positions
         for v in scenario.vehicles:
-            vid = f"v{v.id}"
-            pos = _vehicle_display_pos(snap, vid)
-            patch = veh_patches[vid]
-            txt   = veh_texts[vid]
+            pos = _vehicle_map_pos(snap, v.id)
             if pos is None:
-                patch.set_visible(False)
-                txt.set_visible(False)
+                veh_patches[v.id].set_visible(False)
+                veh_texts[v.id].set_visible(False)
             else:
-                patch.center = pos
-                txt.set_position(pos)
-                patch.set_visible(True)
-                txt.set_visible(True)
+                veh_patches[v.id].center = pos
+                veh_texts[v.id].set_position(pos)
+                veh_patches[v.id].set_visible(True)
+                veh_texts[v.id].set_visible(True)
 
-        # Clock
         time_text.set_text(f"t = {snap.sim_time:.2f}s")
+        _draw_jssp_frame(snap)
 
-        # Stats
-        done_count = sum(1 for s in snap.vehicle_statuses.values() if s == "done")
-        active = [vid for vid, s in snap.vehicle_statuses.items() if s == "crossing"]
-        stats_text.set_text(
-            f"Vehicles done:  {done_count}/{len(scenario.vehicles)}\n"
-            f"Active in zone: {', '.join(active) or '—'}\n"
-            f"Held:           {', '.join(vid for vid, s in snap.vehicle_statuses.items() if s == 'waiting') or '—'}"
+        done_count = sum(1 for s in snap.vehicle_status.values() if s == "done")
+        active_vids = [f"v{vid}" for vid, s in snap.vehicle_status.items() if s == "crossing"]
+        held_vids   = [f"v{vid}" for vid in snap.waiting_vids]
+        g = snap.jssp_graph
+        t1c = t2c = t3c = 0
+        if g is not None:
+            for _, _, d in g.edges(data=True):
+                et = d.get("edge_type", "")
+                if et == "type1_precedence":   t1c += 1
+                elif et == "type2_same_lane_order": t2c += 1
+                elif et == "type3_conflict":   t3c += 1
+            t3c //= 2
+        panel_text_obj.set_text(
+            f"t = {snap.sim_time:.2f}s\n"
+            f"Done:    {done_count}/{len(scenario.vehicles)}\n"
+            f"Crossing:{', '.join(active_vids) or '—'}\n"
+            f"Waiting: {', '.join(held_vids) or '—'}\n"
+            "\nGraph edges\n"
+            "-----------\n"
+            f"T1 (route):   {t1c}\n"
+            f"T2 (lane):    {t2c}\n"
+            f"T3 (conflict):{t3c}\n"
+            f"Nodes:        {g.number_of_nodes() if g else 0}\n"
+            "\nVehicles\n"
+            "--------\n" +
+            "\n".join(
+                f"v{v.id} {scenario.manoeuvres[v.id]}\n"
+                f"  arr={v.arrival_time:.1f}s "
+                f"  {snap.vehicle_status.get(v.id, '?')}"
+                for v in scenario.vehicles
+            )
         )
-
-        return (list(zone_patches.values()) + list(veh_patches.values()) +
-                list(veh_texts.values()) + [time_text, stats_text])
 
     fig._anim = animation.FuncAnimation(
         fig, update, frames=len(frames), interval=1000 // fps, blit=False
@@ -561,37 +617,49 @@ def animate(
     plt.show()
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# ── Lane arrow drawing ─────────────────────────────────────────────────────────
+
+def _draw_lane_arrows(ax: plt.Axes, scenario: Scenario) -> None:
+    seen = set()
+    for v in scenario.vehicles:
+        key = tuple(v.route)
+        if key in seen:
+            continue
+        seen.add(key)
+        for i in range(len(v.route) - 1):
+            x0, y0 = ZONE_POSITIONS[v.route[i]]
+            x1, y1 = ZONE_POSITIONS[v.route[i + 1]]
+            ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                        arrowprops=dict(arrowstyle="-|>", color="#7f8c8d", lw=1.0, alpha=0.4),
+                        zorder=2)
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Abstract intersection simulation — mirrors FCFS TraCI controller structure."
-    )
-    parser.add_argument("--checkpoint", default="results/checkpoint_best.pt",
-                        help="Path to HGT policy checkpoint")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", default="results/checkpoint_best.pt")
     parser.add_argument("--mode", choices=["hgt", "igreedy", "both"], default="hgt")
     parser.add_argument("--difficulty", choices=["easy", "medium", "hard"], default="hard")
     parser.add_argument("--n_vehicles", type=int, default=None)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--decision-period", type=float, default=1.0,
-                        help="Seconds between debug log lines (mirrors --decision-period)")
-    parser.add_argument("--speed", type=float, default=2.0,
-                        help="Animation playback speed multiplier")
-    parser.add_argument("--no-gui", action="store_true",
-                        help="Run headless (no animation window)")
+    parser.add_argument("--speed", type=float, default=0.3)
+    parser.add_argument("--no-gui", action="store_true")
     args = parser.parse_args()
+
+    if not HAS_NX and not args.no_gui:
+        print("Warning: networkx not installed — JSSP panel skipped. pip install networkx")
 
     gen = ScenarioGenerator(seed=args.seed)
     n = args.n_vehicles or {"easy": 2, "medium": 4, "hard": 5}[args.difficulty]
     scenario = getattr(gen, args.difficulty)(n_vehicles=n)
 
     print(f"Scenario: {args.difficulty}, {n} vehicles, seed={args.seed}")
-    for v, m in zip(scenario.vehicles, scenario.manoeuvres):
-        print(f"  v{v.id}: {m:5s}  route={v.route}  "
+    for v in scenario.vehicles:
+        print(f"  v{v.id}: {scenario.manoeuvres[v.id]:5s}  route={v.route}  "
               f"arrival={v.arrival_time:.2f}s  vel={v.velocity:.1f}m/s")
 
     env = IntersectionEnv()
-
     modes = ["hgt", "igreedy"] if args.mode == "both" else [args.mode]
 
     for mode in modes:
@@ -604,24 +672,21 @@ def main() -> None:
                 policy.load_state_dict(ckpt)
             policy.eval()
             print(f"\nLoaded checkpoint: {args.checkpoint}")
-            scheduler = HGTScheduler(policy, env)
+            schedule = run_hgt_episode(policy, env, scenario)
         else:
-            scheduler = IGreedyScheduler(env)
+            schedule = run_igreedy_episode(env, scenario)
 
-        scheduler.set_scenario(scenario)
-
-        snapshots, stats = run_simulation(
-            scenario=scenario,
-            scheduler=scheduler,
-            decision_period=args.decision_period,
-        )
+        print_schedule(schedule, scenario, mode, env)
 
         if not args.no_gui:
+            wt = episode_waiting_time(env)
+            ms = episode_makespan(env)
             title = (
                 f"{'HGT Policy' if mode == 'hgt' else 'iGreedy'}  —  "
                 f"{args.difficulty} ({n} vehicles)  |  "
-                f"wt={stats['waiting_time']:.2f}s  mkspan={stats['makespan']:.2f}s"
+                f"wt={wt:.2f}s  mkspan={ms:.2f}s"
             )
+            snapshots = build_snapshots(schedule, scenario)
             animate(snapshots, scenario, title, playback_speed=args.speed)
 
 
