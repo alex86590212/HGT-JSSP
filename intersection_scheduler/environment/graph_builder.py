@@ -86,7 +86,7 @@ def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
     zone_feats = []
     for zid in zone_ids:
         z = zones[zid]
-        occ = 1.0 if z.occupied else 0.0
+        occ = 1.0 if z.time_free > env.current_time + 1e-9 else 0.0
         tf = z.time_free / max_tf
         nc = z.n_competing / max_nc_z
         zone_feats.append([occ, tf, nc, z.x, z.y])

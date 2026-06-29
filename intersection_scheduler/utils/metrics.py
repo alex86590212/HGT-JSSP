@@ -48,14 +48,18 @@ def igreedy(env: "IntersectionEnv", scenario: "Scenario") -> float:
     Rule: at each step pick the feasible op belonging to the vehicle
     with the earliest arrival time; break ties by route position.
     """
-    from intersection_scheduler.environment.feasibility import compute_feasible_set
+    from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
 
     env.reset(scenario.vehicles)
     done = False
     while not done:
         mask = compute_feasible_set(env)
         if not mask.any():
-            break
+            next_t = next_feasible_time(env)
+            if next_t is None:
+                break
+            env.current_time = next_t
+            continue
 
         best_idx: Optional[int] = None
         best_key: Optional[Tuple] = None
