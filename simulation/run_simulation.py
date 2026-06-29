@@ -47,7 +47,7 @@ from intersection_scheduler.data.scenario_generator import (
     ZONE_POSITIONS, ROUTES, SAME_LANE_GROUPS, ScenarioGenerator, Scenario,
 )
 from intersection_scheduler.environment.intersection import IntersectionEnv
-from intersection_scheduler.environment.feasibility import compute_feasible_set
+from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
 from intersection_scheduler.environment.graph_builder import build_hetero_graph
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.utils.metrics import episode_waiting_time, episode_makespan
@@ -103,7 +103,7 @@ def run_hgt_episode(policy: SchedulingPolicy, env: IntersectionEnv, scenario: Sc
             # Advance time to the earliest moment an op becomes schedulable.
             # This handles cases where all feasible ops are blocked only by
             # zone_free or arrival_time being in the near future.
-            next_event = _next_feasible_time(env)
+            next_event = next_feasible_time(env)
             if next_event is None:
                 break  # genuine deadlock — shouldn't happen in valid scenarios
             env.current_time = next_event
@@ -115,44 +115,6 @@ def run_hgt_episode(policy: SchedulingPolicy, env: IntersectionEnv, scenario: Sc
     return _extract_schedule(env)
 
 
-def _next_feasible_time(env: IntersectionEnv) -> Optional[float]:
-    """Return the earliest time at which any unscheduled op could become schedulable."""
-    candidates = []
-    for op in env.operations:
-        if op.scheduled:
-            continue
-        v = next((v for v in env.vehicles if v.id == op.vehicle_id), None)
-        if v is None:
-            continue
-        # Predecessor must be scheduled for this op to ever be considered
-        if op.route_position > 0:
-            pred = next((o for o in env.operations
-                         if o.vehicle_id == op.vehicle_id and o.route_position == op.route_position - 1), None)
-            if pred is None or not pred.scheduled:
-                continue
-        # Earliest this op can start = max(arrival, zone_free, pred finish)
-        zone = env.zones.get(op.zone_id)
-        zone_free = zone.time_free if zone else 0.0
-        pred_finish = 0.0
-        if op.route_position > 0:
-            pred = next((o for o in env.operations
-                         if o.vehicle_id == op.vehicle_id and o.route_position == op.route_position - 1), None)
-            pred_finish = pred.earliest_finish if pred else 0.0
-        earliest = max(v.arrival_time, zone_free, pred_finish)
-        candidates.append(earliest)
-    # Also consider vehicles whose first op's predecessor constraint is arrival_time
-    for op in env.operations:
-        if op.scheduled or op.route_position != 0:
-            continue
-        v = next((v for v in env.vehicles if v.id == op.vehicle_id), None)
-        if v is None:
-            continue
-        zone = env.zones.get(op.zone_id)
-        zone_free = zone.time_free if zone else 0.0
-        earliest = max(v.arrival_time, zone_free)
-        candidates.append(earliest)
-    return min(candidates) if candidates else None
-
 
 def run_igreedy_episode(env: IntersectionEnv, scenario: Scenario) -> List[ScheduledOp]:
     """Run iGreedy: earliest arrival first, tie-break by route position."""
@@ -161,7 +123,7 @@ def run_igreedy_episode(env: IntersectionEnv, scenario: Scenario) -> List[Schedu
     while not done:
         mask = compute_feasible_set(env)
         if not mask.any():
-            next_event = _next_feasible_time(env)
+            next_event = next_feasible_time(env)
             if next_event is None:
                 break
             env.current_time = next_event

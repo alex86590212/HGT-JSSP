@@ -14,7 +14,7 @@ from intersection_scheduler.data.scenario_generator import (
     ScenarioGenerator,
     get_curriculum_scenario,
 )
-from intersection_scheduler.environment.feasibility import compute_feasible_set
+from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
 from intersection_scheduler.environment.graph_builder import build_hetero_graph
 from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.model.policy import SchedulingPolicy
@@ -43,8 +43,11 @@ def run_episode(
         feasible_mask = compute_feasible_set(env)
 
         if not feasible_mask.any():
-            # Should not happen in a valid scenario, but guard anyway
-            break
+            next_t = next_feasible_time(env)
+            if next_t is None:
+                break
+            env.current_time = next_t
+            continue
 
         with torch.no_grad() if deterministic else torch.enable_grad():
             dist, value = policy(data, feasible_mask)

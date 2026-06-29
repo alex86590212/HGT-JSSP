@@ -10,6 +10,34 @@ if TYPE_CHECKING:
     from intersection_scheduler.environment.intersection import IntersectionEnv, Operation
 
 
+def next_feasible_time(env: "IntersectionEnv") -> Optional[float]:
+    """Return the earliest time at which any unscheduled op could become schedulable.
+
+    Called when compute_feasible_set returns an all-False mask but the episode
+    is not done — meaning all remaining ops are blocked only by zone_free or
+    arrival_time being in the near future, not by a logical conflict.
+    Advancing env.current_time to this value unblocks at least one op.
+    """
+    candidates = []
+    for op in env.operations:
+        if op.scheduled:
+            continue
+        v = next((v for v in env.vehicles if v.id == op.vehicle_id), None)
+        if v is None:
+            continue
+        zone = env.zones.get(op.zone_id)
+        zone_free = zone.time_free if zone else 0.0
+        if op.route_position == 0:
+            candidates.append(max(v.arrival_time, zone_free))
+        else:
+            pred = next((o for o in env.operations
+                         if o.vehicle_id == op.vehicle_id
+                         and o.route_position == op.route_position - 1), None)
+            if pred is not None and pred.scheduled:
+                candidates.append(max(v.arrival_time, zone_free, pred.earliest_finish))
+    return min(candidates) if candidates else None
+
+
 def compute_feasible_set(env: "IntersectionEnv") -> torch.BoolTensor:
     """Return bool mask [num_ops] where True = op is in A(t)."""
     n = len(env.operations)
