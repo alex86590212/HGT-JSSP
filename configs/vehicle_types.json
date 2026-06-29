@@ -1,0 +1,14 @@
+{
+  "processing_time_by_type": {
+    "passenger": 1.8,
+    "delivery": 2.2,
+    "truck": 2.8,
+    "bus": 2.8
+  },
+  "class_groups": {
+    "car": ["passenger", "delivery"],
+    "truck": ["truck"],
+    "bus": ["bus"]
+  }
+}
+

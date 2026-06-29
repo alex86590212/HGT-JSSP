@@ -1,0 +1,39 @@
+{
+  "sumo_configs": {
+    "baseline": "sumo/single_intersection/single_intersection.sumocfg",
+    "hard": "sumo/single_intersection/single_intersection_hard.sumocfg"
+  },
+  "junction_id": "J0",
+  "incoming_lanes": ["N_in_0", "S_in_0", "E_in_0", "W_in_0"],
+  "incoming_edges": ["N_in", "S_in", "E_in", "W_in"],
+  "control": {
+    "detection_distance_m": 180.0,
+    "hold_distance_m": 90.0,
+    "stop_distance_m": 8.0,
+    "min_eta_speed_mps": 0.1,
+    "release_lookahead_s": 0.0
+  },
+  "scheduling": {
+    "conflict_zone_clearance_s": 1.0,
+    "same_lane_clearance_s": 1.0
+  },
+  "conflict_zone_geometry": {
+    "zone_half_size_m": 8.0,
+    "overlap_tolerance_s": 0.0
+  },
+  "route_to_conflict_zones": {
+    "E_to_W": ["z1", "z2"],
+    "W_to_E": ["z3", "z4"],
+    "N_to_S": ["z2", "z3"],
+    "S_to_N": ["z4", "z1"],
+    "E_to_N": ["z1", "z4"],
+    "N_to_W": ["z2", "z1"],
+    "W_to_S": ["z3", "z2"],
+    "S_to_E": ["z4", "z3"],
+    "E_to_S": ["z1", "z2", "z3"],
+    "N_to_E": ["z2", "z3", "z4"],
+    "W_to_N": ["z3", "z4", "z1"],
+    "S_to_W": ["z4", "z1", "z2"]
+  }
+}
+

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configuration>
+    <input>
+        <net-file value="single_intersection.net.xml" />
+        <route-files value="routes.rou.xml,hard_demand.rou.xml" />
+        <additional-files value="additional.add.xml" />
+    </input>
+    <time>
+        <begin value="0.0" />
+        <end value="600.0" />
+        <step-length value="0.1" />
+    </time>
+    <report>
+        <no-step-log value="true" />
+    </report>
+    <processing>
+        <collision.action value="warn" />
+    </processing>
+</configuration>

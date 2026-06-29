@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<edges>
+    <!-- Each approach has one inbound edge (*_in, about 200 m) and one outbound edge (*_out, about 100 m). -->
+    <edge id="N_in" from="N_src" to="J0" numLanes="1" speed="13.89" priority="1" shape="-3.2,210.0 -3.2,8 0,0" />
+    <edge id="N_out" from="J0" to="N_sink" numLanes="1" speed="13.89" priority="1" shape="0,0 3.2,8 3.2,110.0" />
+    <edge id="S_in" from="S_src" to="J0" numLanes="1" speed="13.89" priority="1" shape="3.2,-210.0 3.2,-8 0,0" />
+    <edge id="S_out" from="J0" to="S_sink" numLanes="1" speed="13.89" priority="1" shape="0,0 -3.2,-8 -3.2,-110.0" />
+    <edge id="E_in" from="E_src" to="J0" numLanes="1" speed="13.89" priority="1" shape="210.0,3.2 8,3.2 0,0" />
+    <edge id="E_out" from="J0" to="E_sink" numLanes="1" speed="13.89" priority="1" shape="0,0 8,-3.2 110.0,-3.2" />
+    <edge id="W_in" from="W_src" to="J0" numLanes="1" speed="13.89" priority="1" shape="-210.0,-3.2 -8,-3.2 0,0" />
+    <edge id="W_out" from="J0" to="W_sink" numLanes="1" speed="13.89" priority="1" shape="0,0 -8,3.2 -110.0,3.2" />
+</edges>

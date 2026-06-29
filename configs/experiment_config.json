@@ -1,0 +1,12 @@
+{
+  "mode": "headless",
+  "scheduler": "fcfs",
+  "scenario": "baseline",
+  "episodes": 1,
+  "seeds": [42],
+  "until_s": 120.0,
+  "output_dir": "outputs",
+  "decision_period_s": 1.0,
+  "log_steps": false,
+  "no_warnings": true
+}

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<nodes>
+    <!-- J0 is signal-free and unregulated; source/sink nodes define the road arms. -->
+    <node id="J0" x="0.0" y="0.0" type="unregulated" />
+    <node id="N_src" x="-3.2" y="210.0" />
+    <node id="N_sink" x="3.2" y="110.0" />
+    <node id="S_src" x="3.2" y="-210.0" />
+    <node id="S_sink" x="-3.2" y="-110.0" />
+    <node id="E_src" x="210.0" y="3.2" />
+    <node id="E_sink" x="110.0" y="-3.2" />
+    <node id="W_src" x="-210.0" y="-3.2" />
+    <node id="W_sink" x="-110.0" y="3.2" />
+</nodes>

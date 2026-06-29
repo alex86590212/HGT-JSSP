@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<connections>
+    <!-- Only straight/left/right movements are allowed. U-turns are intentionally omitted. -->
+    <connection from="N_in" to="S_out" fromLane="0" toLane="0" dir="s" />
+    <connection from="N_in" to="E_out" fromLane="0" toLane="0" dir="l" />
+    <connection from="N_in" to="W_out" fromLane="0" toLane="0" dir="r" />
+    <connection from="S_in" to="N_out" fromLane="0" toLane="0" dir="s" />
+    <connection from="S_in" to="W_out" fromLane="0" toLane="0" dir="l" />
+    <connection from="S_in" to="E_out" fromLane="0" toLane="0" dir="r" />
+    <connection from="E_in" to="W_out" fromLane="0" toLane="0" dir="s" />
+    <connection from="E_in" to="S_out" fromLane="0" toLane="0" dir="l" />
+    <connection from="E_in" to="N_out" fromLane="0" toLane="0" dir="r" />
+    <connection from="W_in" to="E_out" fromLane="0" toLane="0" dir="s" />
+    <connection from="W_in" to="N_out" fromLane="0" toLane="0" dir="l" />
+    <connection from="W_in" to="S_out" fromLane="0" toLane="0" dir="r" />
+</connections>
