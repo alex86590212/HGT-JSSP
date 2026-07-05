@@ -18,7 +18,12 @@ from ortools.sat.python import cp_model
 from intersection_scheduler.data.scenario_generator import _MANOEUVRE_TO_LANE
 from intersection_scheduler.environment.intersection import Vehicle
 
-SCALE = 1000  # scale seconds -> integer milliseconds for CP-SAT
+# Scale seconds -> integer ticks for CP-SAT. At 1e5 the resolution is 0.01ms,
+# small enough that rounding the continuous processing times to integers does
+# not let the exact solver's W* drift measurably from the real (float) env —
+# at SCALE=1000 (1ms) rounding produced spurious ~0.5ms negative gaps where
+# HGT appeared to beat the "optimal".
+SCALE = 100_000
 
 
 def solve_optimal(
