@@ -49,6 +49,10 @@ def solve_optimal(
     start_vars = {}
     end_vars = {}
     intervals_by_zone: dict = {}
+    # Per-zone op records for the non-delay (no idle-insertion) constraint:
+    # (op_key, start_var, end_var). ready_lb is start's lower bound = arrival
+    # (or predecessor finish, handled via the Type-1 constraint chain).
+    ops_by_zone: dict = {}
     # Per-vehicle scaled durations, kept so min_finish uses exactly the same
     # rounded integers as the interval variables (avoids a ~1ms rounding
     # artifact where round(sum(p)) != sum(round(p))).
@@ -67,6 +71,7 @@ def solve_optimal(
             start_vars[(v.id, j)] = start
             end_vars[(v.id, j)] = end
             intervals_by_zone.setdefault(zone_id, []).append(interval)
+            ops_by_zone.setdefault(zone_id, []).append((v.id, j, start, end))
 
             # Vehicle cannot start before it arrives (position 0) — already
             # enforced by the variable's lower bound above.

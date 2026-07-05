@@ -20,6 +20,13 @@ from evaluation.optimal_solver import compute_gap, solve_optimal
 
 _LEFT_TURNS = {"N_E", "S_W", "E_S", "W_N"}
 
+# Percentage gaps are only meaningful when the optimal waiting time is not
+# near zero — dividing a small absolute gap by a ~0s optimum produces
+# thousands-of-percent artifacts. Scenarios with W* below this floor (in
+# seconds) are excluded from the percentage-gap mean but still reported in
+# the absolute-gap mean and the CSV.
+_PCT_GAP_WSTAR_FLOOR = 0.05
+
 
 def analyse_conflict_density(scenarios: List[Scenario]) -> dict:
     """Compute Type-3 conflict density stats across a list of scenarios."""
@@ -101,8 +108,10 @@ def run_tier(
     time_limit: float,
     rows: List[dict],
 ) -> dict:
-    gaps_hgt = []
-    gaps_igreedy = []
+    pct_gaps_hgt = []
+    pct_gaps_igreedy = []
+    abs_gaps_hgt = []
+    abs_gaps_igreedy = []
     solved = 0
 
     for i, scenario in enumerate(scenarios):
@@ -126,6 +135,8 @@ def run_tier(
             "W_hgt": w_hgt,
             "W_igreedy": w_ig,
             "W_star": w_star if w_star is not None else "",
+            "abs_gap_hgt": "",
+            "abs_gap_igreedy": "",
             "gap_hgt_pct": "",
             "gap_igreedy_pct": "",
             "solved": w_star is not None,
@@ -133,31 +144,49 @@ def run_tier(
 
         if w_star is not None:
             solved += 1
-            gap_hgt = compute_gap(w_hgt, w_star)
-            gap_ig = compute_gap(w_ig, w_star)
-            if gap_hgt is not None:
-                gaps_hgt.append(gap_hgt)
-                row["gap_hgt_pct"] = gap_hgt
-            if gap_ig is not None:
-                gaps_igreedy.append(gap_ig)
-                row["gap_igreedy_pct"] = gap_ig
+            # Absolute gap in seconds — always well-defined.
+            abs_hgt = w_hgt - w_star
+            abs_ig = w_ig - w_star
+            abs_gaps_hgt.append(abs_hgt)
+            abs_gaps_igreedy.append(abs_ig)
+            row["abs_gap_hgt"] = abs_hgt
+            row["abs_gap_igreedy"] = abs_ig
+
+            # Percentage gap only when the optimum is above the floor, so a
+            # near-zero W* denominator can't inflate the mean.
+            if w_star >= _PCT_GAP_WSTAR_FLOOR:
+                gap_hgt = compute_gap(w_hgt, w_star)
+                gap_ig = compute_gap(w_ig, w_star)
+                if gap_hgt is not None:
+                    pct_gaps_hgt.append(gap_hgt)
+                    row["gap_hgt_pct"] = gap_hgt
+                if gap_ig is not None:
+                    pct_gaps_igreedy.append(gap_ig)
+                    row["gap_igreedy_pct"] = gap_ig
 
         rows.append(row)
 
-    mean_gap_hgt = sum(gaps_hgt) / len(gaps_hgt) if gaps_hgt else float("nan")
-    mean_gap_ig = sum(gaps_igreedy) / len(gaps_igreedy) if gaps_igreedy else float("nan")
+    mean_pct_hgt = sum(pct_gaps_hgt) / len(pct_gaps_hgt) if pct_gaps_hgt else float("nan")
+    mean_pct_ig = sum(pct_gaps_igreedy) / len(pct_gaps_igreedy) if pct_gaps_igreedy else float("nan")
+    mean_abs_hgt = sum(abs_gaps_hgt) / len(abs_gaps_hgt) if abs_gaps_hgt else float("nan")
+    mean_abs_ig = sum(abs_gaps_igreedy) / len(abs_gaps_igreedy) if abs_gaps_igreedy else float("nan")
 
     print(
-        f"[{tier:6s}]  scenarios={len(scenarios)}  solved={solved}  "
-        f"HGT_gap={mean_gap_hgt:.1f}%  iGreedy_gap={mean_gap_ig:.1f}%",
+        f"[{tier:6s}]  solved={solved}  "
+        f"HGT: abs={mean_abs_hgt:.3f}s pct={mean_pct_hgt:.1f}%  |  "
+        f"iGreedy: abs={mean_abs_ig:.3f}s pct={mean_pct_ig:.1f}%  "
+        f"(pct over {len(pct_gaps_hgt)} scenarios with W*>={_PCT_GAP_WSTAR_FLOOR}s)",
         flush=True,
     )
 
     return {
         "n_scenarios": len(scenarios),
         "solved": solved,
-        "mean_gap_hgt": mean_gap_hgt,
-        "mean_gap_igreedy": mean_gap_ig,
+        "n_pct": len(pct_gaps_hgt),
+        "mean_abs_hgt": mean_abs_hgt,
+        "mean_abs_igreedy": mean_abs_ig,
+        "mean_pct_hgt": mean_pct_hgt,
+        "mean_pct_igreedy": mean_pct_ig,
     }
 
 
@@ -196,7 +225,8 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
         "tier", "scenario_id", "n_vehicles", "n_conflicts", "n_zones_contested",
-        "W_hgt", "W_igreedy", "W_star", "gap_hgt_pct", "gap_igreedy_pct", "solved",
+        "W_hgt", "W_igreedy", "W_star", "abs_gap_hgt", "abs_gap_igreedy",
+        "gap_hgt_pct", "gap_igreedy_pct", "solved",
     ]
     with out_path.open("w", newline="") as f:
         writer = csv_module.DictWriter(f, fieldnames=fieldnames)
@@ -206,31 +236,36 @@ def main():
 
     total_scenarios = sum(s["n_scenarios"] for s in tier_summaries.values())
     total_solved = sum(s["solved"] for s in tier_summaries.values())
-    all_gaps_hgt = [r["gap_hgt_pct"] for r in rows if r["gap_hgt_pct"] != ""]
-    all_gaps_ig = [r["gap_igreedy_pct"] for r in rows if r["gap_igreedy_pct"] != ""]
-    overall_gap_hgt = sum(all_gaps_hgt) / len(all_gaps_hgt) if all_gaps_hgt else float("nan")
-    overall_gap_ig = sum(all_gaps_ig) / len(all_gaps_ig) if all_gaps_ig else float("nan")
+    total_pct = sum(s["n_pct"] for s in tier_summaries.values())
+    all_abs_hgt = [r["abs_gap_hgt"] for r in rows if r["abs_gap_hgt"] != ""]
+    all_abs_ig = [r["abs_gap_igreedy"] for r in rows if r["abs_gap_igreedy"] != ""]
+    all_pct_hgt = [r["gap_hgt_pct"] for r in rows if r["gap_hgt_pct"] != ""]
+    all_pct_ig = [r["gap_igreedy_pct"] for r in rows if r["gap_igreedy_pct"] != ""]
+    ov_abs_hgt = sum(all_abs_hgt) / len(all_abs_hgt) if all_abs_hgt else float("nan")
+    ov_abs_ig = sum(all_abs_ig) / len(all_abs_ig) if all_abs_ig else float("nan")
+    ov_pct_hgt = sum(all_pct_hgt) / len(all_pct_hgt) if all_pct_hgt else float("nan")
+    ov_pct_ig = sum(all_pct_ig) / len(all_pct_ig) if all_pct_ig else float("nan")
 
-    print("\nFinal summary:")
+    print("\nFinal summary (abs gap = mean W - W* in seconds; pct gap over W* >= "
+          f"{_PCT_GAP_WSTAR_FLOOR}s only):")
     print(
-        f"{'Tier':8s} | {'Scenarios':9s} | {'Solved':6s} | "
-        f"{'HGT gap (mean)':>14s} | {'iGreedy gap (mean)':>18s} | {'HGT vs iGreedy':>14s}"
+        f"{'Tier':8s} | {'Solved':6s} | {'HGT abs':>8s} | {'iGrdy abs':>9s} | "
+        f"{'HGT pct':>8s} | {'iGrdy pct':>9s}"
     )
     for tier, s in tier_summaries.items():
-        hgt_vs_ig = s["mean_gap_igreedy"] - s["mean_gap_hgt"]
         print(
-            f"{tier:8s} | {s['n_scenarios']:9d} | {s['solved']:6d} | "
-            f"{s['mean_gap_hgt']:13.1f}% | {s['mean_gap_igreedy']:17.1f}% | "
-            f"{hgt_vs_ig:+13.1f}%"
+            f"{tier:8s} | {s['solved']:6d} | "
+            f"{s['mean_abs_hgt']:7.3f}s | {s['mean_abs_igreedy']:8.3f}s | "
+            f"{s['mean_pct_hgt']:7.1f}% | {s['mean_pct_igreedy']:8.1f}%"
         )
-    overall_hgt_vs_ig = overall_gap_ig - overall_gap_hgt
     print(
-        f"{'overall':8s} | {total_scenarios:9d} | {total_solved:6d} | "
-        f"{overall_gap_hgt:13.1f}% | {overall_gap_ig:17.1f}% | {overall_hgt_vs_ig:+13.1f}%"
+        f"{'overall':8s} | {total_solved:6d} | "
+        f"{ov_abs_hgt:7.3f}s | {ov_abs_ig:8.3f}s | "
+        f"{ov_pct_hgt:7.1f}% | {ov_pct_ig:8.1f}%"
     )
     print(
-        f"\nSolved {total_solved}/{total_scenarios} scenarios within time limit. "
-        f"Skipped {total_scenarios - total_solved}."
+        f"\nSolved {total_solved}/{total_scenarios} scenarios (OR-Tools proved optimal). "
+        f"Percentage gap computed over {total_pct} scenarios with W* >= {_PCT_GAP_WSTAR_FLOOR}s."
     )
 
     # Conflict density analysis (Component 3)
