@@ -627,7 +627,7 @@ def main() -> None:
     for mode in modes:
         if mode == "hgt":
             policy = SchedulingPolicy(hidden_dim=128, num_heads=4, num_layers=3)
-            ckpt = torch.load(args.checkpoint, weights_only=True)
+            ckpt = torch.load(args.checkpoint, weights_only=True, map_location="cpu")
             if isinstance(ckpt, dict) and "policy" in ckpt:
                 policy.load_state_dict(ckpt["policy"])
             else:
