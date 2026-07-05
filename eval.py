@@ -3,15 +3,50 @@
 from __future__ import annotations
 
 import argparse
+import platform
+import resource
+import time
 from pathlib import Path
 
 import torch
 import yaml
 
 from intersection_scheduler.data.scenario_generator import ScenarioGenerator
+from intersection_scheduler.environment.feasibility import compute_feasible_set
+from intersection_scheduler.environment.graph_builder import build_hetero_graph
 from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.utils.metrics import evaluate_hgt_vs_igreedy
+
+
+def profile_inference_memory(policy: SchedulingPolicy, env: IntersectionEnv, scenario) -> None:
+    """Report peak memory and latency for a single scheduling forward pass."""
+    env.reset(scenario.vehicles)
+    data = build_hetero_graph(env)
+    mask = compute_feasible_set(env)
+
+    use_cuda = torch.cuda.is_available()
+    if use_cuda:
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.synchronize()
+
+    start = time.perf_counter()
+    with torch.no_grad():
+        policy(data, mask)
+    if use_cuda:
+        torch.cuda.synchronize()
+    elapsed_ms = (time.perf_counter() - start) * 1000.0
+
+    print("\n[memory] Single inference forward pass:")
+    print(f"  latency: {elapsed_ms:.2f} ms")
+    if use_cuda:
+        peak_mb = torch.cuda.max_memory_allocated() / 1e6
+        print(f"  peak GPU memory: {peak_mb:.2f} MB")
+    else:
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        divisor = 1e6 if platform.system() == "Darwin" else 1024.0
+        peak_mb = rss / divisor
+        print(f"  peak process RSS (CPU): {peak_mb:.2f} MB")
 
 
 def main():
@@ -54,7 +89,7 @@ def main():
         num_layers=model_cfg.get("num_layers", 3),
     )
 
-    ckpt = torch.load(args.checkpoint, weights_only=True)
+    ckpt = torch.load(args.checkpoint, weights_only=True, map_location="cpu")
     if isinstance(ckpt, dict) and "policy" in ckpt:
         policy.load_state_dict(ckpt["policy"])
         ep = ckpt.get("episode", "?")
@@ -67,6 +102,8 @@ def main():
 
     gen = ScenarioGenerator(seed=args.seed)
     n = args.n_scenarios
+
+    profile_inference_memory(policy, IntersectionEnv(), gen.hard(n_vehicles=5))
 
     scenarios_by_tier = {
         "easy":   [gen.easy()   for _ in range(n)],
