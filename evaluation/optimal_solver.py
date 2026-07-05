@@ -30,15 +30,20 @@ def solve_optimal(
     vehicles: List[Vehicle],
     manoeuvres: Optional[List[str]] = None,
     time_limit_seconds: float = 60.0,
-) -> Optional[float]:
+    return_schedule: bool = False,
+):
     """Solve for the exact minimum mean waiting time W* via CP-SAT.
 
     Returns W* in seconds (mean waiting time across vehicles, matching
     episode_waiting_time's convention), or None if no solution was found
     within the time limit.
+
+    If return_schedule is True, returns (W*, schedule) where schedule is a
+    list of dicts {vehicle_id, route_position, zone_id, start, end} in seconds
+    for inspecting/verifying the solved timings. schedule is None if unsolved.
     """
     if not vehicles:
-        return 0.0
+        return (0.0, []) if return_schedule else 0.0
 
     model = cp_model.CpModel()
 
@@ -140,10 +145,25 @@ def solve_optimal(
     # would let a suboptimal (too-high) value masquerade as ground truth
     # and make HGT/iGreedy look artificially better or worse than they are.
     if status != cp_model.OPTIMAL:
-        return None
+        return (None, None) if return_schedule else None
 
     total_delay_seconds = solver.Value(total_delay) / SCALE
-    return total_delay_seconds / len(vehicles)
+    w_star = total_delay_seconds / len(vehicles)
+
+    if not return_schedule:
+        return w_star
+
+    schedule = []
+    for v in vehicles:
+        for j, zone_id in enumerate(v.route):
+            schedule.append({
+                "vehicle_id": v.id,
+                "route_position": j,
+                "zone_id": zone_id,
+                "start": solver.Value(start_vars[(v.id, j)]) / SCALE,
+                "end": solver.Value(end_vars[(v.id, j)]) / SCALE,
+            })
+    return w_star, schedule
 
 
 def compute_gap(w_hgt: float, w_star: Optional[float]) -> Optional[float]:
