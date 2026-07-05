@@ -257,6 +257,7 @@ class IntersectionEnv:
         """
         current = self._last_finish_per_vehicle()
         reward = -sum(c - p for c, p in zip(current, self._prev_completion_times))
+        reward = reward / len(self.vehicles)
         return reward
 
     # ------------------------------------------------------------------

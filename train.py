@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description="Train HGT intersection scheduler")
     parser.add_argument(
         "--config",
-        default="configs/default.yaml",
+        default=str(Path(__file__).resolve().parent / "configs" / "default.yaml"),
         help="Path to YAML config file",
     )
     parser.add_argument(

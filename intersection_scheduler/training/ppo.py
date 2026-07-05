@@ -59,19 +59,21 @@ def ppo_update(
     gamma: float = 0.99,
     gae_lambda: float = 0.95,
 ) -> dict:
+    device = next(policy.parameters()).device
+
     rewards = [t.reward for t in transitions]
     values = [t.value.detach() for t in transitions]
     dones = [t.done for t in transitions]
 
     advantages, returns = compute_gae(rewards, values, dones, gamma, gae_lambda)
 
-    adv_tensor = torch.tensor(advantages, dtype=torch.float)
-    ret_tensor = torch.tensor(returns, dtype=torch.float)
+    adv_tensor = torch.tensor(advantages, dtype=torch.float, device=device)
+    ret_tensor = torch.tensor(returns, dtype=torch.float, device=device)
     # Normalise advantages
     adv_tensor = (adv_tensor - adv_tensor.mean()) / (adv_tensor.std() + 1e-8)
 
     old_log_probs = torch.stack([t.log_prob.detach() for t in transitions])
-    actions = torch.tensor([t.action for t in transitions], dtype=torch.long)
+    actions = torch.tensor([t.action for t in transitions], dtype=torch.long, device=device)
 
     total_actor_loss = 0.0
     total_critic_loss = 0.0
