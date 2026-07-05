@@ -114,7 +114,11 @@ def solve_optimal(
 
     status = solver.Solve(model)
 
-    if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+    # Only OPTIMAL is a valid W* — FEASIBLE means the solver found a valid
+    # schedule but did not prove it minimal within the time limit, which
+    # would let a suboptimal (too-high) value masquerade as ground truth
+    # and make HGT/iGreedy look artificially better or worse than they are.
+    if status != cp_model.OPTIMAL:
         return None
 
     total_delay_seconds = solver.Value(total_delay) / SCALE
