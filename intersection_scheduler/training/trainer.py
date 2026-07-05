@@ -19,7 +19,7 @@ from intersection_scheduler.environment.feasibility import compute_feasible_set,
 from intersection_scheduler.environment.graph_builder import build_hetero_graph
 from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.model.policy import SchedulingPolicy
-from intersection_scheduler.training.ppo import Transition, ppo_update
+from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
 from intersection_scheduler.utils.metrics import (
     episode_waiting_time,
     episode_makespan,
@@ -139,6 +139,12 @@ def train(cfg: Dict[str, Any], output_dir: str = "results", resume: Optional[str
     for episode in range(start_episode, num_episodes + 1):
         scenario = get_curriculum_scenario(episode, gen)
         transitions, stats = run_episode(policy, env, scenario)
+        # Compute GAE immediately, in temporal order, before buffer shuffling
+        compute_gae(
+            transitions,
+            gamma=ppo_cfg.get("gamma", 0.99),
+            gae_lambda=ppo_cfg.get("gae_lambda", 0.95),
+        )
         buffer.extend(transitions)
 
         if episode == start_episode:
@@ -159,8 +165,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results", resume: Optional[str
                 value_loss_coef=ppo_cfg.get("value_loss_coef", 0.5),
                 entropy_coef=ppo_cfg.get("entropy_coef", 0.01),
                 max_grad_norm=ppo_cfg.get("max_grad_norm", 0.5),
-                gamma=ppo_cfg.get("gamma", 0.99),
-                gae_lambda=ppo_cfg.get("gae_lambda", 0.95),
+                mini_batch_size=ppo_cfg.get("mini_batch_size", 16),
             )
             buffer = []
 
