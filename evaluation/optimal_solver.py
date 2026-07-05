@@ -49,11 +49,17 @@ def solve_optimal(
     start_vars = {}
     end_vars = {}
     intervals_by_zone: dict = {}
+    # Per-vehicle scaled durations, kept so min_finish uses exactly the same
+    # rounded integers as the interval variables (avoids a ~1ms rounding
+    # artifact where round(sum(p)) != sum(round(p))).
+    scaled_durations: dict = {}
 
     for v in vehicles:
         arrival = int(round(v.arrival_time * SCALE))
+        durs = []
         for j, (zone_id, p) in enumerate(zip(v.route, v.processing_times)):
             dur = max(1, int(round(p * SCALE)))
+            durs.append(dur)
             start = model.NewIntVar(arrival, horizon, f"s_{v.id}_{j}")
             end = model.NewIntVar(arrival, horizon, f"e_{v.id}_{j}")
             interval = model.NewIntervalVar(start, dur, end, f"iv_{v.id}_{j}")
@@ -66,6 +72,7 @@ def solve_optimal(
             # enforced by the variable's lower bound above.
             if j == 0:
                 model.Add(start >= arrival)
+        scaled_durations[v.id] = durs
 
         # Type-1: route order — op(i,j+1) starts no earlier than op(i,j) ends
         for j in range(len(v.route) - 1):
@@ -99,7 +106,11 @@ def solve_optimal(
     delay_terms = []
     for v in vehicles:
         last_j = len(v.route) - 1
-        min_finish = int(round((v.arrival_time + sum(v.processing_times)) * SCALE))
+        # Use the same rounded per-op durations as the interval vars so that
+        # a conflict-free schedule yields exactly zero delay (matching the
+        # env's episode_waiting_time, which subtracts sum(processing_times)).
+        arrival = int(round(v.arrival_time * SCALE))
+        min_finish = arrival + sum(scaled_durations[v.id])
         delay = model.NewIntVar(0, horizon, f"delay_{v.id}")
         model.Add(delay >= end_vars[(v.id, last_j)] - min_finish)
         delay_terms.append(delay)
