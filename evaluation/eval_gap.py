@@ -173,9 +173,8 @@ def run_tier(
 
     print(
         f"[{tier:6s}]  solved={solved}  "
-        f"HGT: abs={mean_abs_hgt:.3f}s pct={mean_pct_hgt:.1f}%  |  "
-        f"iGreedy: abs={mean_abs_ig:.3f}s pct={mean_pct_ig:.1f}%  "
-        f"(pct over {len(pct_gaps_hgt)} scenarios with W*>={_PCT_GAP_WSTAR_FLOOR}s)",
+        f"HGT above optimal={mean_abs_hgt:.3f}s  "
+        f"iGreedy above optimal={mean_abs_ig:.3f}s",
         flush=True,
     )
 
@@ -236,36 +235,31 @@ def main():
 
     total_scenarios = sum(s["n_scenarios"] for s in tier_summaries.values())
     total_solved = sum(s["solved"] for s in tier_summaries.values())
-    total_pct = sum(s["n_pct"] for s in tier_summaries.values())
     all_abs_hgt = [r["abs_gap_hgt"] for r in rows if r["abs_gap_hgt"] != ""]
     all_abs_ig = [r["abs_gap_igreedy"] for r in rows if r["abs_gap_igreedy"] != ""]
-    all_pct_hgt = [r["gap_hgt_pct"] for r in rows if r["gap_hgt_pct"] != ""]
-    all_pct_ig = [r["gap_igreedy_pct"] for r in rows if r["gap_igreedy_pct"] != ""]
     ov_abs_hgt = sum(all_abs_hgt) / len(all_abs_hgt) if all_abs_hgt else float("nan")
     ov_abs_ig = sum(all_abs_ig) / len(all_abs_ig) if all_abs_ig else float("nan")
-    ov_pct_hgt = sum(all_pct_hgt) / len(all_pct_hgt) if all_pct_hgt else float("nan")
-    ov_pct_ig = sum(all_pct_ig) / len(all_pct_ig) if all_pct_ig else float("nan")
 
-    print("\nFinal summary (abs gap = mean W - W* in seconds; pct gap over W* >= "
-          f"{_PCT_GAP_WSTAR_FLOOR}s only):")
-    print(
-        f"{'Tier':8s} | {'Solved':6s} | {'HGT abs':>8s} | {'iGrdy abs':>9s} | "
-        f"{'HGT pct':>8s} | {'iGrdy pct':>9s}"
-    )
+    def improvement_pct(hgt_abs: float, ig_abs: float) -> float:
+        if ig_abs <= 1e-9:
+            return float("nan")
+        return (ig_abs - hgt_abs) / ig_abs * 100.0
+
+    print("\nFinal summary (seconds above optimal W*):")
+    print(f"{'Tier':8s} | {'HGT above optimal':>18s} | {'iGreedy above optimal':>22s} | {'HGT improvement':>16s}")
     for tier, s in tier_summaries.items():
+        imp = improvement_pct(s["mean_abs_hgt"], s["mean_abs_igreedy"])
         print(
-            f"{tier:8s} | {s['solved']:6d} | "
-            f"{s['mean_abs_hgt']:7.3f}s | {s['mean_abs_igreedy']:8.3f}s | "
-            f"{s['mean_pct_hgt']:7.1f}% | {s['mean_pct_igreedy']:8.1f}%"
+            f"{tier:8s} | {s['mean_abs_hgt']:17.3f}s | "
+            f"{s['mean_abs_igreedy']:21.3f}s | {imp:15.0f}%"
         )
+    overall_imp = improvement_pct(ov_abs_hgt, ov_abs_ig)
     print(
-        f"{'overall':8s} | {total_solved:6d} | "
-        f"{ov_abs_hgt:7.3f}s | {ov_abs_ig:8.3f}s | "
-        f"{ov_pct_hgt:7.1f}% | {ov_pct_ig:8.1f}%"
+        f"{'overall':8s} | {ov_abs_hgt:17.3f}s | "
+        f"{ov_abs_ig:21.3f}s | {overall_imp:15.0f}%"
     )
     print(
-        f"\nSolved {total_solved}/{total_scenarios} scenarios (OR-Tools proved optimal). "
-        f"Percentage gap computed over {total_pct} scenarios with W* >= {_PCT_GAP_WSTAR_FLOOR}s."
+        f"\nSolved {total_solved}/{total_scenarios} scenarios (OR-Tools proved optimal)."
     )
 
     # Conflict density analysis (Component 3)
