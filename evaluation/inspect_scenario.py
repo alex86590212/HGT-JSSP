@@ -17,7 +17,11 @@ from intersection_scheduler.data.scenario_generator import (
 
 from evaluation.optimal_solver import solve_optimal
 
-EPS = 1e-6
+# Tolerance for constraint checks. The solver works in scaled integers, so a
+# value round-tripped back to seconds can differ from the original float by up
+# to one SCALE tick (1/100000 = 1e-5 s). Use a tolerance safely above that so a
+# start that equals arrival (the optimal no-wait case) is not flagged.
+EPS = 1e-4
 
 
 def check_constraints(scenario, schedule) -> None:
@@ -86,15 +90,24 @@ def main():
     parser = argparse.ArgumentParser(description="Inspect one scenario's CP-SAT schedule")
     parser.add_argument("--tier", default="hard", choices=["easy", "medium", "hard"])
     parser.add_argument("--index", type=int, default=0,
-                        help="Which scenario (0-based) in the seeded sequence")
+                        help="Which scenario (0-based) within the tier")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--time_limit", type=float, default=30.0)
+    parser.add_argument("--n_scenarios", type=int, default=100,
+                        help="Must match eval_gap.py's --n_scenarios so the "
+                             "shared RNG stream reproduces the same scenario")
     args = parser.parse_args()
 
+    # Reproduce eval_gap.py's exact draw order: it generates n easy, then n
+    # medium, then n hard from a single shared RNG. Drawing the requested tier
+    # in isolation would land on a different point in the RNG stream and thus
+    # a different scenario, even with the same seed.
     gen = ScenarioGenerator(seed=args.seed)
-    scenario = None
-    for _ in range(args.index + 1):
-        scenario = getattr(gen, args.tier)()
+    tier_order = ["easy", "medium", "hard"]
+    scenarios_by_tier = {}
+    for t in tier_order:
+        scenarios_by_tier[t] = [getattr(gen, t)() for _ in range(args.n_scenarios)]
+    scenario = scenarios_by_tier[args.tier][args.index]
 
     print(f"=== {args.tier} scenario #{args.index} (seed={args.seed}) ===")
     print(f"{len(scenario.vehicles)} vehicles")
