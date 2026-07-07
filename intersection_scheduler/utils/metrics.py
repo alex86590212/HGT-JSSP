@@ -42,7 +42,11 @@ def episode_makespan(env: "IntersectionEnv") -> float:
 # iGreedy baseline
 # ------------------------------------------------------------------
 
-def igreedy(env: "IntersectionEnv", scenario: "Scenario") -> float:
+def igreedy(
+    env: "IntersectionEnv",
+    scenario: "Scenario",
+    zone_positions: Optional[Dict[int, Tuple[float, float]]] = None,
+) -> float:
     """Run iGreedy on scenario and return mean waiting time.
 
     Rule: at each step pick the feasible op belonging to the vehicle
@@ -50,7 +54,7 @@ def igreedy(env: "IntersectionEnv", scenario: "Scenario") -> float:
     """
     from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
 
-    env.reset(scenario.vehicles)
+    env.reset(scenario.vehicles, zone_positions=zone_positions)
     done = False
     while not done:
         mask = compute_feasible_set(env)
