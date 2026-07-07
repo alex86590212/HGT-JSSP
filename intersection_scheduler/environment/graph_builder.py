@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Set, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Set, Tuple
 
 import torch
 from torch_geometric.data import HeteroData
@@ -11,7 +11,22 @@ if TYPE_CHECKING:
     from intersection_scheduler.environment.intersection import IntersectionEnv
 
 
-def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
+def build_hetero_graph(
+    env: "IntersectionEnv",
+    feasible_mask: Optional[torch.Tensor] = None,
+    static_edges: Optional[Dict] = None,
+) -> HeteroData:
+    """Build the heterogeneous graph for the current env state.
+
+    feasible_mask: if provided, used directly instead of recomputing the
+        feasible set (identical result, since it must be computed for the same
+        env state anyway). If None, computed here.
+    static_edges: if provided (from build_static_edges at reset time), the
+        seq/lane/owns/hosts edge tensors are reused instead of rebuilt. These
+        edges depend only on route_position/vehicle_id/zone_id/arrival_time,
+        all immutable during an episode, so caching is exact. Type-3 conflict
+        edges and all node features are always rebuilt (they change per step).
+    """
     data = HeteroData()
     ops = env.operations
     vehicles = env.vehicles
@@ -19,9 +34,7 @@ def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
     n_ops = len(ops)
     n_veh = len(vehicles)
     zone_ids = sorted(zones.keys())
-    zone_idx = {zid: i for i, zid in enumerate(zone_ids)}
     n_zones = len(zone_ids)
-    veh_idx = {v.id: i for i, v in enumerate(vehicles)}
 
     max_p = env.norm_max_p or 1.0
     max_c = env.norm_max_c or 1.0
@@ -31,8 +44,9 @@ def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
     # ----------------------------------------------------------------
     # Feasible set — import lazily to avoid circular imports
     # ----------------------------------------------------------------
-    from intersection_scheduler.environment.feasibility import compute_feasible_set
-    feasible_mask = compute_feasible_set(env)  # BoolTensor [n_ops]
+    if feasible_mask is None:
+        from intersection_scheduler.environment.feasibility import compute_feasible_set
+        feasible_mask = compute_feasible_set(env)  # BoolTensor [n_ops]
 
     # ----------------------------------------------------------------
     # n_conflicts per operation (active Type-3 edges)
@@ -93,77 +107,23 @@ def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
     data["zone"].x = torch.tensor(zone_feats, dtype=torch.float)
 
     # ----------------------------------------------------------------
-    # Type-1 seq edges: op(i,j) -> op(i,j+1), directed route order
+    # Static edges (seq, lane, owns, hosts) — reuse cache if provided,
+    # otherwise build fresh via the single source of truth build_static_edges.
+    # These depend only on immutable per-episode data, so the cached tensors
+    # are byte-identical to a fresh build.
     # ----------------------------------------------------------------
-    seq_src, seq_dst = [], []
-    seq_attr = []
-    for i, op in enumerate(ops):
-        if op.route_position < op.route_length - 1:
-            # Find the next op in the same vehicle's route
-            for j, op2 in enumerate(ops):
-                if (op2.vehicle_id == op.vehicle_id
-                        and op2.route_position == op.route_position + 1):
-                    seq_src.append(i)
-                    seq_dst.append(j)
-                    seq_attr.append([op.processing_time / max_p])
-                    break
-    if seq_src:
-        data["operation", "seq", "operation"].edge_index = torch.tensor(
-            [seq_src, seq_dst], dtype=torch.long
-        )
-        data["operation", "seq", "operation"].edge_attr = torch.tensor(
-            seq_attr, dtype=torch.float
-        )
-    else:
-        data["operation", "seq", "operation"].edge_index = torch.zeros(
-            (2, 0), dtype=torch.long
-        )
-        data["operation", "seq", "operation"].edge_attr = torch.zeros((0, 1))
-
-    # ----------------------------------------------------------------
-    # Type-2 lane edges: same-lane ordering (directed, earlier -> later)
-    # ----------------------------------------------------------------
-    lane_src, lane_dst, lane_attr = [], [], []
-    # Group vehicles by entry direction (same source zone = same lane)
-    from collections import defaultdict
-    by_entry: dict = defaultdict(list)
-    for v in vehicles:
-        if v.route:
-            by_entry[v.route[0]].append(v)
-
-    for entry_zone, group in by_entry.items():
-        sorted_group = sorted(group, key=lambda v: v.arrival_time)
-        for k in range(len(sorted_group) - 1):
-            leader = sorted_group[k]
-            follower = sorted_group[k + 1]
-            gap = follower.arrival_time - leader.arrival_time
-            # First op of leader -> first op of follower
-            li = next(
-                (i for i, o in enumerate(ops)
-                 if o.vehicle_id == leader.id and o.route_position == 0),
-                None,
-            )
-            fi = next(
-                (i for i, o in enumerate(ops)
-                 if o.vehicle_id == follower.id and o.route_position == 0),
-                None,
-            )
-            if li is not None and fi is not None:
-                lane_src.append(li)
-                lane_dst.append(fi)
-                lane_attr.append([gap / (max_r or 1.0)])
-    if lane_src:
-        data["operation", "lane", "operation"].edge_index = torch.tensor(
-            [lane_src, lane_dst], dtype=torch.long
-        )
-        data["operation", "lane", "operation"].edge_attr = torch.tensor(
-            lane_attr, dtype=torch.float
-        )
-    else:
-        data["operation", "lane", "operation"].edge_index = torch.zeros(
-            (2, 0), dtype=torch.long
-        )
-        data["operation", "lane", "operation"].edge_attr = torch.zeros((0, 1))
+    if static_edges is None:
+        static_edges = build_static_edges(env)
+    for (etype, key) in (
+        (("operation", "seq", "operation"), "seq"),
+        (("operation", "lane", "operation"), "lane"),
+        (("vehicle", "owns", "operation"), "owns"),
+        (("zone", "hosts", "operation"), "hosts"),
+    ):
+        edge_index, edge_attr = static_edges[key]
+        data[etype].edge_index = edge_index
+        if edge_attr is not None:
+            data[etype].edge_attr = edge_attr
 
     # ----------------------------------------------------------------
     # Type-3 conflict edges: undirected active conflicts (both directions)
@@ -197,28 +157,97 @@ def build_hetero_graph(env: "IntersectionEnv") -> HeteroData:
         )
         data["operation", "conflict", "operation"].edge_attr = torch.zeros((0, 3))
 
-    # ----------------------------------------------------------------
+    return data
+
+
+def build_static_edges(env: "IntersectionEnv") -> Dict:
+    """Build the per-episode-static edge tensors (seq, lane, owns, hosts).
+
+    These edges depend only on route_position, vehicle_id, zone_id, route[0]
+    and arrival_time — all immutable during an episode — so they can be built
+    once at reset time and reused every step. Returns a dict mapping each edge
+    key to a (edge_index, edge_attr) tuple; edge_attr is None where the edge
+    type has no attributes (owns, hosts).
+
+    This is the single source of truth for these edges: build_hetero_graph
+    calls it when no cache is supplied, so cached and fresh builds are exact.
+    """
+    ops = env.operations
+    vehicles = env.vehicles
+    zones = env.zones
+    zone_ids = sorted(zones.keys())
+    zone_idx = {zid: i for i, zid in enumerate(zone_ids)}
+    veh_idx = {v.id: i for i, v in enumerate(vehicles)}
+    max_p = env.norm_max_p or 1.0
+    max_r = env.norm_max_r or 1.0
+
+    # Type-1 seq edges: op(i,j) -> op(i,j+1), directed route order
+    seq_src, seq_dst, seq_attr = [], [], []
+    for i, op in enumerate(ops):
+        if op.route_position < op.route_length - 1:
+            for j, op2 in enumerate(ops):
+                if (op2.vehicle_id == op.vehicle_id
+                        and op2.route_position == op.route_position + 1):
+                    seq_src.append(i)
+                    seq_dst.append(j)
+                    seq_attr.append([op.processing_time / max_p])
+                    break
+    if seq_src:
+        seq_edge = (
+            torch.tensor([seq_src, seq_dst], dtype=torch.long),
+            torch.tensor(seq_attr, dtype=torch.float),
+        )
+    else:
+        seq_edge = (torch.zeros((2, 0), dtype=torch.long), torch.zeros((0, 1)))
+
+    # Type-2 lane edges: same-lane ordering (directed, earlier -> later)
+    lane_src, lane_dst, lane_attr = [], [], []
+    from collections import defaultdict
+    by_entry: dict = defaultdict(list)
+    for v in vehicles:
+        if v.route:
+            by_entry[v.route[0]].append(v)
+    for _entry_zone, group in by_entry.items():
+        sorted_group = sorted(group, key=lambda v: v.arrival_time)
+        for k in range(len(sorted_group) - 1):
+            leader = sorted_group[k]
+            follower = sorted_group[k + 1]
+            gap = follower.arrival_time - leader.arrival_time
+            li = next(
+                (i for i, o in enumerate(ops)
+                 if o.vehicle_id == leader.id and o.route_position == 0),
+                None,
+            )
+            fi = next(
+                (i for i, o in enumerate(ops)
+                 if o.vehicle_id == follower.id and o.route_position == 0),
+                None,
+            )
+            if li is not None and fi is not None:
+                lane_src.append(li)
+                lane_dst.append(fi)
+                lane_attr.append([gap / (max_r or 1.0)])
+    if lane_src:
+        lane_edge = (
+            torch.tensor([lane_src, lane_dst], dtype=torch.long),
+            torch.tensor(lane_attr, dtype=torch.float),
+        )
+    else:
+        lane_edge = (torch.zeros((2, 0), dtype=torch.long), torch.zeros((0, 1)))
+
     # Vehicle -> Operation edges (vehicle owns its ops)
-    # ----------------------------------------------------------------
     vo_src, vo_dst = [], []
     for i, op in enumerate(ops):
-        vi = veh_idx[op.vehicle_id]
-        vo_src.append(vi)
+        vo_src.append(veh_idx[op.vehicle_id])
         vo_dst.append(i)
-    data["vehicle", "owns", "operation"].edge_index = torch.tensor(
-        [vo_src, vo_dst], dtype=torch.long
-    )
+    owns_edge = (torch.tensor([vo_src, vo_dst], dtype=torch.long), None)
 
-    # ----------------------------------------------------------------
     # Zone -> Operation edges (zone hosts all ops that use it)
-    # ----------------------------------------------------------------
     zo_src, zo_dst = [], []
     for i, op in enumerate(ops):
         if op.zone_id in zone_idx:
             zo_src.append(zone_idx[op.zone_id])
             zo_dst.append(i)
-    data["zone", "hosts", "operation"].edge_index = torch.tensor(
-        [zo_src, zo_dst], dtype=torch.long
-    )
+    hosts_edge = (torch.tensor([zo_src, zo_dst], dtype=torch.long), None)
 
-    return data
+    return {"seq": seq_edge, "lane": lane_edge, "owns": owns_edge, "hosts": hosts_edge}

@@ -16,7 +16,7 @@ from intersection_scheduler.data.scenario_generator import (
     get_curriculum_scenario,
 )
 from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
-from intersection_scheduler.environment.graph_builder import build_hetero_graph
+from intersection_scheduler.environment.graph_builder import build_hetero_graph, build_static_edges
 from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
@@ -38,19 +38,29 @@ def run_episode(
     """Collect one full episode trajectory."""
     device = next(policy.parameters()).device
     env.reset(scenario.vehicles, zone_positions=zone_positions)
+    # Static edge topology (seq/lane/owns/hosts) is constant for the episode;
+    # build it once and reuse every step. Only conflict edges and node features
+    # are rebuilt per step inside build_hetero_graph.
+    static_edges = build_static_edges(env)
     transitions: List[Transition] = []
 
     done = False
     while not done:
-        data = build_hetero_graph(env).to(device)
-        feasible_mask = compute_feasible_set(env).to(device)
+        # Compute the feasible mask once (CPU) and thread it into the graph
+        # builder so it is not recomputed a second time internally.
+        cpu_mask = compute_feasible_set(env)
 
-        if not feasible_mask.any():
+        if not cpu_mask.any():
             next_t = next_feasible_time(env)
             if next_t is None:
                 break
             env.current_time = next_t
             continue
+
+        data = build_hetero_graph(
+            env, feasible_mask=cpu_mask, static_edges=static_edges
+        ).to(device)
+        feasible_mask = cpu_mask.to(device)
 
         with torch.no_grad() if deterministic else torch.enable_grad():
             dist, value = policy(data, feasible_mask)
