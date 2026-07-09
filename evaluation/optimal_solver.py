@@ -11,11 +11,13 @@ Models the same three constraint types as the trained env/feasibility checker:
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from ortools.sat.python import cp_model
 
-from intersection_scheduler.data.scenario_generator import _MANOEUVRE_TO_LANE
+from intersection_scheduler.data.scenario_generator import (
+    _MANOEUVRE_TO_LANE as _MANOEUVRE_TO_LANE_3X3,
+)
 from intersection_scheduler.environment.intersection import Vehicle
 
 # Scale seconds -> integer ticks for CP-SAT. At 1e5 the resolution is 0.01ms,
@@ -31,6 +33,7 @@ def solve_optimal(
     manoeuvres: Optional[List[str]] = None,
     time_limit_seconds: float = 60.0,
     return_schedule: bool = False,
+    manoeuvre_to_lane: Optional[Dict[str, str]] = None,
 ):
     """Solve for the exact minimum mean waiting time W* via CP-SAT.
 
@@ -41,7 +44,15 @@ def solve_optimal(
     If return_schedule is True, returns (W*, schedule) where schedule is a
     list of dicts {vehicle_id, route_position, zone_id, start, end} in seconds
     for inspecting/verifying the solved timings. schedule is None if unsolved.
+
+    manoeuvre_to_lane: maps manoeuvre name -> lane group, used for the Type-2
+    same-lane constraint. Defaults to the 3x3 topology's mapping; pass the
+    4x4 topology's mapping (scenario_generator_4x4._MANOEUVRE_TO_LANE) when
+    solving 4x4 scenarios, since manoeuvre names and lane groupings differ
+    between the two topologies.
     """
+    if manoeuvre_to_lane is None:
+        manoeuvre_to_lane = _MANOEUVRE_TO_LANE_3X3
     if not vehicles:
         return (0.0, []) if return_schedule else 0.0
 
@@ -98,7 +109,7 @@ def solve_optimal(
     if manoeuvres is not None:
         by_lane: dict = {}
         for v, m in zip(vehicles, manoeuvres):
-            lane = _MANOEUVRE_TO_LANE.get(m)
+            lane = manoeuvre_to_lane.get(m)
             if lane is None:
                 continue
             by_lane.setdefault(lane, []).append(v)
