@@ -1,0 +1,614 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 950" width="1600" height="950">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap');
+      
+      /* Base typography */
+      text {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        fill: #0F172A;
+      }
+      .title-main { font-size: 30px; font-weight: 700; fill: #0F172A; }
+      .title-section { font-size: 17px; font-weight: 700; fill: #1E293B; }
+      .title-subsection { font-size: 14px; font-weight: 700; fill: #334155; }
+      .text-body { font-size: 13px; fill: #334155; font-weight: 400; }
+      .text-body-bold { font-size: 13px; fill: #0F172A; font-weight: 600; }
+      .text-muted { font-size: 12px; fill: #64748B; font-weight: 400; }
+      .text-legend { font-size: 12px; fill: #334155; font-weight: 500; }
+      
+      /* Mathematical typography */
+      .math { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
+      .math-bold { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; font-weight: bold; }
+      .math-code { font-family: 'Fira Code', 'Courier New', monospace; font-size: 12.5px; fill: #0F172A; font-weight: 500; }
+      .math-code-red { font-family: 'Fira Code', 'Courier New', monospace; font-size: 12.5px; fill: #991B1B; font-weight: 600; }
+      
+      /* Subscript and Superscript helpers */
+      .sub { font-size: 75%; baseline-shift: sub; font-style: normal; }
+      .super { font-size: 75%; baseline-shift: super; font-style: normal; }
+      
+      /* Column card frames */
+      .column-frame { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1.5; }
+      .column-frame-purple { fill: #FAF5FF; stroke: #D8B4FE; stroke-width: 1.5; }
+      
+      /* Styled inner cards */
+      .card-neutral { fill: #F8FAFC; stroke: #E2E8F0; stroke-width: 1.5; }
+      .card-blue { fill: #EFF6FF; stroke: #BFDBFE; stroke-width: 1.5; }
+      .card-green { fill: #ECFDF5; stroke: #A7F3D0; stroke-width: 1.5; }
+      .card-orange { fill: #FFF7ED; stroke: #FED7AA; stroke-width: 1.5; }
+      .card-purple { fill: #F5F3FF; stroke: #C084FC; stroke-width: 1.5; }
+      .card-teal { fill: #F0FDFA; stroke: #99F6E4; stroke-width: 1.5; }
+      .card-amber { fill: #FEF3C7; stroke: #FDE68A; stroke-width: 1.5; }
+      .card-red { fill: #FEF2F2; stroke: #FCA5A5; stroke-width: 1.5; }
+      
+      /* Node visual styles */
+      .node-op-circle { fill: #3B82F6; stroke: #1D4ED8; stroke-width: 1.5; }
+      .node-veh-circle { fill: #10B981; stroke: #047857; stroke-width: 1.5; }
+      .node-zone-circle { fill: #F59E0B; stroke: #B45309; stroke-width: 1.5; }
+      .node-text { font-size: 11px; fill: #FFFFFF; font-weight: 700; text-anchor: middle; }
+      
+      /* Connectors and Arrows */
+      .connector { fill: none; stroke: #475569; stroke-width: 2; }
+      .connector-dashed { fill: none; stroke: #3B82F6; stroke-width: 1.5; stroke-dasharray: 4,4; }
+      .connector-solid-blue { fill: none; stroke: #3B82F6; stroke-width: 1.5; }
+      .connector-dotted-red { fill: none; stroke: #EF4444; stroke-width: 1.5; stroke-dasharray: 2,2; }
+      .connector-green { fill: none; stroke: #10B981; stroke-width: 1.5; }
+      .connector-orange { fill: none; stroke: #F59E0B; stroke-width: 1.5; }
+      
+      /* Separation bar styles */
+      .bar-frame { fill: #F8FAFC; stroke: #CBD5E1; stroke-width: 1.5; }
+      .bar-sep { stroke: #E2E8F0; stroke-width: 1.5; }
+      
+      /* Helper classes */
+      .center-text { text-anchor: middle; }
+      .right-text { text-anchor: end; }
+    </style>
+    
+    <!-- Marker definition for arrows -->
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#475569" />
+    </marker>
+    <marker id="arrowhead-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#3B82F6" />
+    </marker>
+    <marker id="arrowhead-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#EF4444" />
+    </marker>
+    <marker id="arrowhead-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#10B981" />
+    </marker>
+    <marker id="arrowhead-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#F59E0B" />
+    </marker>
+  </defs>
+
+  <!-- Background canvas -->
+  <rect x="0" y="0" width="1600" height="950" fill="#F8FAFC" />
+  <rect x="15" y="15" width="1570" height="920" fill="none" stroke="#E2E8F0" stroke-width="2" rx="10" />
+
+  <!-- Main Figure Header -->
+  <g transform="translate(800, 60)">
+    <text class="title-main center-text">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</text>
+    <text class="text-subtitle center-text" y="32">Academic architectural pipeline for graph reinforcement learning in Job Shop Scheduling Problem</text>
+  </g>
+
+  <!-- REGION 1: Traffic State (x=50, w=220, y=120, h=680) -->
+  <g id="region-1" transform="translate(50, 120)">
+    <rect width="230" height="680" rx="8" class="column-frame" />
+    
+    <!-- Title Area -->
+    <rect width="230" height="50" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" />
+    <text x="115" y="30" class="title-section center-text">1. Traffic State</text>
+    <text x="115" y="44" class="text-muted center-text">Decision step t</text>
+    
+    <!-- Text Elements -->
+    <g transform="translate(15, 80)">
+      <!-- Bullet 1 -->
+      <circle cx="8" cy="10" r="3" fill="#475569" />
+      <text x="20" y="14" class="text-body-bold">Vehicles &amp; arrival times</text>
+      <text x="20" y="28" class="text-muted">Awaiting entry at boundaries</text>
+      
+      <!-- Bullet 2 -->
+      <circle cx="8" cy="55" r="3" fill="#475569" />
+      <text x="20" y="59" class="text-body-bold">Routes &amp; conflict zones</text>
+      <text x="20" y="73" class="text-muted">Path through intersection</text>
+      
+      <!-- Bullet 3 -->
+      <circle cx="8" cy="100" r="3" fill="#475569" />
+      <text x="20" y="104" class="text-body-bold">Zone availability</text>
+      <text x="20" y="118" class="text-muted">Current spatial reservations</text>
+      
+      <!-- Bullet 4 -->
+      <circle cx="8" cy="145" r="3" fill="#475569" />
+      <text x="20" y="149" class="text-body-bold">Scheduled operations</text>
+      <text x="20" y="163" class="text-muted">Completed crossings</text>
+      
+      <!-- Bullet 5 -->
+      <circle cx="8" cy="190" r="3" fill="#475569" />
+      <text x="20" y="194" class="text-body-bold">Feasible action set</text>
+      <text x="20" y="208" class="text-muted">Executable operations <tspan class="math">A<tspan class="sub">t</tspan></tspan></text>
+    </g>
+
+    <!-- Schematic Intersection visual -->
+    <text x="115" y="325" class="title-subsection center-text">Intersection Topology</text>
+    <g transform="translate(20, 340)">
+      <!-- Background of visual -->
+      <rect width="190" height="230" rx="6" class="card-neutral" />
+      
+      <!-- Vertical road -->
+      <rect x="75" y="10" width="40" height="210" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1" />
+      <line x1="95" y1="10" x2="95" y2="220" stroke="#FFFFFF" stroke-dasharray="4,4" stroke-width="1.5" />
+      
+      <!-- Horizontal road -->
+      <rect x="10" y="95" width="170" height="40" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1" />
+      <line x1="10" y1="115" x2="180" y2="115" stroke="#FFFFFF" stroke-dasharray="4,4" stroke-width="1.5" />
+
+      <!-- Conflict Zones Grid (Intersection box) -->
+      <rect x="75" y="95" width="40" height="40" fill="none" stroke="#D97706" stroke-width="1.5" stroke-dasharray="2,2" />
+      
+      <!-- Four conflict zone labels -->
+      <rect x="77" y="97" width="16" height="16" rx="2" fill="#FFF7ED" stroke="#F59E0B" stroke-width="1" />
+      <text x="85" y="109" font-size="9" font-weight="bold" fill="#B45309" text-anchor="middle">Z1</text>
+
+      <rect x="97" y="97" width="16" height="16" rx="2" fill="#FFF7ED" stroke="#F59E0B" stroke-width="1" />
+      <text x="105" y="109" font-size="9" font-weight="bold" fill="#B45309" text-anchor="middle">Z2</text>
+
+      <rect x="77" y="117" width="16" height="16" rx="2" fill="#FFF7ED" stroke="#F59E0B" stroke-width="1" />
+      <text x="85" y="129" font-size="9" font-weight="bold" fill="#B45309" text-anchor="middle">Z3</text>
+
+      <rect x="97" y="117" width="16" height="16" rx="2" fill="#FFF7ED" stroke="#F59E0B" stroke-width="1" />
+      <text x="105" y="129" font-size="9" font-weight="bold" fill="#B45309" text-anchor="middle">Z4</text>
+
+      <!-- Vehicles -->
+      <rect x="35" y="99" width="22" height="14" rx="2" class="node-veh-circle" />
+      <text x="46" y="110" font-size="9" font-weight="bold" fill="#FFFFFF" text-anchor="middle">V1</text>
+      
+      <rect x="99" y="170" width="14" height="22" rx="2" class="node-veh-circle" />
+      <text x="106" y="184" font-size="9" font-weight="bold" fill="#FFFFFF" text-anchor="middle">V2</text>
+      
+      <!-- Operations (Task actions) -->
+      <circle cx="65" cy="115" r="9" class="node-op-circle" />
+      <text x="65" y="118" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">O1</text>
+
+      <circle cx="95" cy="155" r="9" class="node-op-circle" />
+      <text x="95" y="158" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">O2</text>
+      
+      <!-- Arrow showing motion paths -->
+      <path d="M 35 115 L 53 115" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowhead-green)" fill="none" />
+      <path d="M 106 170 L 106 167" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowhead-green)" fill="none" />
+      
+      <text x="95" y="215" class="text-muted center-text" font-size="11">Spatial conflict control</text>
+    </g>
+  </g>
+
+  <!-- REGION 2: Heterogeneous Graph Input (x=330, w=280, y=120, h=680) -->
+  <g id="region-2" transform="translate(330, 120)">
+    <rect width="280" height="680" rx="8" class="column-frame" />
+    
+    <!-- Title Area -->
+    <rect width="280" height="50" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" />
+    <text x="140" y="30" class="title-section center-text">2. Heterogeneous Graph <tspan class="math">G<tspan class="sub">t</tspan></tspan></text>
+    <text x="140" y="44" class="text-muted center-text">Action-oriented state representation</text>
+
+    <!-- Node Type 1: Operations (Blue) -->
+    <g transform="translate(10, 65)">
+      <rect width="260" height="135" rx="6" class="card-blue" />
+      <text x="15" y="24" class="title-subsection" fill="#1E40AF">Operation Nodes</text>
+      <text x="15" y="42" class="math" font-size="13">X<tspan class="sub">op</tspan> ∈ ℝ<tspan class="super">n<tspan class="sub">o</tspan>×6</tspan></text>
+      <text x="15" y="58" class="text-muted">Units of dispatching action</text>
+      
+      <!-- Mini graph visualization inside operation box -->
+      <g transform="translate(10, 60)">
+        <!-- Nodes -->
+        <circle cx="35" cy="50" r="14" class="node-op-circle" />
+        <text x="35" y="54" class="node-text">O1</text>
+        
+        <circle cx="120" cy="50" r="14" class="node-op-circle" />
+        <text x="120" y="54" class="node-text">O2</text>
+        
+        <circle cx="205" cy="50" r="14" class="node-op-circle" />
+        <text x="205" y="54" class="node-text">O3</text>
+        
+        <!-- Edges -->
+        <path d="M 49 50 L 101 50" class="connector-solid-blue" marker-end="url(#arrowhead-blue)" />
+        <text x="75" y="43" font-size="10" fill="#2563EB" font-weight="bold" text-anchor="middle">seq</text>
+
+        <path d="M 134 50 L 186 50" class="connector-dashed" marker-end="url(#arrowhead-blue)" />
+        <text x="160" y="43" font-size="10" fill="#2563EB" font-weight="bold" text-anchor="middle">lane</text>
+
+        <path d="M 47 38 Q 120 10 193 38" class="connector-dotted-red" marker-end="url(#arrowhead-red)" marker-start="url(#arrowhead-red)" />
+        <text x="120" y="22" font-size="10" fill="#DC2626" font-weight="bold" text-anchor="middle">conflict</text>
+      </g>
+    </g>
+
+    <!-- Node Type 2: Vehicles (Green) -->
+    <g transform="translate(10, 210)">
+      <rect width="260" height="110" rx="6" class="card-green" />
+      <text x="15" y="24" class="title-subsection" fill="#065F46">Vehicle Nodes</text>
+      <text x="15" y="42" class="math" font-size="13">X<tspan class="sub">veh</tspan> ∈ ℝ<tspan class="super">n<tspan class="sub">v</tspan>×4</tspan></text>
+      <text x="15" y="58" class="text-muted">Contextual routing constraints</text>
+      
+      <g transform="translate(10, 52)">
+        <circle cx="70" cy="35" r="14" class="node-veh-circle" />
+        <text x="70" y="39" class="node-text">V1</text>
+        
+        <circle cx="170" cy="35" r="14" class="node-veh-circle" />
+        <text x="170" y="39" class="node-text">V2</text>
+        
+        <!-- Association arrow to operations -->
+        <path d="M 84 35 Q 110 35 120 0" stroke="#10B981" stroke-width="1.2" stroke-dasharray="3,3" fill="none" />
+        <path d="M 170 21 L 170 -5" stroke="#10B981" stroke-width="1.2" stroke-dasharray="3,3" fill="none" />
+      </g>
+    </g>
+
+    <!-- Node Type 3: Zones (Orange) -->
+    <g transform="translate(10, 330)">
+      <rect width="260" height="110" rx="6" class="card-orange" />
+      <text x="15" y="24" class="title-subsection" fill="#9A3412">Zone Nodes</text>
+      <text x="15" y="42" class="math" font-size="13">X<tspan class="sub">zone</tspan> ∈ ℝ<tspan class="super">n<tspan class="sub">z</tspan>×5</tspan></text>
+      <text x="15" y="58" class="text-muted">Spatial intersection capacity</text>
+      
+      <g transform="translate(10, 52)">
+        <circle cx="70" cy="35" r="14" class="node-zone-circle" />
+        <text x="70" y="39" class="node-text">Z1</text>
+        
+        <circle cx="170" cy="35" r="14" class="node-zone-circle" />
+        <text x="170" y="39" class="node-text">Z2</text>
+        
+        <!-- Association arrow to operations -->
+        <path d="M 70 21 Q 70 -50 45 -120" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="3,3" fill="none" />
+        <path d="M 156 35 Q 120 35 120 -120" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="3,3" fill="none" />
+      </g>
+    </g>
+
+    <!-- Relation Legend (Bottom) -->
+    <g transform="translate(10, 450)">
+      <rect width="260" height="220" rx="6" class="card-neutral" />
+      <text x="15" y="22" class="title-subsection">Relation Legend &amp; Schema</text>
+      
+      <g transform="translate(15, 35)">
+        <!-- Relation 1 -->
+        <line x1="0" y1="12" x2="40" y2="12" class="connector-solid-blue" marker-end="url(#arrowhead-blue)" />
+        <text x="50" y="16" class="text-legend"><tspan class="math-bold">seq</tspan> : Op → Op (Precedence)</text>
+        
+        <!-- Relation 2 -->
+        <line x1="0" y1="42" x2="40" y2="42" class="connector-dashed" marker-end="url(#arrowhead-blue)" />
+        <text x="50" y="46" class="text-legend"><tspan class="math-bold">lane</tspan> : Op → Op (Same Lane)</text>
+        
+        <!-- Relation 3 -->
+        <line x1="0" y1="72" x2="40" y2="72" class="connector-dotted-red" marker-end="url(#arrowhead-red)" marker-start="url(#arrowhead-red)" />
+        <text x="50" y="76" class="text-legend" fill="#B91C1C"><tspan class="math-bold">conflict</tspan> : Op ↔ Op (Conflict Zone)</text>
+        
+        <!-- Relation 4 -->
+        <line x1="0" y1="102" x2="40" y2="102" stroke="#10B981" stroke-width="1.5" marker-end="url(#arrowhead-green)" />
+        <text x="50" y="106" class="text-legend"><tspan class="math-bold">owns</tspan> : Vehicle → Op (Routing)</text>
+        
+        <!-- Relation 5 -->
+        <line x1="0" y1="132" x2="40" y2="132" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#arrowhead-orange)" />
+        <text x="50" y="136" class="text-legend"><tspan class="math-bold">hosts</tspan> : Zone → Op (Reservation)</text>
+      </g>
+      
+      <text x="15" y="200" class="text-muted">Nodes represent active agents and resources</text>
+    </g>
+  </g>
+
+  <!-- REGION 3: Type-specific Input Projection (x=670, w=260, y=120, h=680) -->
+  <g id="region-3" transform="translate(670, 120)">
+    <rect width="260" height="680" rx="8" class="column-frame" />
+    
+    <!-- Title Area -->
+    <rect width="260" height="50" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" />
+    <text x="130" y="30" class="title-section center-text">3. Type-specific Projection</text>
+    <text x="130" y="44" class="text-muted center-text">Map raw node features to joint space</text>
+
+    <!-- Formula Panel -->
+    <g transform="translate(10, 65)">
+      <rect width="240" height="65" rx="6" class="card-neutral" fill="#FAFAFA" />
+      <text x="120" y="25" class="text-muted center-text">Projection Operator</text>
+      <text x="120" y="48" class="math center-text" font-size="15" font-weight="bold">
+        H<tspan class="sub">τ</tspan><tspan class="super">0</tspan> = σ( X<tspan class="sub">τ</tspan> W<tspan class="sub">in</tspan><tspan class="super">τ</tspan> + b<tspan class="sub">in</tspan><tspan class="super">τ</tspan> )
+      </text>
+    </g>
+
+    <!-- Projection Stack -->
+    <!-- Operation Projection -->
+    <g transform="translate(10, 145)">
+      <rect width="240" height="135" rx="6" class="card-blue" />
+      <text x="15" y="22" class="title-subsection" fill="#1E40AF">Operation Node Projection</text>
+      <path d="M 20 40 L 220 40" stroke="#BFDBFE" stroke-width="1" />
+      
+      <g transform="translate(15, 55)">
+        <text x="0" y="15" class="text-body-bold">Input Raw:</text>
+        <text x="100" y="15" class="math">[n<tspan class="sub">o</tspan>, 6]</text>
+        
+        <text x="0" y="38" class="text-body-bold">Linear Layer:</text>
+        <text x="100" y="38" class="math">W<tspan class="sub">in</tspan><tspan class="super">op</tspan> ∈ ℝ<tspan class="super">6×128</tspan></text>
+        
+        <text x="0" y="60" class="text-body-bold">Output Hidden:</text>
+        <text x="100" y="60" class="math">[n<tspan class="sub">o</tspan>, 128]</text>
+      </g>
+    </g>
+
+    <!-- Vehicle Projection -->
+    <g transform="translate(10, 295)">
+      <rect width="240" height="135" rx="6" class="card-green" />
+      <text x="15" y="22" class="title-subsection" fill="#065F46">Vehicle Node Projection</text>
+      <path d="M 20 40 L 220 40" stroke="#A7F3D0" stroke-width="1" />
+      
+      <g transform="translate(15, 55)">
+        <text x="0" y="15" class="text-body-bold">Input Raw:</text>
+        <text x="100" y="15" class="math">[n<tspan class="sub">v</tspan>, 4]</text>
+        
+        <text x="0" y="38" class="text-body-bold">Linear Layer:</text>
+        <text x="100" y="38" class="math">W<tspan class="sub">in</tspan><tspan class="super">veh</tspan> ∈ ℝ<tspan class="super">4×128</tspan></text>
+        
+        <text x="0" y="60" class="text-body-bold">Output Hidden:</text>
+        <text x="100" y="60" class="math">[n<tspan class="sub">v</tspan>, 128]</text>
+      </g>
+    </g>
+
+    <!-- Zone Projection -->
+    <g transform="translate(10, 445)">
+      <rect width="240" height="135" rx="6" class="card-orange" />
+      <text x="15" y="22" class="title-subsection" fill="#9A3412">Zone Node Projection</text>
+      <path d="M 20 40 L 220 40" stroke="#FED7AA" stroke-width="1" />
+      
+      <g transform="translate(15, 55)">
+        <text x="0" y="15" class="text-body-bold">Input Raw:</text>
+        <text x="100" y="15" class="math">[n<tspan class="sub">z</tspan>, 5]</text>
+        
+        <text x="0" y="38" class="text-body-bold">Linear Layer:</text>
+        <text x="100" y="38" class="math">W<tspan class="sub">in</tspan><tspan class="super">zone</tspan> ∈ ℝ<tspan class="super">5×128</tspan></text>
+        
+        <text x="0" y="60" class="text-body-bold">Output Hidden:</text>
+        <text x="100" y="60" class="math">[n<tspan class="sub">z</tspan>, 128]</text>
+      </g>
+    </g>
+
+    <!-- Sub-info -->
+    <g transform="translate(10, 595)">
+      <rect width="240" height="75" rx="6" class="card-neutral" />
+      <text x="120" y="22" class="text-body-bold center-text">Shared Representation Space</text>
+      <text x="120" y="44" class="math-code center-text" font-weight="bold">Dimension F = 128</text>
+      <text x="120" y="60" class="text-muted center-text">Enables cross-type attention mapping</text>
+    </g>
+  </g>
+
+  <!-- REGION 4: 3-layer HGT Encoder (x=980, w=290, y=120, h=680) -->
+  <g id="region-4" transform="translate(980, 120)">
+    <rect width="290" height="680" rx="8" class="column-frame-purple" />
+    
+    <!-- Title Area -->
+    <rect width="290" height="50" rx="8" fill="#F3E8FF" stroke="#D8B4FE" stroke-width="1" />
+    <text x="145" y="30" class="title-section center-text" fill="#6B21A8">4. 3-layer HGT Encoder</text>
+    <text x="145" y="44" class="text-muted center-text" fill="#7E22CE">Heterogeneous Graph Transformer Layers</text>
+
+    <!-- Conv Layers stack -->
+    <g transform="translate(15, 65)">
+      <rect width="260" height="150" rx="6" class="card-purple" fill="#FAF5FF" />
+      <text x="130" y="20" class="title-subsection center-text" fill="#6B21A8">Stacked message passing</text>
+      
+      <!-- HGT Conv 1 -->
+      <rect x="20" y="32" width="220" height="30" rx="4" fill="#FFFFFF" stroke="#C084FC" />
+      <text x="130" y="51" class="text-body-bold center-text">HGTConv Layer 1 (ℓ = 0)</text>
+
+      <!-- HGT Conv 2 -->
+      <rect x="20" y="70" width="220" height="30" rx="4" fill="#FFFFFF" stroke="#C084FC" />
+      <text x="130" y="89" class="text-body-bold center-text">HGTConv Layer 2 (ℓ = 1)</text>
+
+      <!-- HGT Conv 3 -->
+      <rect x="20" y="108" width="220" height="30" rx="4" fill="#FFFFFF" stroke="#C084FC" />
+      <text x="130" y="127" class="text-body-bold center-text">HGTConv Layer 3 (ℓ = 2)</text>
+      
+      <text x="130" y="145" class="text-muted center-text" font-size="10.5">Vehicles &amp; zones pass context forward</text>
+    </g>
+
+    <!-- Inset 1: QKV Projection Details -->
+    <g transform="translate(15, 230)">
+      <rect width="260" height="215" rx="6" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5" />
+      <text x="15" y="20" class="title-subsection" fill="#6B21A8">Multi-head Q/K/V Computation</text>
+      <path d="M 15 30 L 245 30" stroke="#F3E8FF" stroke-width="1" />
+      
+      <g transform="translate(15, 45)">
+        <!-- Equation -->
+        <text x="0" y="15" class="math">[K<tspan class="sub">τ</tspan> ‖ Q<tspan class="sub">τ</tspan> ‖ V<tspan class="sub">τ</tspan>] = H<tspan class="sub">τ</tspan><tspan class="super">ℓ</tspan> W<tspan class="sub">KQV</tspan><tspan class="super">τ</tspan> + b<tspan class="sub">KQV</tspan><tspan class="super">τ</tspan></text>
+        
+        <text x="0" y="38" class="text-muted">Projections mapping <tspan class="math">128 → 384</tspan> dimensions:</text>
+        <text x="0" y="52" class="text-body">Reshaped to H = 4 heads, <tspan class="math">d<tspan class="sub">h</tspan> = 32</tspan></text>
+        
+        <path d="M 0 65 L 230 65" stroke="#F5F3FF" stroke-width="1" />
+
+        <!-- Relation dependent math -->
+        <text x="0" y="82" class="text-muted">Relation-dependent transforms for target <tspan class="math">v</tspan>, source <tspan class="math">u</tspan>:</text>
+        
+        <text x="10" y="105" class="math" font-size="13">Q<tspan class="sub">v</tspan> = Q<tspan class="sub">τ<tspan font-size="70%">t</tspan></tspan>(v)</text>
+        
+        <text x="10" y="125" class="math" font-size="13">K<tspan class="sub">u</tspan><tspan class="super">r</tspan> = W<tspan class="sub">K</tspan><tspan class="super">r</tspan> K<tspan class="sub">τ<tspan font-size="70%">s</tspan></tspan>(u)</text>
+        
+        <text x="10" y="145" class="math" font-size="13">V<tspan class="sub">u</tspan><tspan class="super">r</tspan> = W<tspan class="sub">V</tspan><tspan class="super">r</tspan> V<tspan class="sub">τ<tspan font-size="70%">s</tspan></tspan>(u)</text>
+        
+        <text x="120" y="125" class="text-muted" font-size="11.5">W<tspan class="sub">K</tspan><tspan class="super">r</tspan>, W<tspan class="sub">V</tspan><tspan class="super">r</tspan> are relation-</text>
+        <text x="120" y="139" class="text-muted" font-size="11.5">specific weight matrices</text>
+      </g>
+    </g>
+
+    <!-- Inset 2: Attention math -->
+    <g transform="translate(15, 460)">
+      <rect width="260" height="205" rx="6" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5" />
+      <text x="15" y="22" class="title-subsection" fill="#6B21A8">Relation-aware Attention</text>
+      <path d="M 15 32 L 245 32" stroke="#F3E8FF" stroke-width="1" />
+      
+      <g transform="translate(15, 50)">
+        <!-- Score formula -->
+        <text x="0" y="15" class="text-muted">Softmax attention weight for edge <tspan class="math">(u, v)</tspan> of relation <tspan class="math">r</tspan>:</text>
+        
+        <text x="10" y="45" class="math" font-size="14" font-weight="bold">score(u, v, r) = Q<tspan class="sub">v</tspan> · K<tspan class="sub">u</tspan><tspan class="super">r</tspan> / √32</text>
+        
+        <text x="10" y="75" class="math" font-size="14" font-weight="bold">α(u, v, r) = softmax<tspan class="sub">u</tspan>(score(u, v, r))</text>
+        
+        <path d="M 0 95 L 230 95" stroke="#F5F3FF" stroke-width="1" />
+        
+        <text x="0" y="112" class="text-muted">Message aggregation to target operation:</text>
+        <text x="10" y="135" class="math" font-size="14" font-weight="bold">message = α(u, v, r) · V<tspan class="sub">u</tspan><tspan class="super">r</tspan></text>
+        
+        <!-- Info text -->
+        <text x="0" y="150" class="text-muted" font-size="11">Message aggregation is summed across all 5</text>
+        <text x="0" y="163" class="text-muted" font-size="11">in-bound relation types dynamically.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- REGION 5: Actor-Critic Decision Module (x=1320, w=230, y=120, h=680) -->
+  <g id="region-5" transform="translate(1320, 120)">
+    <rect width="230" height="680" rx="8" class="column-frame" />
+    
+    <!-- Title Area -->
+    <rect width="230" height="50" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" />
+    <text x="115" y="30" class="title-section center-text">5. Actor-Critic Module</text>
+    <text x="115" y="44" class="text-muted center-text">Execution &amp; Value estimation</text>
+
+    <!-- Final Embeddings Card -->
+    <g transform="translate(10, 65)">
+      <rect width="210" height="85" rx="6" class="card-blue" stroke-width="2" />
+      <text x="105" y="25" class="title-subsection center-text" fill="#1E40AF">Final Operation Embeds</text>
+      <text x="105" y="50" class="math center-text" font-size="14" fill="#1E3A8A">H<tspan class="sub">op</tspan><tspan class="super">L</tspan> ∈ ℝ<tspan class="super">n<tspan class="sub">o</tspan> × 128</tspan></text>
+      <text x="105" y="70" class="text-muted center-text" font-size="11">One embedding per operation</text>
+    </g>
+
+    <!-- Actor Branch (Teal) -->
+    <g transform="translate(10, 165)">
+      <rect width="210" height="275" rx="6" class="card-teal" stroke-width="2" />
+      <text x="105" y="22" class="title-subsection center-text" fill="#0F766E">Actor: Dispatching Policy</text>
+      <path d="M 15 30 L 195 30" stroke="#99F6E4" stroke-width="1" />
+      
+      <g transform="translate(12, 45)">
+        <!-- MLP -->
+        <text x="0" y="15" class="text-body-bold">MLP Architecture:</text>
+        <text x="25" y="32" class="math">128 → 64 → 1 Logit</text>
+        
+        <text x="0" y="52" class="text-body-bold">Raw Logits output:</text>
+        <text x="25" y="69" class="math">[n<tspan class="sub">o</tspan>] values</text>
+        
+        <!-- Mask Sub-box -->
+        <g transform="translate(0, 85)">
+          <rect width="186" height="80" rx="4" class="card-red" />
+          <text x="93" y="18" class="title-subsection center-text" fill="#991B1B" font-size="12">Feasible Action Mask</text>
+          <text x="93" y="38" class="text-muted center-text" font-size="11">Invalid actions suppressed:</text>
+          <rect x="25" y="47" width="136" height="24" rx="3" fill="#FFFFFF" stroke="#FCA5A5" />
+          <text x="93" y="63" class="math center-text" font-size="12.5" fill="#991B1B">logit<tspan class="sub">o</tspan> = -∞ if o ∉ A<tspan class="sub">t</tspan></text>
+        </g>
+        
+        <!-- Policy Output -->
+        <text x="0" y="190" class="text-body-bold">Action Selection Probability:</text>
+        <rect x="0" y="198" width="186" height="26" rx="4" fill="#FFFFFF" stroke="#99F6E4" />
+        <text x="93" y="215" class="math center-text" font-size="12.5" font-weight="bold" fill="#0F766E">π<tspan class="sub">θ</tspan>(o | G<tspan class="sub">t</tspan>) = softmax(masked logits)</text>
+      </g>
+    </g>
+
+    <!-- Critic Branch (Amber) -->
+    <g transform="translate(10, 455)">
+      <rect width="210" height="210" rx="6" class="card-amber" stroke-width="2" />
+      <text x="105" y="22" class="title-subsection center-text" fill="#B45309">Critic: Graph Value</text>
+      <path d="M 15 30 L 195 30" stroke="#FDE68A" stroke-width="1" />
+      
+      <g transform="translate(12, 45)">
+        <!-- Task Selection -->
+        <text x="0" y="15" class="text-body-bold">Target State Pooling:</text>
+        <text x="0" y="32" class="text-muted">Filter unscheduled operations <tspan class="math">U<tspan class="sub">t</tspan></tspan></text>
+        
+        <rect x="0" y="40" width="186" height="26" rx="4" fill="#FFFFFF" stroke="#FDE68A" />
+        <text x="93" y="57" class="math center-text" font-size="11.5" font-weight="bold" fill="#B45309">h<tspan class="sub">G</tspan> = mean({ h<tspan class="sub">o</tspan><tspan class="super">L</tspan> | o ∈ U<tspan class="sub">t</tspan> })</text>
+        
+        <!-- Value MLP -->
+        <text x="0" y="88" class="text-body-bold">MLP Regressor:</text>
+        <text x="25" y="105" class="math">128 → 64 → 1 Scalar</text>
+        
+        <!-- Value Output -->
+        <text x="0" y="125" class="text-body-bold">Value Estimate:</text>
+        <rect x="0" y="132" width="186" height="26" rx="4" fill="#FFFFFF" stroke="#FDE68A" />
+        <text x="93" y="149" class="math center-text" font-size="13" font-weight="bold" fill="#B45309">V<tspan class="sub">φ</tspan>(G<tspan class="sub">t</tspan>)</text>
+        
+        <text x="93" y="172" class="text-muted center-text" font-size="11">Estimates expected remaining time</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- INTER-REGION CONNECTORS (Arrows between Columns) -->
+  <g id="connectors">
+    <!-- R1 to R2 Arrow -->
+    <path d="M 280 460 L 322 460" class="connector" marker-end="url(#arrowhead)" />
+    <text x="301" y="450" class="text-body-bold center-text" font-size="11">Graph</text>
+    <text x="301" y="480" class="text-body-bold center-text" font-size="11">Build</text>
+
+    <!-- R2 to R3 Arrow 1: Operations -->
+    <path d="M 610 185 Q 640 185 640 212 T 662 212" stroke="#3B82F6" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-blue)" />
+    
+    <!-- R2 to R3 Arrow 2: Vehicles -->
+    <path d="M 610 265 Q 640 265 640 362 T 662 362" stroke="#10B981" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-green)" />
+    
+    <!-- R2 to R3 Arrow 3: Zones -->
+    <path d="M 610 385 Q 640 385 640 512 T 662 512" stroke="#F59E0B" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-orange)" />
+
+    <!-- R3 to R4 Bracket / Covergence -->
+    <!-- Op to HGTConv -->
+    <path d="M 930 212 L 950 212 L 950 315 L 972 315" class="connector" marker-end="url(#arrowhead)" />
+    <!-- Veh to HGTConv -->
+    <path d="M 930 362 L 950 362 L 950 315" stroke="#475569" stroke-width="2" fill="none" />
+    <!-- Zone to HGTConv -->
+    <path d="M 930 512 L 950 512 L 950 315" stroke="#475569" stroke-width="2" fill="none" />
+    
+    <text x="948" y="200" class="text-muted right-text">Init Embeds</text>
+    <text x="948" y="214" class="math-code right-text">H^0</text>
+
+    <!-- R4 to R5 final arrow -->
+    <path d="M 1270 210 L 1312 210" class="connector" marker-end="url(#arrowhead)" />
+    
+    <!-- R5 Final Embeds branching to Actor and Critic -->
+    <!-- Path to Actor -->
+    <path d="M 1425 215 L 1425 242" class="connector" marker-end="url(#arrowhead)" />
+    <!-- Path to Critic -->
+    <path d="M 1540 227.5 L 1550 227.5 L 1550 620 L 1532 620" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="1562" y="420" class="text-body-bold" font-size="11" transform="rotate(90, 1562, 420)">Embedding Flow</text>
+  </g>
+
+  <!-- METHODOLOGICAL SEPARATION BAR (y=820 to 900) -->
+  <g id="methodological-bar" transform="translate(50, 820)">
+    <rect width="1500" height="80" rx="8" class="bar-frame" />
+    
+    <!-- Segment 1: HGT + Actor -->
+    <g transform="translate(10, 10)">
+      <rect width="350" height="60" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+      <text x="20" y="26" class="bar-title" fill="#2563EB">Neural Policy Network (HGT + Actor)</text>
+      <text x="20" y="45" class="bar-subtitle">Learns dispatch preference from priority scores</text>
+    </g>
+    
+    <!-- Arrow 1-2 -->
+    <path d="M 365 40 L 375 40" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+
+    <!-- Segment 2: Feasible Mask -->
+    <g transform="translate(380, 10)">
+      <rect width="360" height="60" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+      <text x="20" y="26" class="bar-title" fill="#DC2626">Hard Feasible-Action Mask</text>
+      <text x="20" y="45" class="bar-subtitle">Enforces legality to prevent deadlock &amp; collision</text>
+    </g>
+
+    <!-- Arrow 2-3 -->
+    <path d="M 745 40 L 755 40" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+
+    <!-- Segment 3: Environment Decoder -->
+    <g transform="translate(760, 10)">
+      <rect width="360" height="60" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+      <text x="20" y="26" class="bar-title" fill="#0F172A">Environment JSSP Decoder</text>
+      <text x="20" y="45" class="bar-subtitle">Calculates exact start and finish schedule times</text>
+    </g>
+
+    <!-- Arrow 3-4 -->
+    <path d="M 1125 40 L 1135 40" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowhead)" fill="none" />
+
+    <!-- Segment 4: Low-level Controller -->
+    <g transform="translate(1140, 10)">
+      <rect width="350" height="60" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+      <text x="20" y="26" class="bar-title" fill="#0F172A">Low-level Vehicle Controller</text>
+      <text x="20" y="45" class="bar-subtitle">Tracks vehicle trajectories in real-time</text>
+    </g>
+  </g>
+</svg>
