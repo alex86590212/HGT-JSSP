@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HGT Actor-Critic Architecture Flow</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --ink: #17202a;
+      --muted: #637083;
+      --panel: #ffffff;
+      --line: #cad5e3;
+      --operation: #246bfe;
+      --vehicle: #149b72;
+      --zone: #d6742a;
+      --hgt: #6f42c1;
+      --actor: #0c8078;
+      --critic: #9a641c;
+      --mask: #bf3737;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 880px;
+    }
+
+    .stage {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 16px 40px rgb(32 47 72 / 10%);
+    }
+
+    .diagram {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .caption-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .note {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+      font-size: 0.92rem;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--ink);
+    }
+
+    .note span {
+      color: var(--muted);
+    }
+
+    .copy {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--hgt);
+      border-radius: 6px;
+      background: #f4f0ff;
+      color: #35205f;
+      font-size: 0.95rem;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      color: #233147;
+    }
+
+    @media (max-width: 860px) {
+      .caption-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 20px, 1280px);
+      }
+
+      .stage {
+        padding: 10px;
+      }
+
+      .caption-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>HGT Actor-Critic Architecture Flow</h1>
+    <p>
+      A compact PPT-ready diagram of the current implementation: typed graph input,
+      type-specific projection, 3-layer HGTConv encoder, and actor-critic outputs.
+    </p>
+
+    <section class="stage" aria-label="HGT architecture flow diagram">
+      <svg class="diagram" viewBox="0 0 1360 940" role="img" aria-labelledby="title desc">
+        <title id="title">HGT actor-critic architecture flow</title>
+        <desc id="desc">
+          Traffic state is converted into operation, vehicle, and zone node features,
+          projected to 128-dimensional embeddings, passed through three HGTConv layers,
+          and split into actor and critic heads.
+        </desc>
+
+        <defs>
+          <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#55687f" />
+          </marker>
+          <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#246bfe" />
+          </marker>
+          <marker id="arrowTeal" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#0c8078" />
+          </marker>
+          <marker id="arrowGold" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#9a641c" />
+          </marker>
+          <style>
+            .title { font: 800 32px "Segoe UI", Arial, sans-serif; fill: #17202a; }
+            .subtitle { font: 600 18px "Segoe UI", Arial, sans-serif; fill: #637083; }
+            .box-title { font: 800 20px "Segoe UI", Arial, sans-serif; fill: #17202a; }
+            .box-text { font: 600 15px "Segoe UI", Arial, sans-serif; fill: #465568; }
+            .tiny { font: 600 13px "Segoe UI", Arial, sans-serif; fill: #637083; }
+            .white-title { font: 800 19px "Segoe UI", Arial, sans-serif; fill: #ffffff; }
+            .white-text { font: 600 14px "Segoe UI", Arial, sans-serif; fill: #eef4ff; }
+            .node-label { font: 800 16px "Segoe UI", Arial, sans-serif; fill: #ffffff; }
+            .shape-label { font: 700 15px "Segoe UI", Arial, sans-serif; fill: #17202a; }
+            .arrow { stroke: #55687f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+            .arrow-blue { stroke: #246bfe; stroke-width: 3; fill: none; marker-end: url(#arrowBlue); }
+            .arrow-teal { stroke: #0c8078; stroke-width: 3; fill: none; marker-end: url(#arrowTeal); }
+            .arrow-gold { stroke: #9a641c; stroke-width: 3; fill: none; marker-end: url(#arrowGold); }
+            .soft-line { stroke: #cad5e3; stroke-width: 2; fill: none; }
+          </style>
+        </defs>
+
+        <rect width="1360" height="940" rx="22" fill="#ffffff" />
+        <text x="50" y="58" class="title">HGT-based Actor-Critic Scheduler</text>
+        <text x="50" y="90" class="subtitle">Typed graph input -> 128-dim projection -> 3 x HGTConv -> actor policy + critic value</text>
+
+        <!-- Traffic state -->
+        <rect x="66" y="140" width="244" height="112" rx="8" fill="#f1f5f9" stroke="#cad5e3" stroke-width="2" />
+        <text x="92" y="180" class="box-title">Traffic State</text>
+        <text x="92" y="210" class="box-text">vehicles, routes, zones,</text>
+        <text x="92" y="232" class="box-text">time, feasibility mask</text>
+
+        <!-- Node feature block -->
+        <rect x="390" y="118" width="292" height="182" rx="8" fill="#fbfcff" stroke="#cad5e3" stroke-width="2" />
+        <text x="414" y="153" class="box-title">Heterogeneous Graph</text>
+
+        <rect x="416" y="175" width="238" height="30" rx="6" fill="#246bfe" />
+        <text x="432" y="196" class="node-label">operation</text>
+        <text x="558" y="196" class="node-label">[n_o, 6]</text>
+
+        <rect x="416" y="218" width="238" height="30" rx="6" fill="#149b72" />
+        <text x="432" y="239" class="node-label">vehicle</text>
+        <text x="570" y="239" class="node-label">[n_v, 4]</text>
+
+        <rect x="416" y="261" width="238" height="30" rx="6" fill="#d6742a" />
+        <text x="432" y="282" class="node-label">zone</text>
+        <text x="585" y="282" class="node-label">[n_z, 5]</text>
+
+        <!-- Projection block -->
+        <rect x="768" y="126" width="266" height="166" rx="8" fill="#eef6ff" stroke="#b8c9df" stroke-width="2" />
+        <text x="792" y="162" class="box-title">Type-specific Linear</text>
+        <text x="792" y="192" class="box-text">operation: 6 -> 128</text>
+        <text x="792" y="216" class="box-text">vehicle: 4 -> 128</text>
+        <text x="792" y="240" class="box-text">zone: 5 -> 128</text>
+        <text x="792" y="266" class="tiny">all node embeddings become 128-dim</text>
+
+        <path class="arrow" d="M310 196 C340 196, 356 196, 390 196" />
+        <path class="arrow" d="M682 209 C720 209, 730 209, 768 209" />
+
+        <!-- HGTConv stack -->
+        <rect x="176" y="382" width="1008" height="314" rx="10" fill="#f7f3ff" stroke="#c6b7eb" stroke-width="2" />
+        <text x="208" y="424" class="box-title">3 x HGTConv Encoder</text>
+        <text x="208" y="451" class="box-text">hidden dimension F=128, attention heads H=4, per-head dimension d_h=32</text>
+
+        <path class="arrow" d="M901 292 C901 328, 680 328, 680 382" />
+
+        <!-- QKV block -->
+        <rect x="222" y="490" width="258" height="132" rx="8" fill="#ffffff" stroke="#c6b7eb" stroke-width="2" />
+        <text x="246" y="524" class="box-title">Q/K/V Projection</text>
+        <text x="246" y="553" class="box-text">Linear: 128 -> 384</text>
+        <text x="246" y="579" class="box-text">split into K, Q, V</text>
+        <text x="246" y="605" class="box-text">reshape: 3 x [4, 32]</text>
+
+        <rect x="554" y="490" width="258" height="132" rx="8" fill="#ffffff" stroke="#c6b7eb" stroke-width="2" />
+        <text x="578" y="524" class="box-title">Typed Relations</text>
+        <text x="578" y="553" class="box-text">seq, lane, conflict</text>
+        <text x="578" y="579" class="box-text">owns, hosts</text>
+        <text x="578" y="605" class="box-text">relation-specific K/V</text>
+
+        <rect x="886" y="490" width="258" height="132" rx="8" fill="#ffffff" stroke="#c6b7eb" stroke-width="2" />
+        <text x="910" y="524" class="box-title">Message Passing</text>
+        <text x="910" y="553" class="box-text">score = Q · K / sqrt(32)</text>
+        <text x="910" y="579" class="box-text">alpha = softmax(score)</text>
+        <text x="910" y="605" class="box-text">message = alpha · V</text>
+
+        <path class="arrow-blue" d="M480 556 C510 556, 524 556, 554 556" />
+        <path class="arrow-blue" d="M812 556 C842 556, 856 556, 886 556" />
+
+        <!-- Operation embeddings -->
+        <rect x="492" y="750" width="376" height="86" rx="8" fill="#eaf1ff" stroke="#246bfe" stroke-width="2" />
+        <text x="525" y="786" class="box-title">Operation Embeddings</text>
+        <text x="525" y="815" class="box-text">H_op^L [n_o, 128]</text>
+
+        <path class="arrow-blue" d="M680 696 C680 720, 680 726, 680 750" />
+
+        <!-- Actor -->
+        <rect x="112" y="810" width="328" height="100" rx="8" fill="#eefaf8" stroke="#0c8078" stroke-width="2" />
+        <text x="140" y="847" class="box-title">Actor Policy</text>
+        <text x="140" y="876" class="box-text">128 -> 64 -> 1 logits</text>
+        <text x="140" y="899" class="box-text">hard feasible mask before softmax</text>
+
+        <!-- Critic -->
+        <rect x="920" y="810" width="344" height="100" rx="8" fill="#fff4e7" stroke="#9a641c" stroke-width="2" />
+        <text x="948" y="847" class="box-title">Critic Value</text>
+        <text x="948" y="876" class="box-text">mean pool unscheduled operations</text>
+        <text x="948" y="899" class="box-text">128 -> 64 -> 1 value</text>
+
+        <path class="arrow-teal" d="M492 795 C410 795, 342 795, 304 810" />
+        <path class="arrow-gold" d="M868 795 C952 795, 1020 795, 1054 810" />
+
+        <!-- Mask badge -->
+        <rect x="316" y="734" width="164" height="34" rx="17" fill="#fff3f3" stroke="#bf3737" stroke-width="2" />
+        <text x="338" y="756" class="shape-label" fill="#bf3737">infeasible -> -inf</text>
+
+        <path class="soft-line" d="M412 768 C395 792, 356 805, 316 820" />
+
+        <!-- relation mini graph -->
+        <g transform="translate(1082 128)">
+          <text x="0" y="0" class="tiny">typed incoming messages</text>
+          <circle cx="78" cy="68" r="24" fill="#246bfe" />
+          <text x="63" y="74" class="white-text">op</text>
+          <circle cx="18" cy="22" r="18" fill="#149b72" />
+          <text x="7" y="27" class="white-text">veh</text>
+          <circle cx="18" cy="114" r="18" fill="#d6742a" />
+          <text x="8" y="119" class="white-text">zone</text>
+          <circle cx="142" cy="22" r="18" fill="#246bfe" />
+          <text x="132" y="27" class="white-text">op</text>
+          <circle cx="142" cy="114" r="18" fill="#246bfe" />
+          <text x="132" y="119" class="white-text">op</text>
+          <path class="soft-line" marker-end="url(#arrow)" d="M36 30 L58 55" />
+          <path class="soft-line" marker-end="url(#arrow)" d="M36 108 L58 82" />
+          <path class="soft-line" marker-end="url(#arrow)" d="M126 34 L98 56" />
+          <path class="soft-line" marker-end="url(#arrow)" d="M126 106 L98 80" />
+          <text x="2" y="156" class="tiny">target node: operation</text>
+        </g>
+      </svg>
+    </section>
+
+    <section class="caption-grid" aria-label="diagram notes">
+      <div class="note">
+        <strong>Input</strong>
+        <span>Operation, vehicle, and zone nodes keep different raw feature sizes before projection.</span>
+      </div>
+      <div class="note">
+        <strong>Encoder</strong>
+        <span>Each node type is projected to 128 dimensions, then processed by 3 HGTConv layers.</span>
+      </div>
+      <div class="note">
+        <strong>Q/K/V</strong>
+        <span>HGTConv uses type-specific linear projection: <code>128 -> 384 -> K/Q/V</code>.</span>
+      </div>
+      <div class="note">
+        <strong>Output</strong>
+        <span>Actor scores all operations then masks infeasible ones; critic pools unscheduled operations.</span>
+      </div>
+    </section>
+
+    <div class="copy">
+      PPT tip: open this page in a browser, zoom to fit, then screenshot the diagram area.
+      The SVG is self-contained and does not require a CDN or Python environment.
+    </div>
+  </main>
+</body>
+</html>

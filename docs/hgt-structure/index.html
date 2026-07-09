@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HGT-JSSP Structure Visual Guide</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5e6b7a;
+      --line: #d9e1ea;
+      --operation: #246bfe;
+      --vehicle: #14a376;
+      --zone: #d86f28;
+      --seq: #3454d1;
+      --lane: #00a0b5;
+      --conflict: #c13636;
+      --owns: #1b9a72;
+      --hosts: #d07b20;
+      --hgt: #6f42c1;
+      --actor: #0f7f75;
+      --critic: #8b5a18;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    a {
+      color: var(--operation);
+      text-decoration: none;
+    }
+
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--hgt);
+      font-size: 0.86rem;
+      font-weight: 760;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(1.35rem, 2vw, 1.9rem);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 20px 0 8px;
+      font-size: 1.04rem;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .lead {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 1.06rem;
+      max-width: 760px;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .viewer-shell {
+      position: relative;
+      overflow: hidden;
+      min-height: 390px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b1220;
+      box-shadow: 0 18px 50px rgb(21 36 56 / 14%);
+    }
+
+    #scene {
+      width: 100%;
+      height: 390px;
+      display: block;
+    }
+
+    .viewer-tools {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border: 1px solid rgb(255 255 255 / 18%);
+      border-radius: 999px;
+      background: rgb(8 14 26 / 72%);
+      color: #edf3ff;
+      font-size: 0.78rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--operation);
+      flex: 0 0 auto;
+    }
+
+    .hint {
+      padding: 6px 9px;
+      border: 1px solid rgb(255 255 255 / 18%);
+      border-radius: 999px;
+      background: rgb(8 14 26 / 72%);
+      color: #d9e6ff;
+      font-size: 0.78rem;
+      pointer-events: auto;
+      backdrop-filter: blur(12px);
+    }
+
+    .fallback {
+      display: none;
+      padding: 18px;
+      color: #e8eefc;
+    }
+
+    .fallback.show {
+      display: block;
+    }
+
+    .fallback p {
+      color: #c8d4e7;
+    }
+
+    section {
+      margin-top: 24px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      min-height: 100%;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #edf2fb;
+      color: #334155;
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.94rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #253447;
+      background: #f1f5f9;
+      font-weight: 760;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .step {
+      position: relative;
+      min-height: 132px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+    }
+
+    .step::after {
+      content: ">";
+      position: absolute;
+      top: 48%;
+      right: -9px;
+      color: #8aa0b8;
+      font-weight: 800;
+    }
+
+    .step:last-child::after {
+      content: "";
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .note {
+      padding: 12px 14px;
+      border-left: 4px solid var(--hgt);
+      border-radius: 6px;
+      background: #f4f0ff;
+      color: #35205f;
+    }
+
+    .warning {
+      padding: 12px 14px;
+      border-left: 4px solid #b84a4a;
+      border-radius: 6px;
+      background: #fff3f3;
+      color: #652323;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.46;
+      white-space: pre;
+    }
+
+    .ppt {
+      background: #0f172a;
+      color: #eef4ff;
+    }
+
+    .ppt h2,
+    .ppt h3 {
+      color: #fff;
+    }
+
+    .ppt .card {
+      background: rgb(255 255 255 / 7%);
+      border-color: rgb(255 255 255 / 14%);
+    }
+
+    .ppt .tag {
+      background: rgb(255 255 255 / 12%);
+      color: #d9e6ff;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 920px) {
+      header,
+      .two-col,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-metrics {
+        grid-template-columns: repeat(3, minmax(88px, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 18px;
+      }
+
+      section {
+        padding: 18px;
+      }
+
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .viewer-shell {
+        min-height: 330px;
+      }
+
+      #scene {
+        height: 330px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <p class="eyebrow">HGT-JSSP / Documentation</p>
+        <h1>HGT 结构可视化：从交通状态到调度动作</h1>
+        <p class="lead">
+          这份页面对应当前仓库实现：环境状态先被转换为 PyTorch Geometric 的异构图，
+          HGT 只输出 operation 节点嵌入，actor 对可行动作做 masked softmax，critic 对未调度 operation 嵌入做均值池化估值。
+        </p>
+        <div class="hero-metrics" aria-label="HGT graph summary">
+          <div class="metric"><strong>3</strong><span>节点类型：operation / vehicle / zone</span></div>
+          <div class="metric"><strong>5</strong><span>边类型：seq / lane / conflict / owns / hosts</span></div>
+          <div class="metric"><strong>3</strong><span>默认 HGTConv 层数，hidden_dim=128, heads=4</span></div>
+        </div>
+      </div>
+
+      <div class="viewer-shell">
+        <canvas id="scene" aria-label="3D HGT structure"></canvas>
+        <div id="fallback" class="fallback">
+          <h2>3D 场景未加载</h2>
+          <p>如果当前环境不能访问 Three.js CDN，下面的表格和流程说明仍然完整描述了 HGT 结构。</p>
+        </div>
+        <div class="viewer-tools">
+          <div class="legend" aria-label="legend">
+            <span class="pill"><span class="dot" style="background: var(--vehicle)"></span>vehicle</span>
+            <span class="pill"><span class="dot" style="background: var(--operation)"></span>operation</span>
+            <span class="pill"><span class="dot" style="background: var(--zone)"></span>zone</span>
+            <span class="pill"><span class="dot" style="background: var(--hgt)"></span>HGTConv</span>
+          </div>
+          <span class="hint">拖动旋转，滚轮缩放</span>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <h2>一眼看懂：当前实现的数据流</h2>
+      <div class="pipeline">
+        <div class="step"><strong>1. 环境状态</strong><span>车辆、路线、冲突区、已调度状态、zone 可用时间。</span></div>
+        <div class="step"><strong>2. 可行集合</strong><span><code>compute_feasible_set</code> 返回每个 operation 是否可调度。</span></div>
+        <div class="step"><strong>3. 异构图</strong><span><code>build_hetero_graph</code> 构造 node features 和 edge_index。</span></div>
+        <div class="step"><strong>4. HGT 编码</strong><span>每类节点先投影到 hidden_dim，再经过多层 <code>HGTConv</code>。</span></div>
+        <div class="step"><strong>5. Actor</strong><span>每个 operation 得到一个 logit；不可行动作被设为 <code>-inf</code>。</span></div>
+        <div class="step"><strong>6. Critic + PPO</strong><span>未调度 operation 均值池化，输出状态价值，供 GAE/PPO 更新。</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Node 输入结构</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>operation 节点 <code>[num_ops, 6]</code></h3>
+          <p>一个 operation 表示“某辆车在路线中的某个位置通过某个 conflict zone”。它也是 actor 可以选择的动作单位。</p>
+          <div class="tag-row">
+            <span class="tag">d(i,j): 是否已调度</span>
+            <span class="tag">c(i,j): earliest finish</span>
+            <span class="tag">p(i,j): processing time</span>
+            <span class="tag">j / n_i: route progress</span>
+            <span class="tag">is_schedulable</span>
+            <span class="tag">n_conflicts</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>vehicle 节点 <code>[num_veh, 4]</code></h3>
+          <p>vehicle 节点提供车辆级上下文，例如到达时间、路线长度和速度。它通过 owns 边给 operation 传递所属车辆信息。</p>
+          <div class="tag-row">
+            <span class="tag">r_i: arrival time</span>
+            <span class="tag">n_i: route length</span>
+            <span class="tag">velocity</span>
+            <span class="tag">zones_done</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>zone 节点 <code>[num_zones, 5]</code></h3>
+          <p>zone 节点描述共享资源状态。它通过 hosts 边告诉 operation 当前 conflict zone 的占用和竞争情况。</p>
+          <div class="tag-row">
+            <span class="tag">occupied</span>
+            <span class="tag">time_free</span>
+            <span class="tag">n_competing</span>
+            <span class="tag">x</span>
+            <span class="tag">y</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Edge / Relation 结构</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>关系</th>
+            <th>方向</th>
+            <th>语义</th>
+            <th>edge_attr</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>seq</code></td>
+            <td><code>operation -> operation</code></td>
+            <td>同一辆车的路线先后顺序：前一个 zone operation 必须早于后一个。</td>
+            <td><code>[processing_time / max_p]</code></td>
+          </tr>
+          <tr>
+            <td><code>lane</code></td>
+            <td><code>operation -> operation</code></td>
+            <td>同一入口车道的先到先行关系，leader 的首个 operation 指向 follower 的首个 operation。</td>
+            <td><code>[arrival_gap / max_r]</code></td>
+          </tr>
+          <tr>
+            <td><code>conflict</code></td>
+            <td><code>operation <-> operation</code></td>
+            <td>不同车辆竞争同一个 zone 的 active conflict，当前实现按双向边加入。</td>
+            <td><code>[arrival_delta, urgency_src, urgency_dst]</code></td>
+          </tr>
+          <tr>
+            <td><code>owns</code></td>
+            <td><code>vehicle -> operation</code></td>
+            <td>车辆拥有自己的所有 route operations。</td>
+            <td>无</td>
+          </tr>
+          <tr>
+            <td><code>hosts</code></td>
+            <td><code>zone -> operation</code></td>
+            <td>某个 conflict zone 承载所有需要使用它的 operations。</td>
+            <td>无</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="warning">
+        代码准确性提示：<code>graph_builder.py</code> 会构造部分 <code>edge_attr</code>，
+        但当前 <code>IntersectionHGT.forward()</code> 调用的是
+        <code>conv(h, edge_index_dict)</code>，没有把 <code>edge_attr</code> 传入 HGTConv。
+        因此论文中不要写成“当前模型已经使用边属性注意力偏置”。
+      </p>
+    </section>
+
+    <section>
+      <h2>HGT Encoder 是怎么实现的</h2>
+      <div class="two-col">
+        <div>
+          <p>
+            <code>IntersectionHGT</code> 固定声明三类节点和五类关系，并把这个 metadata
+            交给 PyG 的 <code>HGTConv</code>。每种节点先经过 lazy <code>Linear(-1, hidden_dim)</code>
+            投影到同一个隐藏维度，所以 operation 的 6 维、vehicle 的 4 维、zone 的 5 维可以进入同一个 HGT 层。
+          </p>
+          <p>
+            每一层 HGTConv 后，代码对返回的目标节点做 <code>ReLU + residual + LayerNorm</code>。
+            因为当前所有边的目标节点都是 operation，HGTConv 主要更新 operation embedding。
+            vehicle 和 zone 是源节点上下文，会被原样保留到下一层，继续作为消息源。
+          </p>
+        </div>
+        <pre><code>h = {
+  ntype: relu(input_proj[ntype](x))
+  for ntype, x in x_dict.items()
+}
+
+for conv, norm in layers:
+  h_new = conv(h, edge_index_dict)
+  h_next = dict(h)
+  for ntype, emb in h_new.items():
+    h_next[ntype] = norm[ntype](relu(emb) + h[ntype])
+  h = h_next
+
+return h["operation"]</code></pre>
+      </div>
+      <p class="note">
+        直观理解：operation 节点是“决策对象”，vehicle 和 zone 节点是“上下文来源”。
+        HGT 的 typed relation 让模型区分 route 顺序、同车道顺序、冲突关系、车辆归属和 zone 承载关系。
+      </p>
+    </section>
+
+    <section>
+      <h2>Actor-Critic 输出结构</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Actor 输出</h3>
+          <p>Actor 对每个 operation embedding 输出一个标量 logit。</p>
+          <pre><code>logits = MLP_actor(op_emb)</code></pre>
+          <p>然后使用 <code>feasible_mask</code> 把不可行动作设为 <code>-inf</code>，再构造 categorical policy。</p>
+        </div>
+        <div class="card">
+          <h3>Critic 输出</h3>
+          <p>Critic 不拼接显式 global feature；它从未调度 operation embedding 中做均值池化。</p>
+          <pre><code>h_G = mean(h_o for o in U_t)
+value = MLP_critic(h_G)</code></pre>
+          <p>如果所有 operation 都已调度，则回退到所有 operation embedding 的均值。</p>
+        </div>
+        <div class="card">
+          <h3>Feasibility 的双重作用</h3>
+          <p><code>is_schedulable</code> 作为 operation feature 进入图，让模型知道当前可行动作状态。</p>
+          <p>真正的约束保证来自 actor 后面的 hard mask：它直接阻止不可行动作被采样。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>论文段落 Review 重点</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>原文风险点</th>
+            <th>建议修法</th>
+            <th>原因</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>W_K^{tau(u),r}</code> 和 <code>phi(e_uv)</code></td>
+            <td>保留 relation-aware projection，但不要声称当前 forward 使用 edge attribute bias。</td>
+            <td>当前代码没有把 <code>edge_attr</code> 传给 HGTConv。</td>
+          </tr>
+          <tr>
+            <td><code>MLP_actor([h_o || h_G || f_global])</code></td>
+            <td>改为 <code>MLP_actor(h_o^L)</code>。</td>
+            <td>当前 actor 只读取 operation embedding。</td>
+          </tr>
+          <tr>
+            <td>“HGT predicts feasibility” 的潜在误读</td>
+            <td>明确 HGT 预测偏好，mask enforce feasibility。</td>
+            <td>可行性由 <code>compute_feasible_set</code> 和 hard mask 保证。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ppt">
+      <h2>PPT 小模板：一页介绍 HGT 结构</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>标题</h3>
+          <p><strong>HGT-based Neural Scheduler for JSSP Intersection Control</strong></p>
+          <p>把当前交通调度状态编码为异构图，用 HGT 学习下一步 operation dispatching preference。</p>
+        </div>
+        <div class="card">
+          <h3>图输入</h3>
+          <div class="tag-row">
+            <span class="tag">operation: 调度动作节点 [6]</span>
+            <span class="tag">vehicle: 车辆上下文 [4]</span>
+            <span class="tag">zone: 共享资源状态 [5]</span>
+            <span class="tag">seq / lane / conflict / owns / hosts</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>模型输出</h3>
+          <p>Actor: 对 operation 节点打分，并用 feasible mask 过滤非法动作。</p>
+          <p>Critic: 对未调度 operation embeddings 均值池化，估计 PPO value。</p>
+        </div>
+      </div>
+      <h3>可直接放进 PPT 的 3 条 bullet</h3>
+      <pre><code>- Environment state is encoded as a typed graph: operation, vehicle, and zone nodes.
+- HGTConv performs relation-aware message passing over seq, lane, conflict, owns, and hosts edges.
+- The actor predicts dispatching preference; feasibility is enforced by a hard action mask, while the critic estimates graph-level value from unscheduled operations.</code></pre>
+    </section>
+
+    <section>
+      <h2>对应代码位置</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td><code>intersection_scheduler/environment/graph_builder.py</code></td>
+            <td>构造 HeteroData，定义所有 node features、edge_index 和 edge_attr。</td>
+          </tr>
+          <tr>
+            <td><code>intersection_scheduler/environment/feasibility.py</code></td>
+            <td>计算 feasible action mask，包含已调度、路线前驱、同车道前驱、zone 可用性、车辆到达和 deadlock 检查。</td>
+          </tr>
+          <tr>
+            <td><code>intersection_scheduler/model/hgt.py</code></td>
+            <td>定义 HGT metadata、input projection、HGTConv layers、residual LayerNorm，并返回 operation embeddings。</td>
+          </tr>
+          <tr>
+            <td><code>intersection_scheduler/model/policy.py</code></td>
+            <td>定义 actor masked policy 和 critic value head。</td>
+          </tr>
+          <tr>
+            <td><code>intersection_scheduler/training/ppo.py</code></td>
+            <td>定义 transition、GAE 和 PPO minibatch 更新逻辑。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="module">
+    const canvas = document.getElementById("scene");
+    const fallback = document.getElementById("fallback");
+
+    const colors = {
+      operation: 0x246bfe,
+      vehicle: 0x14a376,
+      zone: 0xd86f28,
+      seq: 0x3454d1,
+      lane: 0x00a0b5,
+      conflict: 0xc13636,
+      owns: 0x1b9a72,
+      hosts: 0xd07b20,
+      hgt: 0x6f42c1,
+      actor: 0x0f7f75,
+      critic: 0x8b5a18,
+      text: 0xffffff
+    };
+
+    try {
+      const THREE = await import("https://unpkg.com/three@0.160.0/build/three.module.js");
+      initScene(THREE);
+    } catch (error) {
+      fallback.classList.add("show");
+      console.warn("Three.js CDN failed to load:", error);
+    }
+
+    function initScene(THREE) {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x0b1220, 18, 38);
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.set(6.5, 5.2, 12);
+
+      const root = new THREE.Group();
+      root.rotation.x = -0.18;
+      root.rotation.y = -0.45;
+      scene.add(root);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.72));
+      const key = new THREE.DirectionalLight(0xffffff, 1.6);
+      key.position.set(6, 8, 8);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x7fc8ff, 0.7);
+      rim.position.set(-8, -2, -5);
+      scene.add(rim);
+
+      const nodes = {};
+      const nodeData = [
+        ["v0", "vehicle", [-4.9, 2.2, 0.6], "vehicle[4]"],
+        ["v1", "vehicle", [-4.9, 0.2, 0.6], "vehicle[4]"],
+        ["v2", "vehicle", [-4.9, -1.8, 0.6], "vehicle[4]"],
+        ["z2", "zone", [-4.7, 2.0, -1.9], "zone[5]"],
+        ["z5", "zone", [-4.7, 0.0, -1.9], "zone[5]"],
+        ["z8", "zone", [-4.7, -2.0, -1.9], "zone[5]"],
+        ["o00", "operation", [-1.9, 2.3, 0.0], "op[6]"],
+        ["o01", "operation", [-1.1, 1.0, 0.0], "op[6]"],
+        ["o02", "operation", [-0.3, -0.3, 0.0], "op[6]"],
+        ["o10", "operation", [-2.0, -1.2, 0.0], "op[6]"],
+        ["o11", "operation", [-1.1, -2.3, 0.0], "op[6]"],
+        ["o12", "operation", [-0.1, -1.1, 0.0], "op[6]"],
+        ["p0", "hgt", [1.7, 1.45, 0.55], "Input projection"],
+        ["p1", "hgt", [1.7, -0.15, 0.55], "HGTConv x3"],
+        ["p2", "hgt", [1.7, -1.75, 0.55], "op embeddings"],
+        ["actor", "actor", [4.6, 0.95, 0.4], "Actor logits + mask"],
+        ["critic", "critic", [4.6, -1.15, 0.4], "Critic value"]
+      ];
+
+      nodeData.forEach(([id, type, pos, label]) => {
+        const group = new THREE.Group();
+        group.position.set(...pos);
+        const mesh = createNodeMesh(THREE, type);
+        group.add(mesh);
+        group.add(createLabel(THREE, label, type === "operation" ? 0.62 : 0.72));
+        root.add(group);
+        nodes[id] = group;
+      });
+
+      const edges = [
+        ["o00", "o01", "seq"], ["o01", "o02", "seq"],
+        ["o10", "o11", "seq"], ["o11", "o12", "seq"],
+        ["o00", "o10", "lane"],
+        ["o01", "o11", "conflict"], ["o11", "o01", "conflict"],
+        ["v0", "o00", "owns"], ["v0", "o01", "owns"], ["v0", "o02", "owns"],
+        ["v1", "o10", "owns"], ["v1", "o11", "owns"], ["v1", "o12", "owns"],
+        ["z2", "o00", "hosts"], ["z5", "o01", "hosts"], ["z8", "o02", "hosts"],
+        ["z5", "o11", "hosts"],
+        ["o02", "p0", "hgt"], ["o12", "p0", "hgt"], ["p0", "p1", "hgt"], ["p1", "p2", "hgt"],
+        ["p2", "actor", "actor"], ["p2", "critic", "critic"]
+      ];
+      edges.forEach(([from, to, type]) => {
+        root.add(createTube(THREE, nodes[from].position, nodes[to].position, colors[type], type === "conflict" ? 0.022 : 0.016));
+      });
+
+      addLayerPlane(THREE, root, -4.9, "Context nodes", 0x0f2236);
+      addLayerPlane(THREE, root, -1.1, "Operation action graph", 0x111f3a);
+      addLayerPlane(THREE, root, 1.7, "HGT encoder", 0x22173f);
+      addLayerPlane(THREE, root, 4.6, "Actor / Critic", 0x102f2e);
+
+      let isDragging = false;
+      let previousX = 0;
+      let previousY = 0;
+      let targetRotX = root.rotation.x;
+      let targetRotY = root.rotation.y;
+      let distance = 13.2;
+
+      canvas.addEventListener("pointerdown", (event) => {
+        isDragging = true;
+        previousX = event.clientX;
+        previousY = event.clientY;
+        canvas.setPointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (!isDragging) return;
+        const dx = event.clientX - previousX;
+        const dy = event.clientY - previousY;
+        previousX = event.clientX;
+        previousY = event.clientY;
+        targetRotY += dx * 0.008;
+        targetRotX += dy * 0.006;
+        targetRotX = Math.max(-0.75, Math.min(0.45, targetRotX));
+      });
+
+      canvas.addEventListener("pointerup", () => {
+        isDragging = false;
+      });
+
+      canvas.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        distance += event.deltaY * 0.01;
+        distance = Math.max(8.5, Math.min(20, distance));
+      }, { passive: false });
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        renderer.setSize(rect.width, rect.height, false);
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (!isDragging) {
+          targetRotY += 0.0016;
+        }
+        root.rotation.x += (targetRotX - root.rotation.x) * 0.09;
+        root.rotation.y += (targetRotY - root.rotation.y) * 0.09;
+        camera.position.set(0, 4.2, distance);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function createNodeMesh(THREE, type) {
+      if (type === "hgt" || type === "actor" || type === "critic") {
+        const geometry = new THREE.BoxGeometry(1.45, 0.62, 0.82);
+        const material = new THREE.MeshStandardMaterial({
+          color: colors[type],
+          roughness: 0.42,
+          metalness: 0.08,
+          emissive: colors[type],
+          emissiveIntensity: 0.06
+        });
+        return new THREE.Mesh(geometry, material);
+      }
+
+      const geometry = type === "operation"
+        ? new THREE.SphereGeometry(0.27, 32, 18)
+        : new THREE.IcosahedronGeometry(0.34, 1);
+      const material = new THREE.MeshStandardMaterial({
+        color: colors[type],
+        roughness: 0.45,
+        metalness: 0.1,
+        emissive: colors[type],
+        emissiveIntensity: 0.08
+      });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createTube(THREE, start, end, color, radius) {
+      const points = [
+        new THREE.Vector3(start.x, start.y, start.z),
+        new THREE.Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 + 0.08, (start.z + end.z) / 2),
+        new THREE.Vector3(end.x, end.y, end.z)
+      ];
+      const curve = new THREE.CatmullRomCurve3(points);
+      const geometry = new THREE.TubeGeometry(curve, 18, radius, 8, false);
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.5,
+        metalness: 0.02,
+        emissive: color,
+        emissiveIntensity: 0.18
+      });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createLabel(THREE, text, y) {
+      const scale = window.devicePixelRatio || 1;
+      const canvasLabel = document.createElement("canvas");
+      const ctx = canvasLabel.getContext("2d");
+      canvasLabel.width = 512 * scale;
+      canvasLabel.height = 128 * scale;
+      ctx.scale(scale, scale);
+      ctx.clearRect(0, 0, 512, 128);
+      ctx.fillStyle = "rgba(10, 16, 30, 0.78)";
+      roundedRect(ctx, 12, 28, 488, 58, 14);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "600 27px Segoe UI, Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, 256, 58);
+
+      const texture = new THREE.CanvasTexture(canvasLabel);
+      texture.minFilter = THREE.LinearFilter;
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.set(0, y, 0);
+      sprite.scale.set(1.95, 0.49, 1);
+      return sprite;
+    }
+
+    function roundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + width, y, x + width, y + height, radius);
+      ctx.arcTo(x + width, y + height, x, y + height, radius);
+      ctx.arcTo(x, y + height, x, y, radius);
+      ctx.arcTo(x, y, x + width, y, radius);
+      ctx.closePath();
+    }
+
+    function addLayerPlane(THREE, root, x, title, color) {
+      const planeGroup = new THREE.Group();
+      planeGroup.position.set(x, 0, -3.1);
+      const geometry = new THREE.PlaneGeometry(2.25, 5.7);
+      const material = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.38,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      planeGroup.add(mesh);
+      const label = createLabel(THREE, title, -2.55);
+      label.position.z = 0.03;
+      label.scale.set(2.15, 0.54, 1);
+      planeGroup.add(label);
+      root.add(planeGroup);
+    }
+  </script>
+</body>
+</html>
