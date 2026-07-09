@@ -8,6 +8,10 @@ Given a set of approaching vehicles (arrival time, route, velocity), the trained
 policy outputs an exact conflict-free timetable — the entry and exit time for every
 vehicle in every zone it crosses — while minimizing total waiting time.
 
+New to the project? Start with the beginner guide in
+[PROJECT_INTRODUCTION.md](PROJECT_INTRODUCTION.md) for a folder-by-folder map,
+plain-language methodology notes, and a glossary of key terms.
+
 ## How it works
 
 The intersection is modelled as a 3×3 grid of 9 conflict zones. Each vehicle's route
