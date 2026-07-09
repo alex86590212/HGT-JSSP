@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950" role="img" aria-labelledby="title desc">
+  <title id="title">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</title>
+  <desc id="desc">Academic flowchart showing traffic state, heterogeneous graph input, type-specific projection, HGT encoder, final operation embeddings, and actor-critic decision module.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="smallArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    </marker>
+    <style>
+      .bg { fill: #F8FAFC; }
+      .panel { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1.8; rx: 8; ry: 8; }
+      .subpanel { fill: #F8FAFC; stroke: #CBD5E1; stroke-width: 1.5; rx: 8; ry: 8; }
+      .title { font: 700 32px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
+      .section { font: 700 20px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
+      .label { font: 700 15px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
+      .body { font: 400 14px Inter, Arial, Helvetica, sans-serif; fill: #334155; }
+      .small { font: 400 12px Inter, Arial, Helvetica, sans-serif; fill: #475569; }
+      .formula { font: 400 13px "Times New Roman", Cambria, Georgia, serif; fill: #0F172A; }
+      .mono { font: 400 13px Consolas, "Courier New", monospace; fill: #0F172A; }
+      .monoSmall { font: 400 12px Consolas, "Courier New", monospace; fill: #334155; }
+      .arrow { stroke: #475569; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .thinArrow { stroke: #64748B; stroke-width: 1.6; fill: none; marker-end: url(#smallArrow); }
+      .op { fill: #DBEAFE; stroke: #2563EB; }
+      .veh { fill: #D1FAE5; stroke: #059669; }
+      .zone { fill: #FEF3C7; stroke: #D97706; }
+      .hgt { fill: #F3E8FF; stroke: #7C3AED; }
+      .actor { fill: #CCFBF1; stroke: #0F766E; }
+      .critic { fill: #FEF3C7; stroke: #B45309; }
+      .mask { fill: #FEE2E2; stroke: #DC2626; }
+      .nodeText { font: 700 10px Inter, Arial, Helvetica, sans-serif; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="950"/>
+  <text class="title" x="800" y="54" text-anchor="middle">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</text>
+  <text class="body" x="800" y="82" text-anchor="middle">Typed graph state encoding, relation-aware HGT message passing, masked actor policy, and graph-level critic value for PPO.</text>
+
+  <!-- Region 1: Traffic State -->
+  <rect class="panel" x="50" y="125" width="220" height="500"/>
+  <text class="section" x="160" y="160" text-anchor="middle">Current Traffic State</text>
+  <text class="small" x="160" y="184" text-anchor="middle">Decision step t</text>
+  <rect class="subpanel" x="78" y="210" width="164" height="164"/>
+  <line x1="133" y1="225" x2="133" y2="359" stroke="#94A3B8" stroke-width="1.2"/>
+  <line x1="187" y1="225" x2="187" y2="359" stroke="#94A3B8" stroke-width="1.2"/>
+  <line x1="93" y1="265" x2="227" y2="265" stroke="#94A3B8" stroke-width="1.2"/>
+  <line x1="93" y1="319" x2="227" y2="319" stroke="#94A3B8" stroke-width="1.2"/>
+  <rect x="139" y="271" width="42" height="42" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1.2"/>
+  <circle cx="112" cy="245" r="9" fill="#2563EB"/>
+  <circle cx="210" cy="292" r="9" fill="#059669"/>
+  <circle cx="160" cy="343" r="9" fill="#D97706"/>
+  <path d="M 95 292 C 118 292, 129 292, 151 292" class="thinArrow"/>
+  <path d="M 160 356 C 160 330, 160 321, 160 303" class="thinArrow"/>
+  <text class="body" x="78" y="408">Vehicles and arrival times</text>
+  <text class="body" x="78" y="434">Routes through conflict zones</text>
+  <text class="body" x="78" y="460">Zone availability</text>
+  <text class="body" x="78" y="486">Scheduled / unscheduled ops</text>
+  <text class="body" x="78" y="512">Feasible action set</text>
+  <rect class="mask" x="78" y="542" width="164" height="48" rx="8" ry="8"/>
+  <text class="label" x="160" y="562" text-anchor="middle">A<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+  <text class="small" x="160" y="581" text-anchor="middle">valid dispatching actions</text>
+
+  <!-- Region 2: Heterogeneous Graph Input -->
+  <rect class="panel" x="325" y="125" width="285" height="500"/>
+  <text class="section" x="467.5" y="160" text-anchor="middle">Heterogeneous Graph G<tspan baseline-shift="sub" font-size="13">t</tspan></text>
+  <rect class="op" x="352" y="198" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
+  <text class="label" x="467" y="224" text-anchor="middle">Operation nodes</text>
+  <text class="formula" x="467" y="249" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">op</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_o × 6</tspan></text>
+  <circle cx="377" cy="234" r="11" fill="#2563EB"/><text class="nodeText" x="377" y="234">o</text>
+  <circle cx="557" cy="234" r="11" fill="#2563EB"/><text class="nodeText" x="557" y="234">o</text>
+
+  <rect class="veh" x="352" y="288" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
+  <text class="label" x="467" y="314" text-anchor="middle">Vehicle nodes</text>
+  <text class="formula" x="467" y="339" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">veh</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_v × 4</tspan></text>
+  <circle cx="377" cy="324" r="11" fill="#059669"/><text class="nodeText" x="377" y="324">v</text>
+  <circle cx="557" cy="324" r="11" fill="#059669"/><text class="nodeText" x="557" y="324">v</text>
+
+  <rect class="zone" x="352" y="378" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
+  <text class="label" x="467" y="404" text-anchor="middle">Zone nodes</text>
+  <text class="formula" x="467" y="429" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">zone</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_z × 5</tspan></text>
+  <circle cx="377" cy="414" r="11" fill="#D97706"/><text class="nodeText" x="377" y="414">z</text>
+  <circle cx="557" cy="414" r="11" fill="#D97706"/><text class="nodeText" x="557" y="414">z</text>
+
+  <rect class="subpanel" x="352" y="477" width="230" height="118"/>
+  <text class="label" x="467" y="502" text-anchor="middle">Relation legend</text>
+  <text class="small" x="370" y="526">seq, lane: operation → operation</text>
+  <text class="small" x="370" y="548">conflict: operation ↔ operation</text>
+  <text class="small" x="370" y="570">owns: vehicle → operation</text>
+  <text class="small" x="370" y="592">hosts: zone → operation</text>
+  <text class="small" x="467" y="617" text-anchor="middle">Operation nodes are action units.</text>
+
+  <!-- Region 3: Projection -->
+  <rect class="panel" x="675" y="125" width="245" height="500"/>
+  <text class="section" x="797.5" y="154" text-anchor="middle">Type-specific</text>
+  <text class="section" x="797.5" y="179" text-anchor="middle">Linear Projection</text>
+  <rect class="subpanel" x="700" y="210" width="195" height="92"/>
+  <text class="formula" x="797.5" y="244" text-anchor="middle">H<tspan baseline-shift="sub" font-size="10">τ</tspan><tspan baseline-shift="super" font-size="10">0</tspan> = σ(X<tspan baseline-shift="sub" font-size="10">τ</tspan> W<tspan baseline-shift="sub" font-size="10">in</tspan><tspan baseline-shift="super" font-size="10">τ</tspan> + b<tspan baseline-shift="sub" font-size="10">in</tspan><tspan baseline-shift="super" font-size="10">τ</tspan>)</text>
+  <text class="small" x="797.5" y="276" text-anchor="middle">all node embeddings → 128-dim</text>
+  <rect class="op" x="700" y="330" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
+  <text class="monoSmall" x="717" y="354">operation:</text>
+  <text class="monoSmall" x="717" y="372">[n_o, 6] → [n_o, 128]</text>
+  <rect class="veh" x="700" y="402" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
+  <text class="monoSmall" x="717" y="426">vehicle:</text>
+  <text class="monoSmall" x="717" y="444">[n_v, 4] → [n_v, 128]</text>
+  <rect class="zone" x="700" y="474" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
+  <text class="monoSmall" x="717" y="498">zone:</text>
+  <text class="monoSmall" x="717" y="516">[n_z, 5] → [n_z, 128]</text>
+  <text class="small" x="797.5" y="575" text-anchor="middle">Shared hidden dimension F = 128</text>
+
+  <!-- Region 4: HGT Encoder -->
+  <rect class="hgt" x="980" y="125" width="295" height="640" rx="8" ry="8" stroke-width="2"/>
+  <text class="section" x="1127.5" y="158" text-anchor="middle">3 × HGTConv Encoder</text>
+  <text class="small" x="1127.5" y="182" text-anchor="middle">4 attention heads, d<tspan baseline-shift="sub" font-size="9">h</tspan> = 32</text>
+
+  <rect class="panel" x="1005" y="205" width="245" height="62"/>
+  <text class="label" x="1127.5" y="229" text-anchor="middle">HGTConv Layer 1</text>
+  <text class="monoSmall" x="1025" y="249">Input: op / vehicle / zone [*,128]</text>
+  <text class="monoSmall" x="1025" y="264">Output: operation [n_o,128]</text>
+  <rect class="panel" x="1005" y="284" width="245" height="62"/>
+  <text class="label" x="1127.5" y="308" text-anchor="middle">HGTConv Layer 2</text>
+  <text class="monoSmall" x="1025" y="328">Input: op / vehicle / zone [*,128]</text>
+  <text class="monoSmall" x="1025" y="343">Output: operation [n_o,128]</text>
+  <rect class="panel" x="1005" y="363" width="245" height="62"/>
+  <text class="label" x="1127.5" y="387" text-anchor="middle">HGTConv Layer 3</text>
+  <text class="monoSmall" x="1025" y="407">Input: op / vehicle / zone [*,128]</text>
+  <text class="monoSmall" x="1025" y="422">Output: operation [n_o,128]</text>
+  <text class="small" x="1127.5" y="454" text-anchor="middle">Vehicle and zone embeddings are carried</text>
+  <text class="small" x="1127.5" y="472" text-anchor="middle">forward as contextual sources.</text>
+
+  <rect class="panel" x="1005" y="500" width="245" height="128"/>
+  <text class="label" x="1127.5" y="524" text-anchor="middle">Multi-head Q/K/V Computation</text>
+  <text class="monoSmall" x="1023" y="548">h_tau^ell [128] → Linear(128,384)</text>
+  <text class="monoSmall" x="1023" y="570">→ split K,Q,V → [4 heads,32]</text>
+  <text class="formula" x="1023" y="592">[K<tspan baseline-shift="sub" font-size="9">τ</tspan> || Q<tspan baseline-shift="sub" font-size="9">τ</tspan> || V<tspan baseline-shift="sub" font-size="9">τ</tspan>]</text>
+  <text class="formula" x="1023" y="610">= H<tspan baseline-shift="sub" font-size="9">τ</tspan><tspan baseline-shift="super" font-size="9">ℓ</tspan> W<tspan baseline-shift="sub" font-size="9">KQV</tspan><tspan baseline-shift="super" font-size="9">τ</tspan> + b<tspan baseline-shift="sub" font-size="9">KQV</tspan><tspan baseline-shift="super" font-size="9">τ</tspan></text>
+  <text class="small" x="1023" y="629">F = 128, H = 4, d<tspan baseline-shift="sub" font-size="9">h</tspan> = 32</text>
+
+  <rect class="panel" x="1005" y="648" width="245" height="88"/>
+  <text class="label" x="1127.5" y="672" text-anchor="middle">Relation-aware Attention</text>
+  <text class="formula" x="1023" y="695">score(u,v,r) = Q<tspan baseline-shift="sub" font-size="9">v</tspan> · K<tspan baseline-shift="sub" font-size="9">u</tspan><tspan baseline-shift="super" font-size="9">r</tspan> / sqrt(32)</text>
+  <text class="formula" x="1023" y="716">alpha(u,v,r) = softmax(score)</text>
+  <text class="formula" x="1023" y="734">message = alpha · V<tspan baseline-shift="sub" font-size="9">u</tspan><tspan baseline-shift="super" font-size="9">r</tspan></text>
+
+  <!-- Region 5: Embeddings and actor critic -->
+  <rect class="op" x="1320" y="145" width="220" height="100" rx="8" ry="8" stroke-width="2"/>
+  <text class="section" x="1430" y="178" text-anchor="middle">Final Operation</text>
+  <text class="section" x="1430" y="202" text-anchor="middle">Embeddings</text>
+  <text class="formula" x="1430" y="226" text-anchor="middle">H<tspan baseline-shift="sub" font-size="10">op</tspan><tspan baseline-shift="super" font-size="10">L</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_o × 128</tspan></text>
+  <text class="small" x="1430" y="247" text-anchor="middle">One embedding per operation/action</text>
+
+  <rect class="actor" x="1312" y="305" width="235" height="205" rx="8" ry="8" stroke-width="2"/>
+  <text class="section" x="1429.5" y="335" text-anchor="middle">Actor</text>
+  <text class="label" x="1429.5" y="359" text-anchor="middle">Masked Dispatching Policy</text>
+  <text class="mono" x="1332" y="389">MLP_actor: 128 → 64 → 1</text>
+  <text class="mono" x="1332" y="416">all operation logits: [n_o]</text>
+  <rect class="mask" x="1332" y="431" width="195" height="34" rx="8" ry="8"/>
+  <text class="monoSmall" x="1429.5" y="453" text-anchor="middle">if o ∉ A_t: logit_o = -∞</text>
+  <text class="formula" x="1429.5" y="480" text-anchor="middle">π<tspan baseline-shift="sub" font-size="10">θ</tspan>(o | G<tspan baseline-shift="sub" font-size="10">t</tspan>)</text>
+  <text class="formula" x="1429.5" y="498" text-anchor="middle">= softmax(masked logits)</text>
+
+  <rect class="critic" x="1312" y="540" width="235" height="205" rx="8" ry="8" stroke-width="2"/>
+  <text class="section" x="1429.5" y="570" text-anchor="middle">Critic</text>
+  <text class="label" x="1429.5" y="594" text-anchor="middle">Graph-level Value</text>
+  <text class="monoSmall" x="1332" y="624">Select unscheduled operations U_t</text>
+  <text class="monoSmall" x="1332" y="646">Mean pooling over U_t:</text>
+  <text class="monoSmall" x="1332" y="664">h_G = mean({h_o^L | o ∈ U_t})</text>
+  <text class="mono" x="1332" y="694">MLP_critic: 128 → 64 → 1</text>
+  <text class="formula" x="1429.5" y="718" text-anchor="middle">V<tspan baseline-shift="sub" font-size="10">φ</tspan>(G<tspan baseline-shift="sub" font-size="10">t</tspan>)</text>
+  <text class="small" x="1429.5" y="738" text-anchor="middle">Used by PPO / GAE advantage estimation</text>
+
+  <!-- Flow arrows -->
+  <path class="arrow" d="M 270 375 L 325 375"/>
+  <path class="arrow" d="M 610 375 L 675 375"/>
+  <path class="arrow" d="M 920 375 L 980 375"/>
+  <path class="arrow" d="M 1275 195 L 1320 195"/>
+  <path class="arrow" d="M 1430 245 L 1430 305"/>
+  <path class="arrow" d="M 1430 245 C 1495 280, 1495 500, 1430 540"/>
+
+  <text class="small" x="297" y="359" text-anchor="middle">state → graph</text>
+  <text class="small" x="642" y="359" text-anchor="middle">typed features</text>
+  <text class="small" x="950" y="359" text-anchor="middle">128-dim</text>
+  <text class="small" x="1297" y="178" text-anchor="middle">op output</text>
+
+  <!-- Actor wording note -->
+  <rect class="subpanel" x="1300" y="755" width="255" height="52"/>
+  <text class="small" x="1427.5" y="776" text-anchor="middle">Actor scores all operations first;</text>
+  <text class="small" x="1427.5" y="794" text-anchor="middle">infeasible operations are masked before softmax.</text>
+
+  <!-- Bottom methodological separation bar -->
+  <rect class="panel" x="50" y="835" width="1500" height="82"/>
+  <text class="label" x="800" y="860" text-anchor="middle">Methodological separation: the neural scheduler chooses actions, while exact timing and control are handled downstream.</text>
+  <rect x="78" y="878" width="350" height="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/>
+  <rect x="428" y="878" width="350" height="26" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+  <rect x="778" y="878" width="350" height="26" fill="#E2E8F0" stroke="#64748B" stroke-width="1.5"/>
+  <rect x="1128" y="878" width="394" height="26" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
+  <text class="label" x="253" y="897" text-anchor="middle">HGT + Actor</text>
+  <text class="label" x="603" y="897" text-anchor="middle">Feasible Mask</text>
+  <text class="label" x="953" y="897" text-anchor="middle">Environment Decoder</text>
+  <text class="label" x="1325" y="897" text-anchor="middle">Low-level Controller</text>
+  <text class="small" x="253" y="920" text-anchor="middle">learn dispatching preference</text>
+  <text class="small" x="603" y="920" text-anchor="middle">enforce valid JSSP actions</text>
+  <text class="small" x="953" y="920" text-anchor="middle">compute exact start / finish times</text>
+  <text class="small" x="1325" y="920" text-anchor="middle">track the planned schedule</text>
+</svg>
