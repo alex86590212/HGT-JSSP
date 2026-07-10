@@ -61,7 +61,11 @@ class IntersectionEnv:
     # reset
     # ------------------------------------------------------------------
 
-    def reset(self, vehicles: List[Vehicle]):
+    def reset(
+        self,
+        vehicles: List[Vehicle],
+        zone_positions: Optional[Dict[int, Tuple[float, float]]] = None,
+    ):
         """Initialise all operations, compute initial c(i,j), return env."""
         self.vehicles = vehicles
         self.operations = []
@@ -85,10 +89,13 @@ class IntersectionEnv:
                 zone_ids.add(zone_id)
 
         # Populate zones using positions from the scenario generator if present,
-        # otherwise use a simple grid placeholder.
-        from intersection_scheduler.data.scenario_generator import ZONE_POSITIONS
+        # otherwise use a simple grid placeholder. Defaults to the 3x3 model's
+        # positions for backward compatibility with existing callers.
+        if zone_positions is None:
+            from intersection_scheduler.data.scenario_generator import ZONE_POSITIONS
+            zone_positions = ZONE_POSITIONS
         for zid in zone_ids:
-            pos = ZONE_POSITIONS.get(zid, (0.0, 0.0))
+            pos = zone_positions.get(zid, (0.0, 0.0))
             self.zones[zid] = Zone(id=zid, x=pos[0] / 2.0, y=pos[1] / 2.0)
 
         # Compute n_competing per zone
@@ -257,6 +264,7 @@ class IntersectionEnv:
         """
         current = self._last_finish_per_vehicle()
         reward = -sum(c - p for c, p in zip(current, self._prev_completion_times))
+        reward = reward / len(self.vehicles)
         return reward
 
     # ------------------------------------------------------------------

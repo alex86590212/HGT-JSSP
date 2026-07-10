@@ -1,96 +1,30 @@
-"""Episode loop and training orchestration."""
+"""Episode loop and training orchestration for the 4x4 two-lane intersection.
+
+Mirrors trainer.py exactly (same PPO update, GAE, curriculum mechanics, reward
+normalisation, HGT architecture) — the only difference is the scenario
+generator and zone geometry, threaded through via IntersectionEnv.reset's
+zone_positions parameter.
+"""
 
 from __future__ import annotations
 
 import copy
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from intersection_scheduler.data.scenario_generator import (
-    Scenario,
+from intersection_scheduler.data.scenario_generator_4x4 import (
     ScenarioGenerator,
+    ZONE_POSITIONS,
     get_curriculum_scenario,
 )
-from intersection_scheduler.environment.feasibility import compute_feasible_set, next_feasible_time
-from intersection_scheduler.environment.graph_builder import build_hetero_graph, build_static_edges
 from intersection_scheduler.environment.intersection import IntersectionEnv
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
-from intersection_scheduler.utils.metrics import (
-    episode_waiting_time,
-    episode_makespan,
-    igreedy,
-)
-
-
-def run_episode(
-    policy: SchedulingPolicy,
-    env: IntersectionEnv,
-    scenario: Scenario,
-    *,
-    deterministic: bool = False,
-    zone_positions: Optional[Dict[int, Tuple[float, float]]] = None,
-) -> Tuple[List[Transition], Dict[str, float]]:
-    """Collect one full episode trajectory."""
-    device = next(policy.parameters()).device
-    env.reset(scenario.vehicles, zone_positions=zone_positions)
-    # Static edge topology (seq/lane/owns/hosts) is constant for the episode;
-    # build it once and reuse every step. Only conflict edges and node features
-    # are rebuilt per step inside build_hetero_graph.
-    static_edges = build_static_edges(env)
-    transitions: List[Transition] = []
-
-    done = False
-    while not done:
-        # Compute the feasible mask once (CPU) and thread it into the graph
-        # builder so it is not recomputed a second time internally.
-        cpu_mask = compute_feasible_set(env)
-
-        if not cpu_mask.any():
-            next_t = next_feasible_time(env)
-            if next_t is None:
-                break
-            env.current_time = next_t
-            continue
-
-        data = build_hetero_graph(
-            env, feasible_mask=cpu_mask, static_edges=static_edges
-        ).to(device)
-        feasible_mask = cpu_mask.to(device)
-
-        with torch.no_grad() if deterministic else torch.enable_grad():
-            dist, value = policy(data, feasible_mask)
-
-        if deterministic:
-            action = int(dist.probs.argmax().item())
-        else:
-            action = int(dist.sample().item())
-
-        log_prob = dist.log_prob(torch.tensor(action, device=device))
-
-        env, reward, done = env.step(action)
-
-        transitions.append(Transition(
-            data=data,
-            feasible_mask=feasible_mask,
-            action=action,
-            log_prob=log_prob,
-            value=value,
-            reward=reward,
-            done=done,
-        ))
-
-    stats = {
-        "waiting_time": episode_waiting_time(env),
-        "makespan": episode_makespan(env),
-        "steps": len(transitions),
-        "total_reward": sum(t.reward for t in transitions),
-    }
-    return transitions, stats
+from intersection_scheduler.training.trainer import run_episode
 
 
 def train(cfg: Dict[str, Any], output_dir: str = "results", resume: Optional[str] = None) -> None:
@@ -126,7 +60,6 @@ def train(cfg: Dict[str, Any], output_dir: str = "results", resume: Optional[str
             optimizer.load_state_dict(checkpoint["optimizer"])
             start_episode = checkpoint.get("episode", 0) + 1
         else:
-            # Plain weights-only checkpoint
             policy.load_state_dict(checkpoint)
         print(f"Resumed from {resume}, starting at episode {start_episode}", flush=True)
 
@@ -149,7 +82,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results", resume: Optional[str
 
     for episode in range(start_episode, num_episodes + 1):
         scenario = get_curriculum_scenario(episode, gen)
-        transitions, stats = run_episode(policy, env, scenario)
+        transitions, stats = run_episode(policy, env, scenario, zone_positions=ZONE_POSITIONS)
         # Compute GAE immediately, in temporal order, before buffer shuffling
         compute_gae(
             transitions,
@@ -227,8 +160,8 @@ def _evaluate(
     policy.eval()
     total_wt = 0.0
     for _ in range(n_scenarios):
-        scenario = gen.hard(n_vehicles=5)
-        _, stats = run_episode(policy, env, scenario, deterministic=True)
+        scenario = gen.hard(n_vehicles=12)
+        _, stats = run_episode(policy, env, scenario, deterministic=True, zone_positions=ZONE_POSITIONS)
         total_wt += stats["waiting_time"]
     policy.train()
     return total_wt / n_scenarios

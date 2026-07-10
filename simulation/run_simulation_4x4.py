@@ -1,25 +1,17 @@
-"""Intersection simulation and visualization.
+"""Intersection simulation and visualization — 4x4 two-lane intersection.
 
-Architecture (mirrors traci_runner.py / graph_debugger.py):
-
-  Phase 1 — Schedule:
-    Run the env episode exactly as training does:
-      build_hetero_graph → policy → env.step()   (HGT)
-      feasibility mask  → iGreedy rule → env.step()
-    After all operations scheduled, each op has:
-      start_time = earliest_finish - processing_time
-      finish_time = earliest_finish
-
-  Phase 2 — Animate:
-    Replay the solved schedule as a time-stepped animation.
-    Left panel   — 3×3 intersection map (vehicles moving through zones)
-    Centre panel — JSSP timing-conflict graph (Type-1/2/3 edges)
-    Right panel  — debug stats
+Adapted copy of run_simulation.py for the 4x4 topology (16 zones, 2 lanes per
+approach). Differences from the 3x3 version:
+  - imports the 4x4 scenario_generator constants
+  - threads ZONE_POSITIONS into env.reset (graph node features + map geometry)
+  - map geometry (axis limits, road bands, direction labels, waiting-vehicle
+    offset centre) scaled for the 4x4 grid which spans (0,0)-(3,3), centre (1.5,1.5)
+  - core (crossing) zones {6,7,10,11} coloured distinctly from the 12 entry/exit zones
 
 Usage:
-    PYTHONPATH=. python simulation/run_simulation.py --checkpoint results/checkpoint_best.pt
-    PYTHONPATH=. python simulation/run_simulation.py --mode igreedy --difficulty hard
-    PYTHONPATH=. python simulation/run_simulation.py --mode both --seed 7
+    PYTHONPATH=. python simulation/run_simulation_4x4.py --checkpoint results_4x4/checkpoint_best.pt
+    PYTHONPATH=. python simulation/run_simulation_4x4.py --mode both --difficulty hard --seed 7
+    PYTHONPATH=. python simulation/run_simulation_4x4.py --mode igreedy --no-gui
 """
 
 from __future__ import annotations
@@ -43,7 +35,7 @@ try:
 except ImportError:
     HAS_NX = False
 
-from intersection_scheduler.data.scenario_generator import (
+from intersection_scheduler.data.scenario_generator_4x4 import (
     ZONE_POSITIONS, ROUTES, SAME_LANE_GROUPS, ScenarioGenerator, Scenario,
 )
 from intersection_scheduler.environment.intersection import IntersectionEnv
@@ -60,6 +52,7 @@ SIM_STEP_SECONDS = 0.05
 VEHICLE_COLORS = [
     "#e74c3c", "#2ecc71", "#3498db", "#f39c12",
     "#9b59b6", "#1abc9c", "#e67e22", "#34495e",
+    "#c0392b", "#27ae60", "#2980b9", "#d35400",
 ]
 
 TYPE1_COLOR   = "#2f2f2f"
@@ -68,8 +61,13 @@ TYPE3_COLOR   = "#d62728"
 ACTIVE_COLOR  = "#f2c94c"
 STOPPED_COLOR = "#d94f45"
 
-CENTRE_ZONES = {5}
-EDGE_ZONES   = {2, 4, 6, 8}
+# 4x4: the 2x2 inner core are the shared crossing zones.
+CORE_ZONES = {6, 7, 10, 11}
+
+# Grid geometry (4x4 spans (0,0)-(3,3)).
+GRID_MIN = -0.8
+GRID_MAX = 3.8
+GRID_CENTRE = 1.5
 
 _MANOEUVRE_TO_LANE: Dict[str, str] = {
     m: lane
@@ -78,11 +76,15 @@ _MANOEUVRE_TO_LANE: Dict[str, str] = {
 }
 
 
+def _zone_base_color(zid: int) -> str:
+    return "#fadbd8" if zid in CORE_ZONES else "#d6eaf8"
+
+
 # ── Scheduled operation (output of phase 1) ───────────────────────────────────
 
 @dataclass
 class ScheduledOp:
-    vehicle_id: int       # integer id
+    vehicle_id: int
     zone_id: int
     route_position: int
     start_time: float
@@ -94,18 +96,15 @@ class ScheduledOp:
 
 def run_hgt_episode(policy: SchedulingPolicy, env: IntersectionEnv, scenario: Scenario) -> List[ScheduledOp]:
     """Run HGT exactly as training does — no precomputation, online decisions."""
-    env.reset(scenario.vehicles)
+    env.reset(scenario.vehicles, zone_positions=ZONE_POSITIONS)
     done = False
     while not done:
         data = build_hetero_graph(env)
         mask = compute_feasible_set(env)
         if not mask.any():
-            # Advance time to the earliest moment an op becomes schedulable.
-            # This handles cases where all feasible ops are blocked only by
-            # zone_free or arrival_time being in the near future.
             next_event = next_feasible_time(env)
             if next_event is None:
-                break  # genuine deadlock — shouldn't happen in valid scenarios
+                break
             env.current_time = next_event
             continue
         with torch.no_grad():
@@ -115,10 +114,9 @@ def run_hgt_episode(policy: SchedulingPolicy, env: IntersectionEnv, scenario: Sc
     return _extract_schedule(env)
 
 
-
 def run_igreedy_episode(env: IntersectionEnv, scenario: Scenario) -> List[ScheduledOp]:
     """Run iGreedy: earliest arrival first, tie-break by route position."""
-    env.reset(scenario.vehicles)
+    env.reset(scenario.vehicles, zone_positions=ZONE_POSITIONS)
     done = False
     while not done:
         mask = compute_feasible_set(env)
@@ -177,12 +175,12 @@ def print_schedule(schedule: List[ScheduledOp], scenario: Scenario, scheduler_na
 @dataclass
 class SimSnapshot:
     sim_time: float
-    vehicle_zone: Dict[int, Optional[int]]      # vehicle_id -> zone_id or None
-    vehicle_status: Dict[int, str]              # arriving|crossing|waiting|done
-    zone_occupants: Dict[int, int]              # zone_id -> vehicle_id
-    released_now: List[int]                     # vehicle_ids released this step
+    vehicle_zone: Dict[int, Optional[int]]
+    vehicle_status: Dict[int, str]
+    zone_occupants: Dict[int, int]
+    released_now: List[int]
     waiting_vids: List[int]
-    jssp_graph: object                          # nx.DiGraph or None
+    jssp_graph: object
 
 
 def build_snapshots(
@@ -194,7 +192,6 @@ def build_snapshots(
     snapshots: List[SimSnapshot] = []
     sim_time = 0.0
 
-    # Build lookup: vehicle_id -> list of ScheduledOp in route order
     by_vehicle: Dict[int, List[ScheduledOp]] = {}
     for op in schedule:
         by_vehicle.setdefault(op.vehicle_id, []).append(op)
@@ -223,7 +220,6 @@ def build_snapshots(
                 vehicle_zone[vid] = None
                 continue
 
-            # Find which op is active right now
             active_op = None
             for op in ops:
                 if op.start_time <= sim_time < op.finish_time:
@@ -239,16 +235,13 @@ def build_snapshots(
                 vehicle_status[vid] = "crossing"
                 vehicle_zone[vid] = active_op.zone_id
                 zone_occupants[active_op.zone_id] = vid
-                # Detect release: just started this op
                 if abs(active_op.start_time - sim_time) < SIM_STEP_SECONDS + 1e-6:
                     released_now.append(vid)
             else:
-                # Between ops or before first op but after arrival
                 vehicle_status[vid] = "waiting"
                 vehicle_zone[vid] = None
                 waiting_vids.append(vid)
 
-        # Build JSSP graph from remaining unfinished ops
         jssp_g = _build_jssp_graph(schedule, sim_time, scenario) if HAS_NX else None
 
         snapshots.append(SimSnapshot(
@@ -261,7 +254,6 @@ def build_snapshots(
             jssp_graph=jssp_g,
         ))
 
-        # Stop once all vehicles are done
         if all(s == "done" for s in vehicle_status.values()):
             break
 
@@ -276,7 +268,6 @@ def _build_jssp_graph(schedule: List[ScheduledOp], sim_time: float, scenario: Sc
     if not active:
         return g
 
-    # Nodes
     for op in active:
         node_id = f"v{op.vehicle_id}_z{op.zone_id}"
         status = "crossing" if op.start_time <= sim_time < op.finish_time else "pending"
@@ -284,7 +275,6 @@ def _build_jssp_graph(schedule: List[ScheduledOp], sim_time: float, scenario: Sc
                    route_position=op.route_position, processing_time=op.processing_time,
                    start_time=op.start_time, status=status)
 
-    # Type-1: route order within each vehicle
     by_vid: Dict[int, List[ScheduledOp]] = {}
     for op in active:
         by_vid.setdefault(op.vehicle_id, []).append(op)
@@ -296,7 +286,6 @@ def _build_jssp_graph(schedule: List[ScheduledOp], sim_time: float, scenario: Sc
             if g.has_node(src) and g.has_node(dst):
                 g.add_edge(src, dst, edge_type="type1_precedence")
 
-    # Type-2: same-lane ordering
     man_by_vid = {v.id: scenario.manoeuvres[v.id] for v in scenario.vehicles}
     by_lane: Dict[str, List[int]] = {}
     for vid in by_vid:
@@ -314,7 +303,6 @@ def _build_jssp_graph(schedule: List[ScheduledOp], sim_time: float, scenario: Sc
                 if g.has_node(src) and g.has_node(dst):
                     g.add_edge(src, dst, edge_type="type2_same_lane_order")
 
-    # Type-3: zone conflicts
     zone_to_nodes: Dict[int, List[str]] = {}
     for node_id, attrs in g.nodes(data=True):
         zone_to_nodes.setdefault(attrs["zone_id"], []).append(node_id)
@@ -361,21 +349,22 @@ def animate(
 
     # ── Intersection map ──────────────────────────────────────────────────────
     ax_map.set_facecolor("#16213e")
-    ax_map.set_xlim(-0.8, 2.8)
-    ax_map.set_ylim(-0.8, 2.8)
+    ax_map.set_xlim(GRID_MIN, GRID_MAX)
+    ax_map.set_ylim(GRID_MIN, GRID_MAX)
     ax_map.set_aspect("equal")
     ax_map.axis("off")
     ax_map.set_title("Intersection", color="white", fontsize=10)
 
-    ax_map.fill_between([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
-    ax_map.fill_betweenx([-0.8, 2.8], [0.55, 0.55], [1.45, 1.45], color="#2c3e50", zorder=1)
+    # Road bands: the 4 lanes span rows/cols 0..3, road covers the full band.
+    ax_map.fill_between([GRID_MIN, GRID_MAX], [-0.5, -0.5], [3.5, 3.5], color="#2c3e50", zorder=1)
+    ax_map.fill_betweenx([GRID_MIN, GRID_MAX], [-0.5, -0.5], [3.5, 3.5], color="#2c3e50", zorder=1)
 
     _draw_lane_arrows(ax_map, scenario)
 
     zone_patches: Dict[int, plt.Circle] = {}
     for zid, (x, y) in ZONE_POSITIONS.items():
-        base = "#fadbd8" if zid in CENTRE_ZONES else "#fdebd0" if zid in EDGE_ZONES else "#d6eaf8"
-        c = plt.Circle((x, y), 0.28, color=base, zorder=3, alpha=0.85)
+        base = _zone_base_color(zid)
+        c = plt.Circle((x, y), 0.30, color=base, zorder=3, alpha=0.85)
         ax_map.add_patch(c)
         zone_patches[zid] = c
         ax_map.text(x, y, f"z{zid}", ha="center", va="center",
@@ -385,18 +374,21 @@ def animate(
     veh_texts: Dict[int, plt.Text] = {}
     for v in scenario.vehicles:
         col = VEHICLE_COLORS[v.id % len(VEHICLE_COLORS)]
-        c = plt.Circle((0, 0), 0.12, color=col, zorder=6, visible=False)
+        c = plt.Circle((0, 0), 0.13, color=col, zorder=6, visible=False)
         ax_map.add_patch(c)
         veh_patches[v.id] = c
         t = ax_map.text(0, 0, f"v{v.id}", ha="center", va="center",
                         fontsize=5, color="white", fontweight="bold", zorder=7, visible=False)
         veh_texts[v.id] = t
 
-    for label, (x, y) in [("N",(1.0,2.7)),("S",(1.0,-0.65)),("W",(-0.65,1.0)),("E",(2.65,1.0))]:
+    for label, (x, y) in [
+        ("N", (GRID_CENTRE, 3.7)), ("S", (GRID_CENTRE, -0.65)),
+        ("W", (-0.65, GRID_CENTRE)), ("E", (3.65, GRID_CENTRE)),
+    ]:
         ax_map.text(x, y, label, ha="center", va="center", color="#95a5a6",
                     fontsize=11, fontweight="bold", zorder=2)
 
-    time_text = ax_map.text(1.0, -0.58, "", ha="center", color="white", fontsize=9, zorder=8)
+    time_text = ax_map.text(GRID_CENTRE, -0.58, "", ha="center", color="white", fontsize=9, zorder=8)
 
     handles = [
         mpatches.Patch(color=VEHICLE_COLORS[v.id % len(VEHICLE_COLORS)],
@@ -424,11 +416,10 @@ def animate(
             zone_id = snap.vehicle_zone.get(vid)
             if zone_id is not None:
                 return float(ZONE_POSITIONS[zone_id][0]), float(ZONE_POSITIONS[zone_id][1])
-        # waiting — show outside first zone of vehicle's route
         v = next(v for v in scenario.vehicles if v.id == vid)
         zone_id = v.route[0]
         x, y = ZONE_POSITIONS[zone_id]
-        cx, cy = 1.0, 1.0
+        cx, cy = GRID_CENTRE, GRID_CENTRE
         dx, dy = x - cx, y - cy
         dist = max(np.sqrt(dx**2 + dy**2), 1e-9)
         return x + dx / dist * 0.55, y + dy / dist * 0.55
@@ -447,7 +438,6 @@ def animate(
                          color="#95a5a6", transform=ax_jssp.transAxes, fontsize=10)
             return
 
-        # Position: route_position as x, vehicle as y row
         vid_to_row = {v.id: -float(i) for i, v in enumerate(scenario.vehicles)}
         pos = {}
         for node_id, attrs in g.nodes(data=True):
@@ -521,8 +511,7 @@ def animate(
                 patch.set_facecolor(VEHICLE_COLORS[occupant % len(VEHICLE_COLORS)])
                 patch.set_alpha(0.95)
             else:
-                base = "#fadbd8" if zid in CENTRE_ZONES else "#fdebd0" if zid in EDGE_ZONES else "#d6eaf8"
-                patch.set_facecolor(base)
+                patch.set_facecolor(_zone_base_color(zid))
                 patch.set_alpha(0.85)
 
         for v in scenario.vehicles:
@@ -600,7 +589,7 @@ def _draw_lane_arrows(ax: plt.Axes, scenario: Scenario) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checkpoint", default="results/checkpoint_best.pt")
+    parser.add_argument("--checkpoint", default="results_4x4/checkpoint_best.pt")
     parser.add_argument("--mode", choices=["hgt", "igreedy", "both"], default="hgt")
     parser.add_argument("--difficulty", choices=["easy", "medium", "hard"], default="hard")
     parser.add_argument("--n_vehicles", type=int, default=None)
@@ -613,12 +602,12 @@ def main() -> None:
         print("Warning: networkx not installed — JSSP panel skipped. pip install networkx")
 
     gen = ScenarioGenerator(seed=args.seed)
-    n = args.n_vehicles or {"easy": 2, "medium": 4, "hard": 5}[args.difficulty]
+    n = args.n_vehicles or {"easy": 4, "medium": 8, "hard": 12}[args.difficulty]
     scenario = getattr(gen, args.difficulty)(n_vehicles=n)
 
     print(f"Scenario: {args.difficulty}, {n} vehicles, seed={args.seed}")
     for v in scenario.vehicles:
-        print(f"  v{v.id}: {scenario.manoeuvres[v.id]:5s}  route={v.route}  "
+        print(f"  v{v.id}: {scenario.manoeuvres[v.id]:6s}  route={v.route}  "
               f"arrival={v.arrival_time:.2f}s  vel={v.velocity:.1f}m/s")
 
     env = IntersectionEnv()
