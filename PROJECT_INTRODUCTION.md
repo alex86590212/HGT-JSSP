@@ -91,6 +91,18 @@ Scripts for measuring how well the learned scheduler performs.
 Use this folder when you want to answer: "Is the learned policy better than a
 baseline, and how close is it to optimal?"
 
+### `docs/`
+
+Architecture figures and supporting design material.
+
+- `docs/hgt-structure/hgt_actor_critic_scheduler.svg`: the end-to-end learned
+  scheduler diagram, from traffic state and heterogeneous graph construction to
+  the HGT encoder, masked actor, critic, and downstream schedule execution.
+- `docs/hgt-structure/hgt_jssp_flowchart.svg`: a broader JSSP workflow diagram.
+
+Use these figures alongside Section 5 when tracing how an environment state
+becomes a dispatching action.
+
 ### `intersection_scheduler/`
 
 The main learned scheduling package. This is the best place to start if you want
@@ -302,6 +314,22 @@ useful when you want a quick visual summary of waiting time, reward, episode
 steps, and curriculum phases.
 
 ## 5. How the Learned Scheduler Works
+
+![HGT actor-critic scheduler architecture](docs/hgt-structure/hgt_actor_critic_scheduler.svg)
+
+The figure separates four responsibilities that are easy to confuse:
+
+1. The graph builder encodes the current scheduling state.
+2. HGT and the actor learn a preference over operation-level actions.
+3. The feasibility mask enforces the hard JSSP constraints before an action is
+   selected.
+4. The environment decoder computes exact start and finish times. Any low-level
+   vehicle controller acts only downstream to execute that schedule; it is not
+   part of the HGT policy.
+
+During training, the critic supplies the graph-level value estimate used by PPO
+and GAE. During rollout, each selected operation changes the environment, so the
+state is rebuilt and encoded again at the next decision step.
 
 ### Step 1: Build a Scenario
 

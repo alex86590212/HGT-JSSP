@@ -1,205 +1,301 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950" role="img" aria-labelledby="title desc">
-  <title id="title">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</title>
-  <desc id="desc">Academic flowchart showing traffic state, heterogeneous graph input, type-specific projection, HGT encoder, final operation embeddings, and actor-critic decision module.</desc>
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" height="950px" version="1.1" viewBox="0 0 1600 950" width="1600px">
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    <marker id="arrow" markerHeight="10" markerUnits="strokeWidth" markerWidth="10" orient="auto" refX="9" refY="5">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#475569"/>
     </marker>
-    <marker id="smallArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748B"/>
+    <marker id="smallArrow" markerHeight="8" markerUnits="strokeWidth" markerWidth="8" orient="auto" refX="7" refY="4">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#475569"/>
     </marker>
-    <style>
-      .bg { fill: #F8FAFC; }
-      .panel { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1.8; rx: 8; ry: 8; }
-      .subpanel { fill: #F8FAFC; stroke: #CBD5E1; stroke-width: 1.5; rx: 8; ry: 8; }
-      .title { font: 700 32px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
-      .section { font: 700 20px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
-      .label { font: 700 15px Inter, Arial, Helvetica, sans-serif; fill: #0F172A; }
-      .body { font: 400 14px Inter, Arial, Helvetica, sans-serif; fill: #334155; }
-      .small { font: 400 12px Inter, Arial, Helvetica, sans-serif; fill: #475569; }
-      .formula { font: 400 13px "Times New Roman", Cambria, Georgia, serif; fill: #0F172A; }
-      .mono { font: 400 13px Consolas, "Courier New", monospace; fill: #0F172A; }
-      .monoSmall { font: 400 12px Consolas, "Courier New", monospace; fill: #334155; }
-      .arrow { stroke: #475569; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .thinArrow { stroke: #64748B; stroke-width: 1.6; fill: none; marker-end: url(#smallArrow); }
-      .op { fill: #DBEAFE; stroke: #2563EB; }
-      .veh { fill: #D1FAE5; stroke: #059669; }
-      .zone { fill: #FEF3C7; stroke: #D97706; }
-      .hgt { fill: #F3E8FF; stroke: #7C3AED; }
-      .actor { fill: #CCFBF1; stroke: #0F766E; }
-      .critic { fill: #FEF3C7; stroke: #B45309; }
-      .mask { fill: #FEE2E2; stroke: #DC2626; }
-      .nodeText { font: 700 10px Inter, Arial, Helvetica, sans-serif; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle; }
-    </style>
   </defs>
-
-  <rect class="bg" x="0" y="0" width="1600" height="950"/>
-  <text class="title" x="800" y="54" text-anchor="middle">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</text>
-  <text class="body" x="800" y="82" text-anchor="middle">Typed graph state encoding, relation-aware HGT message passing, masked actor policy, and graph-level critic value for PPO.</text>
-
-  <!-- Region 1: Traffic State -->
-  <rect class="panel" x="50" y="125" width="220" height="500"/>
-  <text class="section" x="160" y="160" text-anchor="middle">Current Traffic State</text>
-  <text class="small" x="160" y="184" text-anchor="middle">Decision step t</text>
-  <rect class="subpanel" x="78" y="210" width="164" height="164"/>
-  <line x1="133" y1="225" x2="133" y2="359" stroke="#94A3B8" stroke-width="1.2"/>
-  <line x1="187" y1="225" x2="187" y2="359" stroke="#94A3B8" stroke-width="1.2"/>
-  <line x1="93" y1="265" x2="227" y2="265" stroke="#94A3B8" stroke-width="1.2"/>
-  <line x1="93" y1="319" x2="227" y2="319" stroke="#94A3B8" stroke-width="1.2"/>
-  <rect x="139" y="271" width="42" height="42" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1.2"/>
-  <circle cx="112" cy="245" r="9" fill="#2563EB"/>
-  <circle cx="210" cy="292" r="9" fill="#059669"/>
-  <circle cx="160" cy="343" r="9" fill="#D97706"/>
-  <path d="M 95 292 C 118 292, 129 292, 151 292" class="thinArrow"/>
-  <path d="M 160 356 C 160 330, 160 321, 160 303" class="thinArrow"/>
-  <text class="body" x="78" y="408">Vehicles and arrival times</text>
-  <text class="body" x="78" y="434">Routes through conflict zones</text>
-  <text class="body" x="78" y="460">Zone availability</text>
-  <text class="body" x="78" y="486">Scheduled / unscheduled ops</text>
-  <text class="body" x="78" y="512">Feasible action set</text>
-  <rect class="mask" x="78" y="542" width="164" height="48" rx="8" ry="8"/>
-  <text class="label" x="160" y="562" text-anchor="middle">A<tspan baseline-shift="sub" font-size="10">t</tspan></text>
-  <text class="small" x="160" y="581" text-anchor="middle">valid dispatching actions</text>
-
-  <!-- Region 2: Heterogeneous Graph Input -->
-  <rect class="panel" x="325" y="125" width="285" height="500"/>
-  <text class="section" x="467.5" y="160" text-anchor="middle">Heterogeneous Graph G<tspan baseline-shift="sub" font-size="13">t</tspan></text>
-  <rect class="op" x="352" y="198" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
-  <text class="label" x="467" y="224" text-anchor="middle">Operation nodes</text>
-  <text class="formula" x="467" y="249" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">op</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_o × 6</tspan></text>
-  <circle cx="377" cy="234" r="11" fill="#2563EB"/><text class="nodeText" x="377" y="234">o</text>
-  <circle cx="557" cy="234" r="11" fill="#2563EB"/><text class="nodeText" x="557" y="234">o</text>
-
-  <rect class="veh" x="352" y="288" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
-  <text class="label" x="467" y="314" text-anchor="middle">Vehicle nodes</text>
-  <text class="formula" x="467" y="339" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">veh</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_v × 4</tspan></text>
-  <circle cx="377" cy="324" r="11" fill="#059669"/><text class="nodeText" x="377" y="324">v</text>
-  <circle cx="557" cy="324" r="11" fill="#059669"/><text class="nodeText" x="557" y="324">v</text>
-
-  <rect class="zone" x="352" y="378" width="230" height="72" rx="8" ry="8" stroke-width="1.8"/>
-  <text class="label" x="467" y="404" text-anchor="middle">Zone nodes</text>
-  <text class="formula" x="467" y="429" text-anchor="middle">X<tspan baseline-shift="sub" font-size="10">zone</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_z × 5</tspan></text>
-  <circle cx="377" cy="414" r="11" fill="#D97706"/><text class="nodeText" x="377" y="414">z</text>
-  <circle cx="557" cy="414" r="11" fill="#D97706"/><text class="nodeText" x="557" y="414">z</text>
-
-  <rect class="subpanel" x="352" y="477" width="230" height="118"/>
-  <text class="label" x="467" y="502" text-anchor="middle">Relation legend</text>
-  <text class="small" x="370" y="526">seq, lane: operation → operation</text>
-  <text class="small" x="370" y="548">conflict: operation ↔ operation</text>
-  <text class="small" x="370" y="570">owns: vehicle → operation</text>
-  <text class="small" x="370" y="592">hosts: zone → operation</text>
-  <text class="small" x="467" y="617" text-anchor="middle">Operation nodes are action units.</text>
-
-  <!-- Region 3: Projection -->
-  <rect class="panel" x="675" y="125" width="245" height="500"/>
-  <text class="section" x="797.5" y="154" text-anchor="middle">Type-specific</text>
-  <text class="section" x="797.5" y="179" text-anchor="middle">Linear Projection</text>
-  <rect class="subpanel" x="700" y="210" width="195" height="92"/>
-  <text class="formula" x="797.5" y="244" text-anchor="middle">H<tspan baseline-shift="sub" font-size="10">τ</tspan><tspan baseline-shift="super" font-size="10">0</tspan> = σ(X<tspan baseline-shift="sub" font-size="10">τ</tspan> W<tspan baseline-shift="sub" font-size="10">in</tspan><tspan baseline-shift="super" font-size="10">τ</tspan> + b<tspan baseline-shift="sub" font-size="10">in</tspan><tspan baseline-shift="super" font-size="10">τ</tspan>)</text>
-  <text class="small" x="797.5" y="276" text-anchor="middle">all node embeddings → 128-dim</text>
-  <rect class="op" x="700" y="330" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
-  <text class="monoSmall" x="717" y="354">operation:</text>
-  <text class="monoSmall" x="717" y="372">[n_o, 6] → [n_o, 128]</text>
-  <rect class="veh" x="700" y="402" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
-  <text class="monoSmall" x="717" y="426">vehicle:</text>
-  <text class="monoSmall" x="717" y="444">[n_v, 4] → [n_v, 128]</text>
-  <rect class="zone" x="700" y="474" width="195" height="54" rx="8" ry="8" stroke-width="1.6"/>
-  <text class="monoSmall" x="717" y="498">zone:</text>
-  <text class="monoSmall" x="717" y="516">[n_z, 5] → [n_z, 128]</text>
-  <text class="small" x="797.5" y="575" text-anchor="middle">Shared hidden dimension F = 128</text>
-
-  <!-- Region 4: HGT Encoder -->
-  <rect class="hgt" x="980" y="125" width="295" height="640" rx="8" ry="8" stroke-width="2"/>
-  <text class="section" x="1127.5" y="158" text-anchor="middle">3 × HGTConv Encoder</text>
-  <text class="small" x="1127.5" y="182" text-anchor="middle">4 attention heads, d<tspan baseline-shift="sub" font-size="9">h</tspan> = 32</text>
-
-  <rect class="panel" x="1005" y="205" width="245" height="62"/>
-  <text class="label" x="1127.5" y="229" text-anchor="middle">HGTConv Layer 1</text>
-  <text class="monoSmall" x="1025" y="249">Input: op / vehicle / zone [*,128]</text>
-  <text class="monoSmall" x="1025" y="264">Output: operation [n_o,128]</text>
-  <rect class="panel" x="1005" y="284" width="245" height="62"/>
-  <text class="label" x="1127.5" y="308" text-anchor="middle">HGTConv Layer 2</text>
-  <text class="monoSmall" x="1025" y="328">Input: op / vehicle / zone [*,128]</text>
-  <text class="monoSmall" x="1025" y="343">Output: operation [n_o,128]</text>
-  <rect class="panel" x="1005" y="363" width="245" height="62"/>
-  <text class="label" x="1127.5" y="387" text-anchor="middle">HGTConv Layer 3</text>
-  <text class="monoSmall" x="1025" y="407">Input: op / vehicle / zone [*,128]</text>
-  <text class="monoSmall" x="1025" y="422">Output: operation [n_o,128]</text>
-  <text class="small" x="1127.5" y="454" text-anchor="middle">Vehicle and zone embeddings are carried</text>
-  <text class="small" x="1127.5" y="472" text-anchor="middle">forward as contextual sources.</text>
-
-  <rect class="panel" x="1005" y="500" width="245" height="128"/>
-  <text class="label" x="1127.5" y="524" text-anchor="middle">Multi-head Q/K/V Computation</text>
-  <text class="monoSmall" x="1023" y="548">h_tau^ell [128] → Linear(128,384)</text>
-  <text class="monoSmall" x="1023" y="570">→ split K,Q,V → [4 heads,32]</text>
-  <text class="formula" x="1023" y="592">[K<tspan baseline-shift="sub" font-size="9">τ</tspan> || Q<tspan baseline-shift="sub" font-size="9">τ</tspan> || V<tspan baseline-shift="sub" font-size="9">τ</tspan>]</text>
-  <text class="formula" x="1023" y="610">= H<tspan baseline-shift="sub" font-size="9">τ</tspan><tspan baseline-shift="super" font-size="9">ℓ</tspan> W<tspan baseline-shift="sub" font-size="9">KQV</tspan><tspan baseline-shift="super" font-size="9">τ</tspan> + b<tspan baseline-shift="sub" font-size="9">KQV</tspan><tspan baseline-shift="super" font-size="9">τ</tspan></text>
-  <text class="small" x="1023" y="629">F = 128, H = 4, d<tspan baseline-shift="sub" font-size="9">h</tspan> = 32</text>
-
-  <rect class="panel" x="1005" y="648" width="245" height="88"/>
-  <text class="label" x="1127.5" y="672" text-anchor="middle">Relation-aware Attention</text>
-  <text class="formula" x="1023" y="695">score(u,v,r) = Q<tspan baseline-shift="sub" font-size="9">v</tspan> · K<tspan baseline-shift="sub" font-size="9">u</tspan><tspan baseline-shift="super" font-size="9">r</tspan> / sqrt(32)</text>
-  <text class="formula" x="1023" y="716">alpha(u,v,r) = softmax(score)</text>
-  <text class="formula" x="1023" y="734">message = alpha · V<tspan baseline-shift="sub" font-size="9">u</tspan><tspan baseline-shift="super" font-size="9">r</tspan></text>
-
-  <!-- Region 5: Embeddings and actor critic -->
-  <rect class="op" x="1320" y="145" width="220" height="100" rx="8" ry="8" stroke-width="2"/>
-  <text class="section" x="1430" y="178" text-anchor="middle">Final Operation</text>
-  <text class="section" x="1430" y="202" text-anchor="middle">Embeddings</text>
-  <text class="formula" x="1430" y="226" text-anchor="middle">H<tspan baseline-shift="sub" font-size="10">op</tspan><tspan baseline-shift="super" font-size="10">L</tspan> ∈ R<tspan baseline-shift="super" font-size="10">n_o × 128</tspan></text>
-  <text class="small" x="1430" y="247" text-anchor="middle">One embedding per operation/action</text>
-
-  <rect class="actor" x="1312" y="305" width="235" height="205" rx="8" ry="8" stroke-width="2"/>
-  <text class="section" x="1429.5" y="335" text-anchor="middle">Actor</text>
-  <text class="label" x="1429.5" y="359" text-anchor="middle">Masked Dispatching Policy</text>
-  <text class="mono" x="1332" y="389">MLP_actor: 128 → 64 → 1</text>
-  <text class="mono" x="1332" y="416">all operation logits: [n_o]</text>
-  <rect class="mask" x="1332" y="431" width="195" height="34" rx="8" ry="8"/>
-  <text class="monoSmall" x="1429.5" y="453" text-anchor="middle">if o ∉ A_t: logit_o = -∞</text>
-  <text class="formula" x="1429.5" y="480" text-anchor="middle">π<tspan baseline-shift="sub" font-size="10">θ</tspan>(o | G<tspan baseline-shift="sub" font-size="10">t</tspan>)</text>
-  <text class="formula" x="1429.5" y="498" text-anchor="middle">= softmax(masked logits)</text>
-
-  <rect class="critic" x="1312" y="540" width="235" height="205" rx="8" ry="8" stroke-width="2"/>
-  <text class="section" x="1429.5" y="570" text-anchor="middle">Critic</text>
-  <text class="label" x="1429.5" y="594" text-anchor="middle">Graph-level Value</text>
-  <text class="monoSmall" x="1332" y="624">Select unscheduled operations U_t</text>
-  <text class="monoSmall" x="1332" y="646">Mean pooling over U_t:</text>
-  <text class="monoSmall" x="1332" y="664">h_G = mean({h_o^L | o ∈ U_t})</text>
-  <text class="mono" x="1332" y="694">MLP_critic: 128 → 64 → 1</text>
-  <text class="formula" x="1429.5" y="718" text-anchor="middle">V<tspan baseline-shift="sub" font-size="10">φ</tspan>(G<tspan baseline-shift="sub" font-size="10">t</tspan>)</text>
-  <text class="small" x="1429.5" y="738" text-anchor="middle">Used by PPO / GAE advantage estimation</text>
-
-  <!-- Flow arrows -->
-  <path class="arrow" d="M 270 375 L 325 375"/>
-  <path class="arrow" d="M 610 375 L 675 375"/>
-  <path class="arrow" d="M 920 375 L 980 375"/>
-  <path class="arrow" d="M 1275 195 L 1320 195"/>
-  <path class="arrow" d="M 1430 245 L 1430 305"/>
-  <path class="arrow" d="M 1430 245 C 1495 280, 1495 500, 1430 540"/>
-
-  <text class="small" x="297" y="359" text-anchor="middle">state → graph</text>
-  <text class="small" x="642" y="359" text-anchor="middle">typed features</text>
-  <text class="small" x="950" y="359" text-anchor="middle">128-dim</text>
-  <text class="small" x="1297" y="178" text-anchor="middle">op output</text>
-
-  <!-- Actor wording note -->
-  <rect class="subpanel" x="1300" y="755" width="255" height="52"/>
-  <text class="small" x="1427.5" y="776" text-anchor="middle">Actor scores all operations first;</text>
-  <text class="small" x="1427.5" y="794" text-anchor="middle">infeasible operations are masked before softmax.</text>
-
-  <!-- Bottom methodological separation bar -->
-  <rect class="panel" x="50" y="835" width="1500" height="82"/>
-  <text class="label" x="800" y="860" text-anchor="middle">Methodological separation: the neural scheduler chooses actions, while exact timing and control are handled downstream.</text>
-  <rect x="78" y="878" width="350" height="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/>
-  <rect x="428" y="878" width="350" height="26" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
-  <rect x="778" y="878" width="350" height="26" fill="#E2E8F0" stroke="#64748B" stroke-width="1.5"/>
-  <rect x="1128" y="878" width="394" height="26" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
-  <text class="label" x="253" y="897" text-anchor="middle">HGT + Actor</text>
-  <text class="label" x="603" y="897" text-anchor="middle">Feasible Mask</text>
-  <text class="label" x="953" y="897" text-anchor="middle">Environment Decoder</text>
-  <text class="label" x="1325" y="897" text-anchor="middle">Low-level Controller</text>
-  <text class="small" x="253" y="920" text-anchor="middle">learn dispatching preference</text>
-  <text class="small" x="603" y="920" text-anchor="middle">enforce valid JSSP actions</text>
-  <text class="small" x="953" y="920" text-anchor="middle">compute exact start / finish times</text>
-  <text class="small" x="1325" y="920" text-anchor="middle">track the planned schedule</text>
+  <rect fill="#F8FAFC" height="950" width="1600" x="0" y="0"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="middle" x="800.0" y="43">HGT-based Actor-Critic Scheduler for JSSP Intersection Control</text>
+  <line opacity="1.0" stroke="#CBD5E1" stroke-width="1" x1="245" x2="1355" y1="55" y2="55"/>
+  <circle cx="47" cy="78" fill="#FFFFFF" r="14" stroke="#2563EB" stroke-width="1.8"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="47" y="84">1</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="start" x="71" y="84">Traffic State</text>
+  <circle cx="287" cy="78" fill="#FFFFFF" r="14" stroke="#2563EB" stroke-width="1.8"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="287" y="84">2</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="start" x="311" y="84">Heterogeneous Graph Input</text>
+  <circle cx="607" cy="78" fill="#FFFFFF" r="14" stroke="#2563EB" stroke-width="1.8"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="607" y="84">3</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="start" x="631" y="84">Type-specific Projection</text>
+  <circle cx="862" cy="78" fill="#FFFFFF" r="14" stroke="#7C3AED" stroke-width="1.8"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="862" y="84">4</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="start" x="886" y="84">3-layer HGT Encoder</text>
+  <circle cx="1277" cy="78" fill="#FFFFFF" r="14" stroke="#2563EB" stroke-width="1.8"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="1277" y="84">5</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16.5" font-weight="700" text-anchor="start" x="1301" y="84">Actor-Critic Decision Module</text>
+  <rect fill="#FFFFFF" height="680" id="traffic-state" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.8" width="220" x="25" y="100"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle" x="135" y="128">Current Traffic State</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-style="italic" font-weight="500" text-anchor="middle" x="135" y="152">Decision step t</text>
+  <circle cx="42" cy="180" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="184">Vehicles and arrival times</text>
+  <circle cx="42" cy="202" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="206">Routes through conflict zones</text>
+  <circle cx="42" cy="224" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="228">Zone availability</text>
+  <circle cx="42" cy="246" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="250">Scheduled / unscheduled</text>
+  <circle cx="42" cy="268" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="272">operations</text>
+  <circle cx="42" cy="290" fill="#0F172A" r="2.2" stroke="#0F172A" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" text-anchor="start" x="52" y="294">Feasible action set Aₜ</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="135" y="343">Intersection / Conflict Zones</text>
+  <line opacity="1.0" stroke="#475569" stroke-dasharray="8,7" stroke-width="2" x1="45" x2="225" y1="452" y2="452"/>
+  <line opacity="1.0" stroke="#475569" stroke-dasharray="8,7" stroke-width="2" x1="135" x2="135" y1="362" y2="550"/>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="78" y="386"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="95.0" y="408">1</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="121" y="386"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="138.0" y="408">2</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="164" y="386"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="181.0" y="408">3</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="78" y="429"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="95.0" y="451">4</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="121" y="429"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="138.0" y="451">5</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="164" y="429"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="181.0" y="451">6</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="78" y="472"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="95.0" y="494">7</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="121" y="472"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="138.0" y="494">8</text>
+  <rect fill="#FFEDD5" height="34" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.4" width="34" x="164" y="472"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="181.0" y="494">9</text>
+  <path d="M48,520 C72,505 91,505 112,520 C136,537 161,537 220,510" fill="none" marker-end="url(#arrow)" stroke="#059669" stroke-dasharray="5,4" stroke-width="2"/>
+  <rect fill="#ECFDF5" height="12" opacity="1.0" rx="3" ry="3" stroke="#059669" stroke-width="1.3" width="28" x="44" y="505"/>
+  <circle cx="50" cy="519" fill="#059669" r="3" stroke="#059669" stroke-width="1.2"/>
+  <circle cx="66" cy="519" fill="#059669" r="3" stroke="#059669" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="700" text-anchor="start" x="42" y="590">Schematic legend</text>
+  <circle cx="52" cy="615" fill="#EFF6FF" r="7" stroke="#2563EB" stroke-width="1.2"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" text-anchor="start" x="70" y="620">Operation = action unit</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="5,3" stroke-width="1.8" x1="43" x2="68" y1="646" y2="646"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" text-anchor="start" x="76" y="651">Vehicle route / context</text>
+  <rect fill="#FFF7ED" height="16" opacity="1.0" rx="2" ry="2" stroke="#D97706" stroke-width="1.2" width="16" x="44" y="668"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" text-anchor="start" x="70" y="681">Conflict zone / context</text>
+  <rect fill="#F1F5F9" height="49" opacity="1.0" rx="6" ry="6" stroke="#CBD5E1" stroke-width="1.2" width="190" x="40" y="708"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.7" font-weight="400" text-anchor="middle" x="135" y="728">
+    <tspan dy="0" x="135">State is re-encoded after</tspan>
+    <tspan dy="16" x="135">each dispatching decision.</tspan>
+  </text>
+  <rect fill="#FFFFFF" height="680" id="heterogeneous-graph" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.8" width="300" x="270" y="100"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle" x="420" y="128">Heterogeneous Graph Gₜ</text>
+  <rect fill="#EFF6FF" height="145" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.5" width="270" x="285" y="145"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="start" x="300" y="169">Operation nodes (actions)</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="14" font-weight="500" text-anchor="start" x="300" y="191">X_op ∈ Rⁿᵒ×⁶</text>
+  <circle cx="315" cy="235" fill="#BFDBFE" r="11" stroke="#2563EB" stroke-width="1.4"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="315" y="261">o1</text>
+  <circle cx="365" cy="235" fill="#BFDBFE" r="11" stroke="#2563EB" stroke-width="1.4"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="365" y="261">o2</text>
+  <circle cx="420" cy="235" fill="#BFDBFE" r="11" stroke="#2563EB" stroke-width="1.4"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="420" y="261">o3</text>
+  <circle cx="475" cy="235" fill="#BFDBFE" r="11" stroke="#2563EB" stroke-width="1.4"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="475" y="261">o4</text>
+  <circle cx="525" cy="235" fill="#BFDBFE" r="11" stroke="#2563EB" stroke-width="1.4"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="525" y="261">oₙₒ</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-width="1.5" x1="327" x2="352" y1="235" y2="235"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-width="1.5" x1="377" x2="407" y1="235" y2="235"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-width="1.5" x1="432" x2="462" y1="235" y2="235"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-width="1.5" x1="487" x2="512" y1="235" y2="235"/>
+  <path d="M365,219 C390,195 445,195 475,219" fill="none" marker-end="url(#smallArrow)" stroke="#2563EB" stroke-dasharray="4,3" stroke-width="1.2"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.2" font-weight="400" text-anchor="middle" x="420" y="276">One node per operation / candidate action</text>
+  <rect fill="#ECFDF5" height="125" opacity="1.0" rx="8" ry="8" stroke="#059669" stroke-width="1.5" width="270" x="285" y="305"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="start" x="300" y="329">Vehicle nodes (context)</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="14" font-weight="500" text-anchor="start" x="300" y="351">X_veh ∈ Rⁿᵛ×⁴</text>
+  <circle cx="320" cy="390" fill="#A7F3D0" r="11" stroke="#059669" stroke-width="1.4"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="320" y="415">v1</text>
+  <circle cx="390" cy="390" fill="#A7F3D0" r="11" stroke="#059669" stroke-width="1.4"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="390" y="415">v2</text>
+  <circle cx="460" cy="390" fill="#A7F3D0" r="11" stroke="#059669" stroke-width="1.4"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="460" y="415">v3</text>
+  <circle cx="525" cy="390" fill="#A7F3D0" r="11" stroke="#059669" stroke-width="1.4"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="525" y="415">vₙᵥ</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.3" x1="332" x2="377" y1="390" y2="390"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.3" x1="402" x2="447" y1="390" y2="390"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.3" x1="472" x2="512" y1="390" y2="390"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.1" x1="320" x2="315" y1="378" y2="247"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.1" x1="390" x2="365" y1="378" y2="247"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.1" x1="460" x2="475" y1="378" y2="247"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="4,3" stroke-width="1.1" x1="525" x2="525" y1="378" y2="247"/>
+  <rect fill="#FFF7ED" height="115" opacity="1.0" rx="8" ry="8" stroke="#D97706" stroke-width="1.5" width="270" x="285" y="445"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" text-anchor="start" x="300" y="469">Zone nodes (context)</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="14" font-weight="500" text-anchor="start" x="300" y="491">X_zone ∈ Rⁿᶻ×⁵</text>
+  <circle cx="325" cy="525" fill="#FED7AA" r="11" stroke="#D97706" stroke-width="1.4"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="325" y="550">z1</text>
+  <circle cx="405" cy="525" fill="#FED7AA" r="11" stroke="#D97706" stroke-width="1.4"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="405" y="550">z2</text>
+  <circle cx="485" cy="525" fill="#FED7AA" r="11" stroke="#D97706" stroke-width="1.4"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.5" font-style="italic" font-weight="400" text-anchor="middle" x="485" y="550">zₙ𝓏</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#D97706" stroke-dasharray="4,3" stroke-width="1.1" x1="325" x2="365" y1="513" y2="247"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#D97706" stroke-dasharray="4,3" stroke-width="1.1" x1="405" x2="420" y1="513" y2="247"/>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#D97706" stroke-dasharray="4,3" stroke-width="1.1" x1="485" x2="475" y1="513" y2="247"/>
+  <rect fill="#F1F5F9" height="180" opacity="1.0" rx="6" ry="6" stroke="#CBD5E1" stroke-width="1.2" width="270" x="285" y="580"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" text-anchor="middle" x="420" y="602">Typed Relation Legend</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-width="1.4" x1="302" x2="340" y1="621" y2="621"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="400" text-anchor="start" x="350" y="625">seq: operation → operation</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-dasharray="5,3" stroke-width="1.4" x1="302" x2="340" y1="646" y2="646"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="400" text-anchor="start" x="350" y="650">lane: operation → operation</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#2563EB" stroke-dasharray="3,3" stroke-width="1.4" x1="302" x2="340" y1="671" y2="671"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="400" text-anchor="start" x="350" y="675">conflict: operation ↔ operation</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#059669" stroke-dasharray="5,3" stroke-width="1.4" x1="302" x2="340" y1="696" y2="696"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="400" text-anchor="start" x="350" y="700">owns: vehicle → operation</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#D97706" stroke-dasharray="5,3" stroke-width="1.4" x1="302" x2="340" y1="721" y2="721"/>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="400" text-anchor="start" x="350" y="725">hosts: zone → operation</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="400" text-anchor="middle" x="420" y="750">Operation nodes are the policy action units.</text>
+  <rect fill="#FFFFFF" height="680" id="type-specific-projection" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.8" width="225" x="595" y="100"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" x="707.5" y="126">Type-specific Linear</text>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" x="707.5" y="147">Projection</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.2" font-weight="400" text-anchor="middle" x="707.5" y="174">all node embeddings → 128-dim</text>
+  <rect fill="#F1F5F9" height="84" opacity="1.0" rx="6" ry="6" stroke="#CBD5E1" stroke-width="1.3" width="195" x="610" y="195"/>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="13.2" font-weight="400" text-anchor="middle" x="707.5" y="228">
+    <tspan dy="0" x="707.5">H_τ⁰ = σ(X_τ W_in^τ + b_in^τ)</tspan>
+    <tspan dy="25" x="707.5">τ ∈ {op, veh, zone}</tspan>
+  </text>
+  <rect fill="#EFF6FF" height="92" opacity="1.0" rx="6" ry="6" stroke="#2563EB" stroke-width="1.4" width="195" x="610" y="310"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" text-anchor="start" x="625" y="336">operation</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="13" font-weight="400" text-anchor="middle" x="707.5" y="369">[n_o, 6]  →  [n_o, 128]</text>
+  <rect fill="#ECFDF5" height="92" opacity="1.0" rx="6" ry="6" stroke="#059669" stroke-width="1.4" width="195" x="610" y="428"/>
+  <text fill="#059669" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" text-anchor="start" x="625" y="454">vehicle</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="13" font-weight="400" text-anchor="middle" x="707.5" y="487">[n_v, 4]  →  [n_v, 128]</text>
+  <rect fill="#FFF7ED" height="92" opacity="1.0" rx="6" ry="6" stroke="#D97706" stroke-width="1.4" width="195" x="610" y="546"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="700" text-anchor="start" x="625" y="572">zone</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="13" font-weight="400" text-anchor="middle" x="707.5" y="605">[n_z, 5]  →  [n_z, 128]</text>
+  <rect fill="#F1F5F9" height="77" opacity="1.0" rx="6" ry="6" stroke="#CBD5E1" stroke-width="1.2" width="195" x="610" y="675"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="400" text-anchor="middle" x="707.5" y="705">Shared hidden dimension</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="18" font-weight="700" text-anchor="middle" x="707.5" y="735">F = 128</text>
+  <rect fill="#F5F3FF" height="680" id="hgt-encoder" opacity="1.0" rx="8" ry="8" stroke="#7C3AED" stroke-width="2" width="390" x="845" y="100"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="19" font-weight="700" text-anchor="middle" x="1040" y="128">HGT Encoder: 3 × HGTConv</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="400" text-anchor="middle" x="1040" y="151">4 attention heads, d_h = 32 • typed relation-aware message passing</text>
+  <rect fill="#FFFFFF" height="158" opacity="1.0" rx="7" ry="7" stroke="#7C3AED" stroke-width="1.4" width="160" x="860" y="175"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.2" font-weight="700" text-anchor="middle" x="940.0" y="199">HGTConv Layer 1</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="600" text-anchor="start" x="872" y="224">Input node types:</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.8" font-weight="400" text-anchor="start" x="878" y="244">
+    <tspan dy="0" x="878">operation  [n_o, 128]</tspan>
+    <tspan dy="18" x="878">vehicle    [n_v, 128]</tspan>
+    <tspan dy="18" x="878">zone       [n_z, 128]</tspan>
+  </text>
+  <line opacity="1.0" stroke="#CBD5E1" stroke-width="1" x1="874" x2="1006" y1="299" y2="299"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.1" font-weight="600" text-anchor="start" x="872" y="321">Output: op [n_o, 128]</text>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#7C3AED" stroke-width="2" x1="940" x2="940" y1="334" y2="351"/>
+  <rect fill="#FFFFFF" height="158" opacity="1.0" rx="7" ry="7" stroke="#7C3AED" stroke-width="1.4" width="160" x="860" y="352"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.2" font-weight="700" text-anchor="middle" x="940.0" y="376">HGTConv Layer 2</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="600" text-anchor="start" x="872" y="401">Input node types:</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.8" font-weight="400" text-anchor="start" x="878" y="421">
+    <tspan dy="0" x="878">operation  [n_o, 128]</tspan>
+    <tspan dy="18" x="878">vehicle    [n_v, 128]</tspan>
+    <tspan dy="18" x="878">zone       [n_z, 128]</tspan>
+  </text>
+  <line opacity="1.0" stroke="#CBD5E1" stroke-width="1" x1="874" x2="1006" y1="476" y2="476"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.1" font-weight="600" text-anchor="start" x="872" y="498">Output: op [n_o, 128]</text>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#7C3AED" stroke-width="2" x1="940" x2="940" y1="511" y2="528"/>
+  <rect fill="#FFFFFF" height="158" opacity="1.0" rx="7" ry="7" stroke="#7C3AED" stroke-width="1.4" width="160" x="860" y="529"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.2" font-weight="700" text-anchor="middle" x="940.0" y="553">HGTConv Layer 3</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="600" text-anchor="start" x="872" y="578">Input node types:</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.8" font-weight="400" text-anchor="start" x="878" y="598">
+    <tspan dy="0" x="878">operation  [n_o, 128]</tspan>
+    <tspan dy="18" x="878">vehicle    [n_v, 128]</tspan>
+    <tspan dy="18" x="878">zone       [n_z, 128]</tspan>
+  </text>
+  <line opacity="1.0" stroke="#CBD5E1" stroke-width="1" x1="874" x2="1006" y1="653" y2="653"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="10.1" font-weight="600" text-anchor="start" x="872" y="675">Output: op [n_o, 128]</text>
+  <rect fill="#FFFFFF" height="285" opacity="1.0" rx="7" ry="7" stroke="#7C3AED" stroke-width="1.4" width="185" x="1035" y="175"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.3" font-weight="700" text-anchor="middle" x="1127.5" y="200">Multi-head Q/K/V</text>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.3" font-weight="700" text-anchor="middle" x="1127.5" y="219">Computation</text>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="11.2" font-weight="400" text-anchor="middle" x="1127.5" y="248">
+    <tspan dy="0" x="1127.5">h_τ^ℓ  [128]</tspan>
+    <tspan dy="20" x="1127.5">↓</tspan>
+    <tspan dy="20" x="1127.5">Linear(128, 384)</tspan>
+    <tspan dy="20" x="1127.5">↓</tspan>
+    <tspan dy="20" x="1127.5">split into K, Q, V</tspan>
+    <tspan dy="20" x="1127.5">↓</tspan>
+    <tspan dy="20" x="1127.5">reshape → [4 heads, 32]</tspan>
+  </text>
+  <rect fill="#F1F5F9" height="48" opacity="1.0" rx="4" ry="4" stroke="#CBD5E1" stroke-width="1" width="161" x="1047" y="378"/>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="9.4" font-weight="400" text-anchor="middle" x="1127.5" y="397">
+    <tspan dy="0" x="1127.5">[K_τ ∥ Q_τ ∥ V_τ] =</tspan>
+    <tspan dy="17" x="1127.5">H_τ^ℓ W_KQV^τ + b_KQV^τ</tspan>
+  </text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="11.4" font-weight="600" text-anchor="middle" x="1127.5" y="444">F = 128, H = 4, d_h = 32</text>
+  <rect fill="#FFFFFF" height="250" opacity="1.0" rx="7" ry="7" stroke="#7C3AED" stroke-width="1.4" width="185" x="1035" y="475"/>
+  <text fill="#7C3AED" font-family="Inter, Arial, Helvetica, sans-serif" font-size="14.1" font-weight="700" text-anchor="middle" x="1127.5" y="500">Relation-aware Attention</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="10.8" font-weight="400" text-anchor="start" x="1048" y="532">
+    <tspan dy="0" x="1048">Q_v = Q_{τ_t}(v)</tspan>
+    <tspan dy="24" x="1048">K_u^r = W_K^r K_{τ_s}(u)</tspan>
+    <tspan dy="24" x="1048">V_u^r = W_V^r V_{τ_s}(u)</tspan>
+  </text>
+  <line opacity="1.0" stroke="#CBD5E1" stroke-width="1" x1="1048" x2="1207" y1="598" y2="598"/>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="10.3" font-weight="400" text-anchor="start" x="1048" y="624">
+    <tspan dy="0" x="1048">score(u,v,r) = Q_v · K_u^r / √32</tspan>
+    <tspan dy="23" x="1048">α(u,v,r) = softmax(score)</tspan>
+    <tspan dy="23" x="1048">message = α · V_u^r</tspan>
+  </text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.4" font-weight="400" text-anchor="middle" x="1127.5" y="699">
+    <tspan dy="0" x="1127.5">Aggregate over seq, lane, conflict,</tspan>
+    <tspan dy="15" x="1127.5">owns, and hosts relations.</tspan>
+  </text>
+  <rect fill="#F1F5F9" height="45" opacity="1.0" rx="5" ry="5" stroke="#CBD5E1" stroke-width="1" width="160" x="860" y="710"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="9.8" font-weight="400" text-anchor="middle" x="940" y="728">
+    <tspan dy="0" x="940">Vehicle and zone embeddings are</tspan>
+    <tspan dy="14" x="940">carried forward as contextual sources.</tspan>
+  </text>
+  <text fill="#DC2626" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="400" text-anchor="middle" x="1040" y="757">No explicit edge-feature φ(e_uv) term is passed into HGTConv.</text>
+  <rect fill="#EFF6FF" height="105" id="operation-embeddings" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.8" width="315" x="1260" y="100"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" x="1417.5" y="128">Final Operation Embeddings</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="18" font-weight="600" text-anchor="middle" x="1417.5" y="159">H_op^L ∈ Rⁿᵒ×¹²⁸</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.2" font-weight="400" text-anchor="middle" x="1417.5" y="185">One embedding per operation / action</text>
+  <line opacity="1.0" stroke="#475569" stroke-width="2.2" x1="1417.5" x2="1417.5" y1="205" y2="219"/>
+  <circle cx="1417.5" cy="219" fill="#475569" r="3.4" stroke="#475569" stroke-width="1.2"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.2" x1="1417.5" x2="1417.5" y1="222" y2="235"/>
+  <path d="M1418,219 H1586 V665 H1577" fill="none" marker-end="url(#arrow)" stroke="#475569" stroke-width="2.0"/>
+  <rect fill="#F0FDFA" height="295" id="actor" opacity="1.0" rx="8" ry="8" stroke="#0F766E" stroke-width="1.9" width="315" x="1260" y="235"/>
+  <text fill="#0F766E" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16.5" font-weight="700" text-anchor="middle" x="1417.5" y="263">Actor: Masked Dispatching Policy</text>
+  <rect fill="#FFFFFF" height="42" opacity="1.0" rx="4" ry="4" stroke="#CBD5E1" stroke-width="1.1" width="275" x="1280" y="282"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="13" font-weight="600" text-anchor="middle" x="1417.5" y="308">MLP_actor: 128 → 64 → 1</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#0F766E" stroke-width="1.8" x1="1417.5" x2="1417.5" y1="326" y2="343"/>
+  <rect fill="#FFFFFF" height="39" opacity="1.0" rx="4" ry="4" stroke="#CBD5E1" stroke-width="1.1" width="275" x="1280" y="348"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="12.6" font-weight="400" text-anchor="middle" x="1417.5" y="373">all operation logits: [n_o]</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#0F766E" stroke-width="1.8" x1="1417.5" x2="1417.5" y1="389" y2="405"/>
+  <rect fill="#FEF2F2" height="46" opacity="1.0" rx="5" ry="5" stroke="#DC2626" stroke-width="1.5" width="275" x="1280" y="410"/>
+  <text fill="#DC2626" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="13" font-weight="600" text-anchor="middle" x="1417.5" y="439">if o ∉ Aₜ:  logit_o = −∞</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#0F766E" stroke-width="1.8" x1="1417.5" x2="1417.5" y1="458" y2="473"/>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="12.4" font-weight="600" text-anchor="middle" x="1417.5" y="493">π_θ(o | Gₜ) = softmax(masked logits)</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.7" font-weight="400" text-anchor="middle" x="1417.5" y="512">
+    <tspan dy="0" x="1417.5">Scores all operations first; infeasible</tspan>
+    <tspan dy="14" x="1417.5">operations are masked before softmax.</tspan>
+  </text>
+  <rect fill="#FFFBEB" height="230" id="critic" opacity="1.0" rx="8" ry="8" stroke="#B45309" stroke-width="1.9" width="315" x="1260" y="550"/>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16.5" font-weight="700" text-anchor="middle" x="1417.5" y="579">Critic: Graph-level Value</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.1" font-weight="600" text-anchor="start" x="1280" y="610">Select unscheduled operations Uₜ</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.1" font-weight="600" text-anchor="start" x="1280" y="633">Mean pooling:</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="13" font-weight="400" text-anchor="middle" x="1417.5" y="657">h_G = mean({h_o^L | o ∈ Uₜ})</text>
+  <line marker-end="url(#smallArrow)" opacity="1.0" stroke="#B45309" stroke-width="1.8" x1="1417.5" x2="1417.5" y1="666" y2="681"/>
+  <rect fill="#FFFFFF" height="39" opacity="1.0" rx="4" ry="4" stroke="#CBD5E1" stroke-width="1.1" width="275" x="1280" y="687"/>
+  <text fill="#0F172A" font-family="SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="12.4" font-weight="600" text-anchor="middle" x="1417.5" y="712">MLP_critic: 128 → 64 → 1</text>
+  <text fill="#0F172A" font-family="STIX Two Math, Cambria Math, Times New Roman, serif" font-size="17" font-weight="700" text-anchor="middle" x="1417.5" y="748">V_φ(Gₜ)</text>
+  <text fill="#B45309" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.9" font-weight="400" text-anchor="middle" x="1417.5" y="767">Used by PPO / GAE advantage estimation</text>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.5" x1="248" x2="266" y1="435" y2="435"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.5" x1="573" x2="591" y1="435" y2="435"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.5" x1="823" x2="841" y1="435" y2="435"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.5" x1="1238" x2="1256" y1="435" y2="435"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" text-anchor="start" x="30" y="812">Methodological separation</text>
+  <rect fill="#EFF6FF" height="93" opacity="1.0" rx="8" ry="8" stroke="#2563EB" stroke-width="1.7" width="360" x="30" y="825"/>
+  <text fill="#2563EB" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="210.0" y="857">1. HGT + Actor</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.4" font-weight="400" text-anchor="middle" x="210.0" y="883">learn dispatching preference</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="400" text-anchor="middle" x="210.0" y="904">(probability over operations)</text>
+  <rect fill="#FEF2F2" height="93" opacity="1.0" rx="8" ry="8" stroke="#DC2626" stroke-width="1.7" width="360" x="420" y="825"/>
+  <text fill="#DC2626" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="600.0" y="857">2. Feasible Mask</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.4" font-weight="400" text-anchor="middle" x="600.0" y="883">enforce valid JSSP actions</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="400" text-anchor="middle" x="600.0" y="904">(hard mask before softmax)</text>
+  <rect fill="#FFF7ED" height="93" opacity="1.0" rx="8" ry="8" stroke="#D97706" stroke-width="1.7" width="360" x="810" y="825"/>
+  <text fill="#D97706" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="990.0" y="857">3. Environment Decoder</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.4" font-weight="400" text-anchor="middle" x="990.0" y="883">compute exact start / finish times</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="400" text-anchor="middle" x="990.0" y="904">(simulation-based JSSP decoder)</text>
+  <rect fill="#F0FDF4" height="93" opacity="1.0" rx="8" ry="8" stroke="#3F7D4A" stroke-width="1.7" width="360" x="1200" y="825"/>
+  <text fill="#3F7D4A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="1380.0" y="857">4. Low-level Controller</text>
+  <text fill="#0F172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="12.4" font-weight="400" text-anchor="middle" x="1380.0" y="883">track the planned schedule</text>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="400" text-anchor="middle" x="1380.0" y="904">(execute and track vehicles)</text>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.4" x1="395" x2="412" y1="871.5" y2="871.5"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.4" x1="785" x2="802" y1="871.5" y2="871.5"/>
+  <line marker-end="url(#arrow)" opacity="1.0" stroke="#475569" stroke-width="2.4" x1="1175" x2="1192" y1="871.5" y2="871.5"/>
+  <text fill="#475569" font-family="Inter, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle" x="800" y="940">The neural policy selects the next operation; exact crossing times are computed downstream by the environment decoder.</text>
 </svg>

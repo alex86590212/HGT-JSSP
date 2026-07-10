@@ -24,6 +24,24 @@ route predecessor, and zone availability.
 
 Training uses PPO with curriculum learning (2 → 8 vehicles) over 50,000 episodes.
 
+### Learned scheduler architecture
+
+![HGT actor-critic scheduler architecture](docs/hgt-structure/hgt_actor_critic_scheduler.svg)
+
+At every dispatching step, the environment rebuilds the current state as a
+heterogeneous graph. Type-specific projections map operation, vehicle, and zone
+features into a shared 128-dimensional space; three HGT layers then produce one
+embedding per operation. The actor scores those operations and applies the hard
+feasibility mask before sampling or selecting the next action. In parallel, the
+critic mean-pools the unscheduled-operation embeddings to estimate the state
+value used by PPO and GAE during training.
+
+The network chooses only the next operation. The environment remains responsible
+for computing exact start and finish times and updating zone availability, after
+which the graph is encoded again for the next decision. The low-level controller
+shown at the far right of the diagram is the downstream execution layer; it is
+conceptually separate from the learned dispatching policy.
+
 ## Repo layout
 
 ```
