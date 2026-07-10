@@ -1,0 +1,307 @@
+"""Episode loop and training orchestration for the online dynamic 4x4 scheduler.
+
+Reuses intersection_scheduler.training.ppo.{Transition, compute_gae, ppo_update}
+unchanged — PPO/GAE only need (data, feasible_mask, action, log_prob, value,
+reward, done) per transition, which this loop produces the same way the
+offline run_episode does, just driven by wall-clock replanning events instead
+of a fixed action-per-operation sequence.
+"""
+
+from __future__ import annotations
+
+import copy
+import random
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import torch
+from torch.utils.tensorboard import SummaryWriter
+
+from dynamic_scheduler.data.traffic_generator import TrafficGenerator, get_curriculum_arrivals
+from dynamic_scheduler.environment.dynamic_intersection import DynamicIntersectionEnv
+from dynamic_scheduler.environment.feasibility import compute_feasible_set
+from dynamic_scheduler.environment.graph_builder import build_hetero_graph
+from dynamic_scheduler.utils.metrics import episode_makespan, episode_waiting_time
+from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
+from intersection_scheduler.model.policy import SchedulingPolicy
+from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
+
+
+class InfiniteLoopError(RuntimeError):
+    """Raised when run_episode's replan pass or outer event loop exceeds its
+    hard iteration cap without converging — indicates a real bug (e.g. an
+    operation state that never reaches a terminal condition), not a slow but
+    valid episode. Fail loudly rather than hang or silently truncate."""
+
+
+# Hard caps: generous enough for any real scenario (a replan pass visits each
+# currently-open op at most once, so this cap is really "how many ops could
+# possibly be open at once"; the outer loop cap is "how many distinct events
+# could occur in one episode"), but finite so a real non-convergence bug
+# raises immediately instead of hanging the process.
+MAX_REPLAN_ITERS = 500
+MAX_OUTER_ITERS = 5000
+
+
+def run_episode(
+    policy: SchedulingPolicy,
+    env: DynamicIntersectionEnv,
+    arrivals,
+    episode_duration: float,
+    *,
+    deterministic: bool = False,
+) -> "tuple[List[Transition], Dict[str, float]]":
+    """Run one wall-clock episode of online scheduling.
+
+    At each event (initial detections at t=0, then every subsequent
+    detection event returned by env.advance_time), replan every currently
+    open (non-LOCKED) operation AT MOST ONCE per pass: build the graph,
+    compute the feasible mask (excluding ops already visited this pass),
+    let the policy choose one operation to (re)plan, apply it, repeat until
+    every open op has been visited once or none remain plannable. Then
+    advance time to the next event and repeat until the episode ends.
+
+    Raises InfiniteLoopError if either loop exceeds its hard iteration cap —
+    this indicates a bug (e.g. env.advance_time not making progress), not a
+    legitimately long episode.
+    """
+    device = next(policy.parameters()).device
+    env.reset(arrivals, episode_duration)
+    transitions: List[Transition] = []
+
+    n_vehicles_seen = len(env.vehicles)
+
+    done = False
+    outer_iters = 0
+    while not done:
+        outer_iters += 1
+        if outer_iters > MAX_OUTER_ITERS:
+            raise InfiniteLoopError(
+                f"run_episode outer event loop exceeded {MAX_OUTER_ITERS} iterations "
+                f"without reaching episode_duration={episode_duration} "
+                f"(current_time={env.current_time}). Likely env.advance_time() is not "
+                f"making forward progress."
+            )
+
+        # Replan pass: visit each currently-open op at most once. A TENTATIVE
+        # op remains feasible after being planned (it's revisable), so we
+        # must explicitly exclude already-visited ops this pass — otherwise
+        # the loop never terminates (compute_feasible_set would keep
+        # returning True for it forever).
+        visited_this_pass: set = set()
+        replan_iters = 0
+        while True:
+            replan_iters += 1
+            if replan_iters > MAX_REPLAN_ITERS:
+                raise InfiniteLoopError(
+                    f"run_episode replan pass exceeded {MAX_REPLAN_ITERS} iterations "
+                    f"at current_time={env.current_time} with {len(env.operations)} "
+                    f"operations open. Likely compute_feasible_set is not converging."
+                )
+
+            mask = compute_feasible_set(env)
+            for i in visited_this_pass:
+                if i < len(mask):
+                    mask[i] = False
+            if not mask.any():
+                break
+
+            data = build_hetero_graph(env, feasible_mask=mask).to(device)
+            gpu_mask = mask.to(device)
+
+            with torch.no_grad() if deterministic else torch.enable_grad():
+                dist, value = policy(data, gpu_mask)
+
+            if deterministic:
+                action = int(dist.probs.argmax().item())
+            else:
+                action = int(dist.sample().item())
+
+            log_prob = dist.log_prob(torch.tensor(action, device=device))
+
+            env, reward, _ep_done = env.plan_operation(action)
+            visited_this_pass.add(action)
+
+            transitions.append(Transition(
+                data=data,
+                feasible_mask=gpu_mask,
+                action=action,
+                log_prob=log_prob,
+                value=value,
+                reward=reward,
+                done=False,  # done is only True on the final transition below
+            ))
+
+        done, newly_detected = env.advance_time()
+        n_vehicles_seen += len(newly_detected)
+
+    if transitions:
+        transitions[-1].done = True
+
+    stats = {
+        "n_vehicles_seen": n_vehicles_seen,
+        "n_vehicles_completed": len(env.completed_log),
+        "waiting_time": episode_waiting_time(env.completed_log),
+        "makespan": episode_makespan(env.completed_log),
+        "steps": len(transitions),
+        "total_reward": sum(t.reward for t in transitions),
+        "final_n_active_vehicles": len(env.vehicles),
+        "outer_iters": outer_iters,
+    }
+    return transitions, stats
+
+
+def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Optional[str] = None) -> None:
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    writer = SummaryWriter(log_dir=str(out / "tb"))
+
+    ppo_cfg = cfg.get("ppo", {})
+    model_cfg = cfg.get("model", {})
+    train_cfg = cfg.get("training", {})
+    env_cfg = cfg.get("environment", {})
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if device.type == "cuda":
+        print(f"Training on {device}: {torch.cuda.get_device_name(device)}", flush=True)
+    else:
+        print("Training on CPU (CUDA not available)", flush=True)
+
+    policy = SchedulingPolicy(
+        hidden_dim=model_cfg.get("hidden_dim", 128),
+        num_heads=model_cfg.get("num_heads", 4),
+        num_layers=model_cfg.get("num_layers", 3),
+    ).to(device)
+    optimizer = torch.optim.Adam(policy.parameters(), lr=ppo_cfg.get("lr", 3e-4))
+
+    start_episode = 1
+    if resume is not None:
+        checkpoint = torch.load(resume, weights_only=True, map_location=device)
+        if isinstance(checkpoint, dict) and "policy" in checkpoint:
+            policy.load_state_dict(checkpoint["policy"])
+            optimizer.load_state_dict(checkpoint["optimizer"])
+            start_episode = checkpoint.get("episode", 0) + 1
+        else:
+            policy.load_state_dict(checkpoint)
+        print(f"Resumed from {resume}, starting at episode {start_episode}", flush=True)
+
+    gen = TrafficGenerator(seed=42)
+    detection_window = env_cfg.get("detection_window", 10.0)
+    commit_window = env_cfg.get("commit_window", 2.5)
+    episode_duration = env_cfg.get("episode_duration", 60.0)
+    env = DynamicIntersectionEnv(
+        detection_window=detection_window,
+        commit_window=commit_window,
+        zone_positions=ZONE_POSITIONS,
+    )
+
+    num_episodes = train_cfg.get("num_episodes", 50_000)
+    log_interval = train_cfg.get("log_interval", 100)
+    eval_interval = train_cfg.get("eval_interval", 1_000)
+    checkpoint_interval = train_cfg.get("checkpoint_interval", 5_000)
+
+    best_eval_metric = float("inf")
+    best_state = None
+
+    ROLLOUT_N = 8
+    buffer: List[Transition] = []
+    update_stats = {"actor_loss": 0.0, "critic_loss": 0.0, "entropy": 0.0}
+
+    print(f"Starting training: {num_episodes} episodes (log every {log_interval})", flush=True)
+
+    for episode in range(start_episode, num_episodes + 1):
+        arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
+        transitions, stats = run_episode(policy, env, arrivals, episode_duration)
+
+        compute_gae(
+            transitions,
+            gamma=ppo_cfg.get("gamma", 0.99),
+            gae_lambda=ppo_cfg.get("gae_lambda", 0.95),
+        )
+        buffer.extend(transitions)
+
+        if episode == start_episode:
+            print(
+                f"[{episode:6d}] first episode done "
+                f"({stats['steps']} steps, {stats['n_vehicles_seen']} vehicles)",
+                flush=True,
+            )
+
+        if episode % ROLLOUT_N == 0 and buffer:
+            random.shuffle(buffer)
+            update_stats = ppo_update(
+                policy,
+                optimizer,
+                buffer,
+                clip_epsilon=ppo_cfg.get("clip_epsilon", 0.5),
+                epochs=ppo_cfg.get("epochs_per_update", 4),
+                value_loss_coef=ppo_cfg.get("value_loss_coef", 0.5),
+                entropy_coef=ppo_cfg.get("entropy_coef", 0.01),
+                max_grad_norm=ppo_cfg.get("max_grad_norm", 0.5),
+                mini_batch_size=ppo_cfg.get("mini_batch_size", 16),
+            )
+            buffer = []
+
+        if episode % log_interval == 0:
+            writer.add_scalar("train/n_vehicles_seen", stats["n_vehicles_seen"], episode)
+            writer.add_scalar("train/n_vehicles_completed", stats["n_vehicles_completed"], episode)
+            writer.add_scalar("train/waiting_time", stats["waiting_time"], episode)
+            writer.add_scalar("train/makespan", stats["makespan"], episode)
+            writer.add_scalar("train/total_reward", stats["total_reward"], episode)
+            writer.add_scalar("train/steps", stats["steps"], episode)
+            writer.add_scalar("train/actor_loss", update_stats["actor_loss"], episode)
+            writer.add_scalar("train/critic_loss", update_stats["critic_loss"], episode)
+            writer.add_scalar("train/entropy", update_stats["entropy"], episode)
+            print(
+                f"[{episode:6d}] seen={stats['n_vehicles_seen']:3d}  "
+                f"done={stats['n_vehicles_completed']:3d}  "
+                f"wt={stats['waiting_time']:.2f}  "
+                f"rew={stats['total_reward']:.2f}  "
+                f"steps={stats['steps']}",
+                flush=True,
+            )
+
+        if episode % eval_interval == 0:
+            eval_wt = _evaluate(policy, env, gen, episode_duration, n_episodes=10)
+            writer.add_scalar("eval/waiting_time", eval_wt, episode)
+            print(f"  >>> EVAL waiting_time={eval_wt:.3f}", flush=True)
+            if eval_wt < best_eval_metric:
+                best_eval_metric = eval_wt
+                best_state = copy.deepcopy(policy.state_dict())
+                torch.save(best_state, out / "checkpoint_best.pt")
+
+        if episode % checkpoint_interval == 0:
+            torch.save({
+                "episode": episode,
+                "policy": policy.state_dict(),
+                "optimizer": optimizer.state_dict(),
+            }, out / f"checkpoint_{episode}.pt")
+
+    writer.close()
+    if best_state is not None:
+        torch.save(best_state, out / "checkpoint_best.pt")
+    print(f"Training complete. Best eval metric: {best_eval_metric:.3f}", flush=True)
+
+
+def _evaluate(
+    policy: SchedulingPolicy,
+    env: DynamicIntersectionEnv,
+    gen: TrafficGenerator,
+    episode_duration: float,
+    n_episodes: int = 10,
+) -> float:
+    """Mean waiting time (seconds, real metric — see dynamic_scheduler.utils.metrics)
+    across n_episodes hard (high arrival-rate) episodes, deterministic policy."""
+    policy.eval()
+    total_wt = 0.0
+    total_completed = 0
+    for _ in range(n_episodes):
+        arrivals = gen.hard(episode_duration)
+        _, stats = run_episode(policy, env, arrivals, episode_duration, deterministic=True)
+        # Weight by vehicles completed so episodes with more completions
+        # contribute proportionally more to the mean (avoids a near-empty
+        # episode's 0.0 waiting time diluting the average).
+        total_wt += stats["waiting_time"] * stats["n_vehicles_completed"]
+        total_completed += stats["n_vehicles_completed"]
+    policy.train()
+    return total_wt / total_completed if total_completed > 0 else 0.0
