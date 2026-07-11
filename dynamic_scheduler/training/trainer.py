@@ -18,7 +18,22 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import torch
+import torch.multiprocessing as torch_mp
 from torch.utils.tensorboard import SummaryWriter
+
+# Default Linux tensor-sharing strategy ("file_descriptor") ships tensors
+# between processes via /dev/shm-backed shared memory — this applies to ANY
+# multiprocessing IPC carrying tensors, including plain
+# concurrent.futures.ProcessPoolExecutor, not just torch.multiprocessing.Pool.
+# HPC/SLURM nodes commonly cap /dev/shm per job (or count it against the
+# job's cgroup memory limit) to something far smaller than --mem; each
+# rollout episode returns 1000+ small tensors (log_prob/value + each
+# HeteroData graph's tensors), so with num_workers>1 this exhausts /dev/shm
+# almost immediately (observed: "unable to mmap ... Cannot allocate memory"
+# -> BrokenProcessPool). "file_system" routes tensor IPC through regular temp
+# files instead, avoiding /dev/shm entirely. Must be set before any tensor
+# is shared across a process boundary, so this runs at import time.
+torch_mp.set_sharing_strategy("file_system")
 
 from dynamic_scheduler.data.traffic_generator import TrafficGenerator, get_curriculum_arrivals
 from dynamic_scheduler.environment.dynamic_intersection import DynamicIntersectionEnv
