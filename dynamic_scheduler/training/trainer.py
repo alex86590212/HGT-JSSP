@@ -118,11 +118,23 @@ def run_episode(
             if not mask.any():
                 break
 
-            data = build_hetero_graph(env, feasible_mask=mask).to(device)
-            gpu_mask = mask.to(device)
+            data_cpu = build_hetero_graph(env, feasible_mask=mask)  # keep on CPU
 
-            with torch.no_grad() if deterministic else torch.enable_grad():
-                dist, value = policy(data, gpu_mask)
+            # Rollout ALWAYS runs under no_grad: ppo_update recomputes fresh
+            # log-probs/values (and their gradients) from the stored `data` in
+            # its own forward pass, and only ever uses the rollout-time
+            # log_prob/value as detached constants (old_log_prob baseline,
+            # GAE value). Retaining gradient graphs here would pin one full
+            # autograd graph per transition on the GPU — harmless offline
+            # (~40 transitions/episode) but fatal at the dynamic hard tier
+            # (3000+ transitions x 8 buffered episodes => OOM on a 32GB GPU).
+            #
+            # The stored graph is kept on CPU; ppo_update moves each mini-batch
+            # to the GPU itself (Batch.from_data_list(...).to(device)), so the
+            # rollout buffer never holds thousands of graphs in GPU memory at
+            # once — only the single graph being forwarded here is on-device.
+            with torch.no_grad():
+                dist, value = policy(data_cpu.to(device), mask.to(device))
 
             if deterministic:
                 action = int(dist.probs.argmax().item())
@@ -135,11 +147,11 @@ def run_episode(
             visited_this_pass.add(action)
 
             transitions.append(Transition(
-                data=data,
-                feasible_mask=gpu_mask,
+                data=data_cpu,
+                feasible_mask=mask,  # CPU
                 action=action,
-                log_prob=log_prob,
-                value=value,
+                log_prob=log_prob.detach().cpu(),
+                value=value.detach().cpu(),
                 reward=reward,
                 done=False,  # done is only True on the final transition below
             ))
