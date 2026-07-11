@@ -193,11 +193,21 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     train_cfg = cfg.get("training", {})
     env_cfg = cfg.get("environment", {})
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if device.type == "cuda":
-        print(f"Training on {device}: {torch.cuda.get_device_name(device)}", flush=True)
-    else:
-        print("Training on CPU (CUDA not available)", flush=True)
+    # Device: default CPU for the dynamic scheduler. The online rollout does
+    # ~1200 tiny, SEQUENTIAL forward passes per episode (each planning decision
+    # depends on the previous one's env state, so they can't be batched during
+    # rollout). At ~188 nodes/graph, GPU kernel-launch + host<->device transfer
+    # overhead per call dominates and runs ~10x SLOWER than CPU (observed: 27%
+    # GPU utilisation, episodes ~36s on V100 vs ~5s on CPU). Set
+    # training.device: cuda in the config only if you have a specific reason.
+    device_str = train_cfg.get("device", "cpu")
+    device = torch.device(device_str)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        print("Requested cuda but not available; falling back to CPU", flush=True)
+        device = torch.device("cpu")
+    print(f"Training on {device}"
+          + (f": {torch.cuda.get_device_name(device)}" if device.type == "cuda" else ""),
+          flush=True)
 
     policy = SchedulingPolicy(
         hidden_dim=model_cfg.get("hidden_dim", 128),
