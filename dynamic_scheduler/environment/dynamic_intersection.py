@@ -89,10 +89,20 @@ class DynamicIntersectionEnv:
         detection_window: float = 10.0,
         commit_window: float = 2.5,
         zone_positions: Optional[Dict[int, Tuple[float, float]]] = None,
+        penalty_coef: float = 0.1,
+        max_proximity_weight: float = 2.0,
     ) -> None:
         self.detection_window = detection_window
         self.commit_window = commit_window
         self._zone_positions = zone_positions
+        # Rescheduling-penalty tuning. penalty_coef scales the whole penalty
+        # term relative to the completion-time (waiting) objective, so the
+        # penalty doesn't drown the primary signal. max_proximity_weight caps
+        # the 1/time_to_arrival weight, which is otherwise unbounded and
+        # explodes for near-arrival vehicles (was producing -6+ single-step
+        # penalties that dominated the reward).
+        self.penalty_coef = penalty_coef
+        self.max_proximity_weight = max_proximity_weight
 
         self.vehicles: Dict[int, DynamicVehicle] = {}
         self.operations: List[DynamicOperation] = []   # flat list, index = action
@@ -391,6 +401,27 @@ class DynamicIntersectionEnv:
             result[vid] = last.earliest_finish
         return result
 
+    def inflight_waiting_times(self) -> List[float]:
+        """Waiting time of vehicles still active (detected, not yet completed)
+        at the current moment, using their current planned finish.
+
+        Called at episode end so the eval metric can include vehicles that
+        did not finish before the cutoff — otherwise the most-delayed
+        vehicles (the ones still stuck in flight) are silently excluded,
+        biasing the reported waiting time downward (survivorship bias).
+        """
+        times = []
+        for vid, vehicle in self.vehicles.items():
+            ops = [o for o in self.operations if o.vehicle_id == vid]
+            if not ops:
+                continue
+            last = max(ops, key=lambda o: o.route_position)
+            # Only vehicles that have at least a tentative plan have a
+            # meaningful finish estimate; unplanned ops keep their init value.
+            min_finish = vehicle.arrival_time + sum(vehicle.processing_times)
+            times.append(max(0.0, last.earliest_finish - min_finish))
+        return times
+
     # ------------------------------------------------------------------
     # Reward: completion-time term (normalised by currently-active vehicle
     # count) + rescheduling-penalty term (proximity-weighted timing change).
@@ -410,9 +441,11 @@ class DynamicIntersectionEnv:
             vehicle = self.vehicles.get(changed_op.vehicle_id)
             if vehicle is not None:
                 time_to_arrival = max(vehicle.arrival_time - self.current_time, 1e-6)
-                proximity_weight = 1.0 / time_to_arrival
+                # Capped so a near-arrival vehicle can't produce an explosive
+                # penalty that dominates the reward (see __init__).
+                proximity_weight = min(1.0 / time_to_arrival, self.max_proximity_weight)
                 timing_change = abs(changed_op.start_time - changed_op.prev_start_time)
-                penalty_term = -proximity_weight * timing_change
+                penalty_term = -self.penalty_coef * proximity_weight * timing_change
 
         return completion_term + penalty_term
 
@@ -468,3 +501,38 @@ class DynamicIntersectionEnv:
             i for i, op in enumerate(self.operations)
             if op.state != OpState.LOCKED
         ]
+
+    def affected_op_indices(self, trigger_vehicle_ids: List[int]) -> List[int]:
+        """Indices of operations that should be (re)planned in response to the
+        given newly-detected vehicles — the churn-reduction filter.
+
+        An operation is affected if:
+          - it is UNSCHEDULED (it has never been planned; it must be planned
+            regardless — this includes all ops of the trigger vehicles), OR
+          - it is TENTATIVE and shares a conflict zone with any operation of a
+            trigger vehicle (its optimal timing could genuinely have changed).
+
+        TENTATIVE operations in zones untouched by the new arrivals are left
+        as-is: not re-visited, no rescheduling penalty, no wasted transition.
+        This cuts the ~37-replans-per-vehicle churn to only genuinely-affected
+        re-plans, cleaning up the reward signal and speeding up episodes.
+
+        If trigger_vehicle_ids is empty (e.g. a lock/removal-only event with no
+        new detection), returns only UNSCHEDULED ops so nothing already-planned
+        is needlessly disturbed.
+        """
+        trigger_zones = set()
+        for vid in trigger_vehicle_ids:
+            for op in self.operations:
+                if op.vehicle_id == vid:
+                    trigger_zones.add(op.zone_id)
+
+        affected = []
+        for i, op in enumerate(self.operations):
+            if op.state == OpState.LOCKED:
+                continue
+            if op.state == OpState.UNSCHEDULED:
+                affected.append(i)
+            elif op.state == OpState.TENTATIVE and op.zone_id in trigger_zones:
+                affected.append(i)
+        return affected

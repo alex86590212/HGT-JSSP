@@ -21,7 +21,12 @@ from dynamic_scheduler.data.traffic_generator import TrafficGenerator, get_curri
 from dynamic_scheduler.environment.dynamic_intersection import DynamicIntersectionEnv
 from dynamic_scheduler.environment.feasibility import compute_feasible_set
 from dynamic_scheduler.environment.graph_builder import build_hetero_graph
-from dynamic_scheduler.utils.metrics import episode_makespan, episode_waiting_time
+from dynamic_scheduler.utils.metrics import (
+    completion_rate,
+    episode_makespan,
+    episode_waiting_time,
+    episode_waiting_time_all,
+)
 from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
@@ -70,6 +75,9 @@ def run_episode(
     transitions: List[Transition] = []
 
     n_vehicles_seen = len(env.vehicles)
+    # At t=0 every already-detected vehicle is a "trigger" (nothing is planned
+    # yet, so all their ops must be planned this first pass).
+    trigger_vids = list(env.vehicles.keys())
 
     done = False
     outer_iters = 0
@@ -83,11 +91,14 @@ def run_episode(
                 f"making forward progress."
             )
 
-        # Replan pass: visit each currently-open op at most once. A TENTATIVE
-        # op remains feasible after being planned (it's revisable), so we
-        # must explicitly exclude already-visited ops this pass — otherwise
-        # the loop never terminates (compute_feasible_set would keep
-        # returning True for it forever).
+        # Replan pass: only (re)plan operations AFFECTED by this event —
+        # UNSCHEDULED ops (need a first plan) plus TENTATIVE ops sharing a zone
+        # with a newly-detected vehicle (their timing could have changed).
+        # Unaffected tentative plans are left untouched (no churn, no penalty).
+        # Each affected op is visited at most once (a TENTATIVE op stays
+        # feasible after planning, so we must exclude already-visited ones or
+        # the pass never terminates).
+        affected = set(env.affected_op_indices(trigger_vids))
         visited_this_pass: set = set()
         replan_iters = 0
         while True:
@@ -100,8 +111,9 @@ def run_episode(
                 )
 
             mask = compute_feasible_set(env)
-            for i in visited_this_pass:
-                if i < len(mask):
+            # Restrict to affected, not-yet-visited ops.
+            for i in range(len(mask)):
+                if i not in affected or i in visited_this_pass:
                     mask[i] = False
             if not mask.any():
                 break
@@ -134,14 +146,22 @@ def run_episode(
 
         done, newly_detected = env.advance_time()
         n_vehicles_seen += len(newly_detected)
+        # Next pass only re-plans ops affected by these new detections.
+        trigger_vids = newly_detected
 
     if transitions:
         transitions[-1].done = True
 
+    inflight = env.inflight_waiting_times()
+    n_completed = len(env.completed_log)
     stats = {
         "n_vehicles_seen": n_vehicles_seen,
-        "n_vehicles_completed": len(env.completed_log),
-        "waiting_time": episode_waiting_time(env.completed_log),
+        "n_vehicles_completed": n_completed,
+        # Unbiased metric (completed + in-flight) — the one to report/select on.
+        "waiting_time": episode_waiting_time_all(env.completed_log, inflight),
+        # Completed-only, kept for comparison / to see the survivorship gap.
+        "waiting_time_completed": episode_waiting_time(env.completed_log),
+        "completion_rate": completion_rate(n_completed, n_vehicles_seen),
         "makespan": episode_makespan(env.completed_log),
         "steps": len(transitions),
         "total_reward": sum(t.reward for t in transitions),
@@ -193,6 +213,8 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         detection_window=detection_window,
         commit_window=commit_window,
         zone_positions=ZONE_POSITIONS,
+        penalty_coef=env_cfg.get("penalty_coef", 0.1),
+        max_proximity_weight=env_cfg.get("max_proximity_weight", 2.0),
     )
 
     num_episodes = train_cfg.get("num_episodes", 50_000)
@@ -252,19 +274,22 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             writer.add_scalar("train/actor_loss", update_stats["actor_loss"], episode)
             writer.add_scalar("train/critic_loss", update_stats["critic_loss"], episode)
             writer.add_scalar("train/entropy", update_stats["entropy"], episode)
+            writer.add_scalar("train/completion_rate", stats["completion_rate"], episode)
             print(
                 f"[{episode:6d}] seen={stats['n_vehicles_seen']:3d}  "
                 f"done={stats['n_vehicles_completed']:3d}  "
                 f"wt={stats['waiting_time']:.2f}  "
+                f"comp={stats['completion_rate']:.2f}  "
                 f"rew={stats['total_reward']:.2f}  "
                 f"steps={stats['steps']}",
                 flush=True,
             )
 
         if episode % eval_interval == 0:
-            eval_wt = _evaluate(policy, env, gen, episode_duration, n_episodes=10)
+            eval_wt, eval_comp = _evaluate(policy, env, gen, episode_duration, n_episodes=10)
             writer.add_scalar("eval/waiting_time", eval_wt, episode)
-            print(f"  >>> EVAL waiting_time={eval_wt:.3f}", flush=True)
+            writer.add_scalar("eval/completion_rate", eval_comp, episode)
+            print(f"  >>> EVAL waiting_time={eval_wt:.3f}  completion_rate={eval_comp:.2f}", flush=True)
             if eval_wt < best_eval_metric:
                 best_eval_metric = eval_wt
                 best_state = copy.deepcopy(policy.state_dict())
@@ -289,19 +314,26 @@ def _evaluate(
     gen: TrafficGenerator,
     episode_duration: float,
     n_episodes: int = 10,
-) -> float:
-    """Mean waiting time (seconds, real metric — see dynamic_scheduler.utils.metrics)
-    across n_episodes hard (high arrival-rate) episodes, deterministic policy."""
+) -> "tuple[float, float]":
+    """Return (mean_waiting_time, completion_rate) over n_episodes hard
+    (high arrival-rate) episodes with the deterministic policy. Waiting time
+    is the unbiased all-vehicles metric (see dynamic_scheduler.utils.metrics)."""
     policy.eval()
     total_wt = 0.0
+    total_seen = 0
     total_completed = 0
     for _ in range(n_episodes):
         arrivals = gen.hard(episode_duration)
         _, stats = run_episode(policy, env, arrivals, episode_duration, deterministic=True)
-        # Weight by vehicles completed so episodes with more completions
-        # contribute proportionally more to the mean (avoids a near-empty
-        # episode's 0.0 waiting time diluting the average).
-        total_wt += stats["waiting_time"] * stats["n_vehicles_completed"]
+        # stats["waiting_time"] is the unbiased all-vehicles metric (completed
+        # + in-flight), whose denominator is vehicles SEEN — so weight by seen,
+        # not completed, to get a correct pooled mean across episodes.
+        total_wt += stats["waiting_time"] * stats["n_vehicles_seen"]
+        total_seen += stats["n_vehicles_seen"]
         total_completed += stats["n_vehicles_completed"]
     policy.train()
-    return total_wt / total_completed if total_completed > 0 else 0.0
+    mean_wt = total_wt / total_seen if total_seen > 0 else 0.0
+    comp_rate = total_completed / total_seen if total_seen > 0 else 0.0
+    # Return the mean waiting time; completion rate is logged separately by
+    # the caller via the second return value.
+    return mean_wt, comp_rate

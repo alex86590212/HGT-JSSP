@@ -81,18 +81,27 @@ class TrafficGenerator:
         # arrival rate varies across the curriculum, since this experiment
         # validates online scheduling mechanics under full realistic traffic
         # rather than re-teaching manoeuvre-type difficulty from scratch.
+        #
+        # Rates chosen from an iGreedy saturation sweep on the 4x4 intersection
+        # (16 zones, high parallel capacity): rates below ~1/s produce almost
+        # no contention (iGreedy already ~0s waiting, nothing to learn), so the
+        # tiers span mild contention -> genuine saturation where scheduling
+        # quality actually matters:
+        #   easy  1.5/s (~90 veh/60s, iGreedy ~0.8s)
+        #   medium 2.5/s (~150 veh, iGreedy ~1.1s)
+        #   hard  4.0/s (~240 veh, iGreedy ~10.6s, ~69% completion — saturated)
         return self.generate_episode_arrivals(
-            duration, arrival_rate=0.15, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=1.5, manoeuvre_types=list(ROUTES.keys()),
         )
 
     def medium(self, duration: float) -> List[DynamicVehicle]:
         return self.generate_episode_arrivals(
-            duration, arrival_rate=0.35, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=2.5, manoeuvre_types=list(ROUTES.keys()),
         )
 
     def hard(self, duration: float) -> List[DynamicVehicle]:
         return self.generate_episode_arrivals(
-            duration, arrival_rate=0.6, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=4.0, manoeuvre_types=list(ROUTES.keys()),
         )
 
 
@@ -106,5 +115,8 @@ def get_curriculum_arrivals(episode: int, gen: TrafficGenerator, duration: float
     elif episode < 50_000:
         return gen.hard(duration)
     else:
-        rate = float(gen.rng.uniform(0.15, 0.8))
+        # Mixed regime: sample across the full meaningful contention range,
+        # from mild (1.0/s) through saturation (5.0/s), so the policy
+        # generalises across traffic densities rather than overfitting one.
+        rate = float(gen.rng.uniform(1.0, 5.0))
         return gen.generate_episode_arrivals(duration, arrival_rate=rate)

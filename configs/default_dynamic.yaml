@@ -15,9 +15,11 @@ model:
   num_layers: 3
 
 environment:
-  detection_window: 10.0   # seconds before arrival a vehicle becomes visible
-  commit_window: 2.5       # seconds before arrival a tentative plan locks
-  episode_duration: 60.0   # wall-clock seconds per training episode
+  detection_window: 10.0      # seconds before arrival a vehicle becomes visible, aprox 180m
+  commit_window: 2.5          # seconds before arrival a tentative plan locks aprox 30m
+  episode_duration: 60.0      # wall-clock seconds per training episode
+  penalty_coef: 0.1           # weight of the rescheduling penalty vs waiting objective
+  max_proximity_weight: 2.0   # cap on the 1/time_to_arrival proximity weight
 
 training:
   num_episodes: 50000

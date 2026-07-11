@@ -17,16 +17,41 @@ from typing import List
 
 
 def episode_waiting_time(completed_log: List[dict]) -> float:
-    """Mean waiting time across vehicles that completed during the episode.
+    """Mean waiting time across vehicles that COMPLETED during the episode.
 
-    completed_log: env.completed_log after a full episode — list of dicts
-    with a "waiting_time" key (see DynamicIntersectionEnv._remove_completed_vehicles).
-    Returns 0.0 if no vehicle completed (matches the offline convention of
-    returning 0.0 for an empty vehicle set).
+    NOTE: this excludes vehicles still in flight at the episode cutoff, which
+    biases the number downward (the most-delayed vehicles are often the ones
+    that didn't finish). For an unbiased number use
+    episode_waiting_time_all() below. Kept for completeness / comparison.
     """
     if not completed_log:
         return 0.0
     return sum(entry["waiting_time"] for entry in completed_log) / len(completed_log)
+
+
+def episode_waiting_time_all(completed_log: List[dict], inflight_times: List[float]) -> float:
+    """Mean waiting time over ALL vehicles seen — completed plus still-in-flight.
+
+    inflight_times: env.inflight_waiting_times() captured at episode end.
+    Including in-flight vehicles removes the survivorship bias of
+    episode_waiting_time(): a vehicle stuck in congestion at the cutoff
+    counts its accumulated delay rather than being dropped. This is the
+    metric to report and to select checkpoints on.
+    """
+    all_times = [e["waiting_time"] for e in completed_log] + list(inflight_times)
+    if not all_times:
+        return 0.0
+    return sum(all_times) / len(all_times)
+
+
+def completion_rate(n_completed: int, n_seen: int) -> float:
+    """Fraction of detected vehicles that completed within the episode.
+
+    A low completion rate means many vehicles never cleared — the scheduler
+    is falling behind the arrival rate. Reported alongside waiting time so a
+    low waiting time on few completions isn't mistaken for good performance.
+    """
+    return n_completed / n_seen if n_seen > 0 else 0.0
 
 
 def episode_makespan(completed_log: List[dict]) -> float:
