@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import copy
 import random
+import resource
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -253,9 +255,14 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
 
     print(f"Starting training: {num_episodes} episodes (log every {log_interval})", flush=True)
 
+    ep_time_ema = None  # exponential moving average of per-episode wall-clock
+
     for episode in range(start_episode, num_episodes + 1):
+        ep_start = time.perf_counter()
         arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
         transitions, stats = run_episode(policy, env, arrivals, episode_duration)
+        ep_wall = time.perf_counter() - ep_start
+        ep_time_ema = ep_wall if ep_time_ema is None else 0.98 * ep_time_ema + 0.02 * ep_wall
 
         compute_gae(
             transitions,
@@ -297,13 +304,25 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             writer.add_scalar("train/critic_loss", update_stats["critic_loss"], episode)
             writer.add_scalar("train/entropy", update_stats["entropy"], episode)
             writer.add_scalar("train/completion_rate", stats["completion_rate"], episode)
+            # Resource tracking: per-episode wall-clock (smoothed) and peak
+            # process RSS. ru_maxrss is KB on Linux, bytes on macOS.
+            import sys
+            peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            _rss_divisor = 1024 ** 3 if sys.platform == "darwin" else 1024 ** 2
+            peak_gb = peak_rss / _rss_divisor
+            writer.add_scalar("perf/episode_seconds", ep_wall, episode)
+            writer.add_scalar("perf/peak_rss_gb", peak_gb, episode)
+            # Projected time to finish all remaining episodes at current pace.
+            eta_hours = ep_time_ema * (num_episodes - episode) / 3600.0
             print(
                 f"[{episode:6d}] seen={stats['n_vehicles_seen']:3d}  "
                 f"done={stats['n_vehicles_completed']:3d}  "
                 f"wt={stats['waiting_time']:.2f}  "
                 f"comp={stats['completion_rate']:.2f}  "
                 f"rew={stats['total_reward']:.2f}  "
-                f"steps={stats['steps']}",
+                f"steps={stats['steps']}  "
+                f"| {ep_wall:.1f}s/ep (avg {ep_time_ema:.1f})  "
+                f"mem={peak_gb:.1f}GB  eta={eta_hours:.1f}h",
                 flush=True,
             )
 
