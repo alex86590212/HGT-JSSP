@@ -26,3 +26,9 @@ training:
   log_interval: 100
   eval_interval: 1000
   checkpoint_interval: 5000
+  # Rollout episodes are collected in separate single-threaded PROCESSES
+  # (not intra-op threads — measured to make the tiny per-op HGT forwards
+  # SLOWER, even with OMP_NUM_THREADS matched to --cpus-per-task). Set this
+  # to match --cpus-per-task in the sbatch script; keep OMP_NUM_THREADS=1
+  # (and the MKL/OPENBLAS/NUMEXPR equivalents) regardless of this value.
+  num_workers: 8

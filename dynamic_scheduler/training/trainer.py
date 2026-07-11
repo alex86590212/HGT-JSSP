@@ -13,6 +13,7 @@ import copy
 import random
 import resource
 import time
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -185,6 +186,51 @@ def run_episode(
     return transitions, stats
 
 
+def _worker_init() -> None:
+    """ProcessPoolExecutor initializer, run once per worker process.
+
+    Rollout episodes are ~1000+ tiny sequential HGT forwards on a small
+    graph (~188 nodes) — intra-op multithreading was measured to make this
+    SLOWER (thread-pool coordination overhead exceeds the tiny compute per
+    call), confirmed on cluster with matched OMP_NUM_THREADS/--cpus-per-task.
+    Each worker process must stay single-threaded internally; parallelism
+    comes from running N whole episodes in N separate processes instead.
+    set_num_interop_threads can only be called once per process (raises on
+    a second call), so this must live in the pool initializer, not in the
+    per-task worker function below (which the pool re-invokes every round).
+    """
+    torch.set_num_threads(1)
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass  # already set / interop pool already started — harmless
+
+
+def _rollout_worker(
+    state_dict: Dict[str, torch.Tensor],
+    model_kwargs: Dict[str, Any],
+    env_kwargs: Dict[str, Any],
+    episode_duration: float,
+    arrivals,
+    seed: int,
+) -> "tuple[List[Transition], Dict[str, float]]":
+    """Run one full training episode in a worker process.
+
+    Rebuilds a fresh policy/env from plain (picklable) kwargs rather than
+    receiving the live objects, so this has no dependency on anything the
+    main process holds open (optimizer, SummaryWriter, etc.). `seed` is
+    derived from the episode number (not worker identity) so results don't
+    depend on which physical process happens to draw which episode, and so
+    a persistent pool (workers reused across rounds) doesn't replay
+    correlated RNG state inherited from fork.
+    """
+    torch.manual_seed(seed)
+    policy = SchedulingPolicy(**model_kwargs)
+    policy.load_state_dict(state_dict)
+    env = DynamicIntersectionEnv(**env_kwargs)
+    return run_episode(policy, env, arrivals, episode_duration, deterministic=False)
+
+
 def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Optional[str] = None) -> None:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -211,11 +257,12 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
           + (f": {torch.cuda.get_device_name(device)}" if device.type == "cuda" else ""),
           flush=True)
 
-    policy = SchedulingPolicy(
-        hidden_dim=model_cfg.get("hidden_dim", 128),
-        num_heads=model_cfg.get("num_heads", 4),
-        num_layers=model_cfg.get("num_layers", 3),
-    ).to(device)
+    model_kwargs: Dict[str, Any] = {
+        "hidden_dim": model_cfg.get("hidden_dim", 128),
+        "num_heads": model_cfg.get("num_heads", 4),
+        "num_layers": model_cfg.get("num_layers", 3),
+    }
+    policy = SchedulingPolicy(**model_kwargs).to(device)
     optimizer = torch.optim.Adam(policy.parameters(), lr=ppo_cfg.get("lr", 3e-4))
 
     start_episode = 1
@@ -233,18 +280,39 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     detection_window = env_cfg.get("detection_window", 10.0)
     commit_window = env_cfg.get("commit_window", 2.5)
     episode_duration = env_cfg.get("episode_duration", 60.0)
-    env = DynamicIntersectionEnv(
-        detection_window=detection_window,
-        commit_window=commit_window,
-        zone_positions=ZONE_POSITIONS,
-        penalty_coef=env_cfg.get("penalty_coef", 0.1),
-        max_proximity_weight=env_cfg.get("max_proximity_weight", 2.0),
-    )
+    env_kwargs: Dict[str, Any] = {
+        "detection_window": detection_window,
+        "commit_window": commit_window,
+        "zone_positions": ZONE_POSITIONS,
+        "penalty_coef": env_cfg.get("penalty_coef", 0.1),
+        "max_proximity_weight": env_cfg.get("max_proximity_weight", 2.0),
+    }
+    env = DynamicIntersectionEnv(**env_kwargs)
 
     num_episodes = train_cfg.get("num_episodes", 50_000)
     log_interval = train_cfg.get("log_interval", 100)
     eval_interval = train_cfg.get("eval_interval", 1_000)
     checkpoint_interval = train_cfg.get("checkpoint_interval", 5_000)
+
+    # num_workers > 1 collects rollout episodes in separate single-threaded
+    # PROCESSES (not intra-op threads — those were measured to make the tiny
+    # per-op HGT forwards SLOWER, even with --cpus-per-task matched to
+    # OMP_NUM_THREADS). Match this to --cpus-per-task in the sbatch script;
+    # keep OMP_NUM_THREADS=1 etc. regardless of how many workers this is set to.
+    num_workers = max(1, int(train_cfg.get("num_workers", 1)))
+
+    if num_workers > 1:
+        # SchedulingPolicy's HGT uses lazy-initialized modules (materialize
+        # parameter shapes on first real forward, see intersection_scheduler/
+        # model/hgt.py). The serial loop below naturally triggers that on
+        # episode 1 before ever touching state_dict(); the parallel path
+        # snapshots state_dict() up front (before the main process has run
+        # any episode), so force materialization now with one throwaway
+        # warm-up episode — discarded, doesn't touch `gen`/curriculum or
+        # count toward num_episodes/start_episode.
+        _warmup_env = DynamicIntersectionEnv(**env_kwargs)
+        _warmup_duration = min(episode_duration, 5.0)
+        run_episode(policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
 
     best_eval_metric = float("inf")
     best_state = None
@@ -253,15 +321,16 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     buffer: List[Transition] = []
     update_stats = {"actor_loss": 0.0, "critic_loss": 0.0, "entropy": 0.0}
 
-    print(f"Starting training: {num_episodes} episodes (log every {log_interval})", flush=True)
+    print(
+        f"Starting training: {num_episodes} episodes (log every {log_interval}), "
+        f"num_workers={num_workers}",
+        flush=True,
+    )
 
     ep_time_ema = None  # exponential moving average of per-episode wall-clock
 
-    for episode in range(start_episode, num_episodes + 1):
-        ep_start = time.perf_counter()
-        arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
-        transitions, stats = run_episode(policy, env, arrivals, episode_duration)
-        ep_wall = time.perf_counter() - ep_start
+    def _process_episode(ep: int, ep_wall: float, transitions: List[Transition], stats: Dict[str, float]) -> None:
+        nonlocal buffer, update_stats, best_eval_metric, best_state, ep_time_ema
         ep_time_ema = ep_wall if ep_time_ema is None else 0.98 * ep_time_ema + 0.02 * ep_wall
 
         compute_gae(
@@ -271,14 +340,14 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         )
         buffer.extend(transitions)
 
-        if episode == start_episode:
+        if ep == start_episode:
             print(
-                f"[{episode:6d}] first episode done "
+                f"[{ep:6d}] first episode done "
                 f"({stats['steps']} steps, {stats['n_vehicles_seen']} vehicles)",
                 flush=True,
             )
 
-        if episode % ROLLOUT_N == 0 and buffer:
+        if ep % ROLLOUT_N == 0 and buffer:
             random.shuffle(buffer)
             update_stats = ppo_update(
                 policy,
@@ -293,29 +362,32 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             )
             buffer = []
 
-        if episode % log_interval == 0:
-            writer.add_scalar("train/n_vehicles_seen", stats["n_vehicles_seen"], episode)
-            writer.add_scalar("train/n_vehicles_completed", stats["n_vehicles_completed"], episode)
-            writer.add_scalar("train/waiting_time", stats["waiting_time"], episode)
-            writer.add_scalar("train/makespan", stats["makespan"], episode)
-            writer.add_scalar("train/total_reward", stats["total_reward"], episode)
-            writer.add_scalar("train/steps", stats["steps"], episode)
-            writer.add_scalar("train/actor_loss", update_stats["actor_loss"], episode)
-            writer.add_scalar("train/critic_loss", update_stats["critic_loss"], episode)
-            writer.add_scalar("train/entropy", update_stats["entropy"], episode)
-            writer.add_scalar("train/completion_rate", stats["completion_rate"], episode)
+        if ep % log_interval == 0:
+            writer.add_scalar("train/n_vehicles_seen", stats["n_vehicles_seen"], ep)
+            writer.add_scalar("train/n_vehicles_completed", stats["n_vehicles_completed"], ep)
+            writer.add_scalar("train/waiting_time", stats["waiting_time"], ep)
+            writer.add_scalar("train/makespan", stats["makespan"], ep)
+            writer.add_scalar("train/total_reward", stats["total_reward"], ep)
+            writer.add_scalar("train/steps", stats["steps"], ep)
+            writer.add_scalar("train/actor_loss", update_stats["actor_loss"], ep)
+            writer.add_scalar("train/critic_loss", update_stats["critic_loss"], ep)
+            writer.add_scalar("train/entropy", update_stats["entropy"], ep)
+            writer.add_scalar("train/completion_rate", stats["completion_rate"], ep)
             # Resource tracking: per-episode wall-clock (smoothed) and peak
-            # process RSS. ru_maxrss is KB on Linux, bytes on macOS.
+            # process RSS. ru_maxrss is KB on Linux, bytes on macOS. Under
+            # num_workers > 1, ep_wall is the round's wall-clock divided by
+            # round size (an approximation, not this exact episode's time),
+            # and peak_rss reflects only the main process, not the workers.
             import sys
             peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
             _rss_divisor = 1024 ** 3 if sys.platform == "darwin" else 1024 ** 2
             peak_gb = peak_rss / _rss_divisor
-            writer.add_scalar("perf/episode_seconds", ep_wall, episode)
-            writer.add_scalar("perf/peak_rss_gb", peak_gb, episode)
+            writer.add_scalar("perf/episode_seconds", ep_wall, ep)
+            writer.add_scalar("perf/peak_rss_gb", peak_gb, ep)
             # Projected time to finish all remaining episodes at current pace.
-            eta_hours = ep_time_ema * (num_episodes - episode) / 3600.0
+            eta_hours = ep_time_ema * (num_episodes - ep) / 3600.0
             print(
-                f"[{episode:6d}] seen={stats['n_vehicles_seen']:3d}  "
+                f"[{ep:6d}] seen={stats['n_vehicles_seen']:3d}  "
                 f"done={stats['n_vehicles_completed']:3d}  "
                 f"wt={stats['waiting_time']:.2f}  "
                 f"comp={stats['completion_rate']:.2f}  "
@@ -326,22 +398,60 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
                 flush=True,
             )
 
-        if episode % eval_interval == 0:
+        if ep % eval_interval == 0:
             eval_wt, eval_comp = _evaluate(policy, env, gen, episode_duration, n_episodes=10)
-            writer.add_scalar("eval/waiting_time", eval_wt, episode)
-            writer.add_scalar("eval/completion_rate", eval_comp, episode)
+            writer.add_scalar("eval/waiting_time", eval_wt, ep)
+            writer.add_scalar("eval/completion_rate", eval_comp, ep)
             print(f"  >>> EVAL waiting_time={eval_wt:.3f}  completion_rate={eval_comp:.2f}", flush=True)
             if eval_wt < best_eval_metric:
                 best_eval_metric = eval_wt
                 best_state = copy.deepcopy(policy.state_dict())
                 torch.save(best_state, out / "checkpoint_best.pt")
 
-        if episode % checkpoint_interval == 0:
+        if ep % checkpoint_interval == 0:
             torch.save({
-                "episode": episode,
+                "episode": ep,
                 "policy": policy.state_dict(),
                 "optimizer": optimizer.state_dict(),
-            }, out / f"checkpoint_{episode}.pt")
+            }, out / f"checkpoint_{ep}.pt")
+
+    if num_workers <= 1:
+        for episode in range(start_episode, num_episodes + 1):
+            ep_start = time.perf_counter()
+            arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
+            transitions, stats = run_episode(policy, env, arrivals, episode_duration)
+            ep_wall = time.perf_counter() - ep_start
+            _process_episode(episode, ep_wall, transitions, stats)
+    else:
+        # Episodes within a round share the SAME (frozen) policy weights —
+        # the policy only changes at a ppo_update boundary — so a round of
+        # up to num_workers episodes can be collected fully in parallel
+        # across single-threaded worker processes, then merged back into
+        # the identical serial bookkeeping (_process_episode) in episode
+        # order. This mirrors the offline 4x4 trainer's device comment:
+        # the win here comes from process-level parallelism over whole
+        # episodes, never from intra-op threading over one tiny forward.
+        with ProcessPoolExecutor(max_workers=num_workers, initializer=_worker_init) as executor:
+            for round_start in range(start_episode, num_episodes + 1, num_workers):
+                round_episodes = list(range(round_start, min(round_start + num_workers, num_episodes + 1)))
+                arrivals_list = [get_curriculum_arrivals(ep, gen, episode_duration) for ep in round_episodes]
+                # Snapshot CPU weights once per round; workers never mutate
+                # the main process's policy/optimizer.
+                state_dict = {k: v.detach().cpu() for k, v in policy.state_dict().items()}
+
+                round_start_t = time.perf_counter()
+                futures = [
+                    executor.submit(
+                        _rollout_worker, state_dict, model_kwargs, env_kwargs,
+                        episode_duration, arrivals, ep,
+                    )
+                    for ep, arrivals in zip(round_episodes, arrivals_list)
+                ]
+                results = [f.result() for f in futures]
+                per_ep_wall = (time.perf_counter() - round_start_t) / len(round_episodes)
+
+                for ep, (transitions, stats) in zip(round_episodes, results):
+                    _process_episode(ep, per_ep_wall, transitions, stats)
 
     writer.close()
     if best_state is not None:
