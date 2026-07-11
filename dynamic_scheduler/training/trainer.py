@@ -10,6 +10,7 @@ of a fixed action-per-operation sequence.
 from __future__ import annotations
 
 import copy
+import io
 import random
 import resource
 import time
@@ -18,22 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import torch
-import torch.multiprocessing as torch_mp
 from torch.utils.tensorboard import SummaryWriter
-
-# Default Linux tensor-sharing strategy ("file_descriptor") ships tensors
-# between processes via /dev/shm-backed shared memory — this applies to ANY
-# multiprocessing IPC carrying tensors, including plain
-# concurrent.futures.ProcessPoolExecutor, not just torch.multiprocessing.Pool.
-# HPC/SLURM nodes commonly cap /dev/shm per job (or count it against the
-# job's cgroup memory limit) to something far smaller than --mem; each
-# rollout episode returns 1000+ small tensors (log_prob/value + each
-# HeteroData graph's tensors), so with num_workers>1 this exhausts /dev/shm
-# almost immediately (observed: "unable to mmap ... Cannot allocate memory"
-# -> BrokenProcessPool). "file_system" routes tensor IPC through regular temp
-# files instead, avoiding /dev/shm entirely. Must be set before any tensor
-# is shared across a process boundary, so this runs at import time.
-torch_mp.set_sharing_strategy("file_system")
 
 from dynamic_scheduler.data.traffic_generator import TrafficGenerator, get_curriculum_arrivals
 from dynamic_scheduler.environment.dynamic_intersection import DynamicIntersectionEnv
@@ -48,6 +34,39 @@ from dynamic_scheduler.utils.metrics import (
 from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
 from intersection_scheduler.model.policy import SchedulingPolicy
 from intersection_scheduler.training.ppo import Transition, compute_gae, ppo_update
+
+# Any torch.Tensor crossing a process boundary via plain
+# concurrent.futures.ProcessPoolExecutor/multiprocessing IPC gets intercepted
+# by a custom reducer (registered as a side effect of importing
+# torch.multiprocessing — which several dependencies already do transitively)
+# that ships it through POSIX shared memory (/dev/shm) for zero-copy transfer.
+# BOTH available strategies ("file_descriptor" and "file_system") use this
+# same underlying /dev/shm-backed mechanism — "file_system" only changes how
+# the segment is referenced (named vs. fd-passed), not where it lives — so
+# switching strategy does NOT help when /dev/shm itself is capped by the
+# SLURM job's cgroup (confirmed on-cluster: still ENOMEM after switching).
+# Each rollout episode returns 1000+ small tensors (log_prob/value + every
+# tensor inside each HeteroData graph), so with num_workers>1 this exhausts
+# a constrained /dev/shm almost immediately.
+#
+# _pack/_unpack below route tensors through torch.save/torch.load instead —
+# that serializes tensor storage as plain bytes embedded in the payload, not
+# via shared memory — so results are returned as `bytes`, a type with no
+# special multiprocessing reducer, completely avoiding /dev/shm.
+
+
+def _pack(obj: Any) -> bytes:
+    buf = io.BytesIO()
+    torch.save(obj, buf)
+    return buf.getvalue()
+
+
+def _unpack(data: bytes) -> Any:
+    # weights_only=False: this carries full Transition/HeteroData objects, not
+    # just tensors, and is purely local IPC of our own just-generated data
+    # (never an externally-sourced file), so the arbitrary-unpickling risk
+    # torch.load's default weights_only=True guards against doesn't apply.
+    return torch.load(io.BytesIO(data), weights_only=False)  # noqa: S301
 
 
 class InfiniteLoopError(RuntimeError):
@@ -222,13 +241,13 @@ def _worker_init() -> None:
 
 
 def _rollout_worker(
-    state_dict: Dict[str, torch.Tensor],
+    state_dict_bytes: bytes,
     model_kwargs: Dict[str, Any],
     env_kwargs: Dict[str, Any],
     episode_duration: float,
     arrivals,
     seed: int,
-) -> "tuple[List[Transition], Dict[str, float]]":
+) -> bytes:
     """Run one full training episode in a worker process.
 
     Rebuilds a fresh policy/env from plain (picklable) kwargs rather than
@@ -238,12 +257,18 @@ def _rollout_worker(
     depend on which physical process happens to draw which episode, and so
     a persistent pool (workers reused across rounds) doesn't replay
     correlated RNG state inherited from fork.
+
+    Both the incoming weights and the returned (transitions, stats) are
+    packed via _pack/_unpack (torch.save/load to bytes) rather than passed
+    as raw tensors — see the module-level comment on _pack for why.
     """
     torch.manual_seed(seed)
+    state_dict = _unpack(state_dict_bytes)
     policy = SchedulingPolicy(**model_kwargs)
     policy.load_state_dict(state_dict)
     env = DynamicIntersectionEnv(**env_kwargs)
-    return run_episode(policy, env, arrivals, episode_duration, deterministic=False)
+    transitions, stats = run_episode(policy, env, arrivals, episode_duration, deterministic=False)
+    return _pack((transitions, stats))
 
 
 def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Optional[str] = None) -> None:
@@ -451,18 +476,21 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
                 round_episodes = list(range(round_start, min(round_start + num_workers, num_episodes + 1)))
                 arrivals_list = [get_curriculum_arrivals(ep, gen, episode_duration) for ep in round_episodes]
                 # Snapshot CPU weights once per round; workers never mutate
-                # the main process's policy/optimizer.
+                # the main process's policy/optimizer. Packed to bytes (see
+                # _pack) so this doesn't go through torch's shared-memory
+                # multiprocessing reducer.
                 state_dict = {k: v.detach().cpu() for k, v in policy.state_dict().items()}
+                state_dict_bytes = _pack(state_dict)
 
                 round_start_t = time.perf_counter()
                 futures = [
                     executor.submit(
-                        _rollout_worker, state_dict, model_kwargs, env_kwargs,
+                        _rollout_worker, state_dict_bytes, model_kwargs, env_kwargs,
                         episode_duration, arrivals, ep,
                     )
                     for ep, arrivals in zip(round_episodes, arrivals_list)
                 ]
-                results = [f.result() for f in futures]
+                results = [_unpack(f.result()) for f in futures]
                 per_ep_wall = (time.perf_counter() - round_start_t) / len(round_episodes)
 
                 for ep, (transitions, stats) in zip(round_episodes, results):
