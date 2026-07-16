@@ -31,4 +31,12 @@ training:
   # SLOWER, even with OMP_NUM_THREADS matched to --cpus-per-task). Set this
   # to match --cpus-per-task in the sbatch script; keep OMP_NUM_THREADS=1
   # (and the MKL/OPENBLAS/NUMEXPR equivalents) regardless of this value.
-  num_workers: 8
+  # 1 = plain serial loop, no ProcessPoolExecutor/IPC overhead at all — use
+  # this on single-CPU machines.
+  num_workers: 1
+  # Rollout (data collection) always runs on CPU regardless of this setting —
+  # it's ~1000+ tiny SEQUENTIAL forwards per episode, measured ~10x slower on
+  # GPU (kernel-launch overhead per tiny call dominates). device only controls
+  # where ppo_update's BATCHED forward/backward passes run, which is a good
+  # GPU fit (mirrors the offline model). Set to "cpu" if you have no GPU.
+  device: cuda

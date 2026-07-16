@@ -281,33 +281,58 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     train_cfg = cfg.get("training", {})
     env_cfg = cfg.get("environment", {})
 
-    # Device: default CPU for the dynamic scheduler. The online rollout does
+    # Rollout (data collection) ALWAYS runs on CPU: the online rollout does
     # ~1200 tiny, SEQUENTIAL forward passes per episode (each planning decision
     # depends on the previous one's env state, so they can't be batched during
     # rollout). At ~188 nodes/graph, GPU kernel-launch + host<->device transfer
     # overhead per call dominates and runs ~10x SLOWER than CPU (observed: 27%
-    # GPU utilisation, episodes ~36s on V100 vs ~5s on CPU). Set
-    # training.device: cuda in the config only if you have a specific reason.
-    device_str = train_cfg.get("device", "cpu")
-    device = torch.device(device_str)
-    if device.type == "cuda" and not torch.cuda.is_available():
+    # GPU utilisation, episodes ~36s on V100 vs ~5s on CPU).
+    #
+    # ppo_update's forward/backward passes ARE batched (mini_batch_size
+    # transitions at once, like the offline model) and are a good GPU fit.
+    # training.device controls ONLY where ppo_update runs — rollout_device
+    # (always CPU) and update_device (CPU or CUDA) can differ. When they
+    # differ, `policy`/`optimizer` live permanently on update_device;
+    # `rollout_policy` is a CPU-only copy kept in sync via state_dict() after
+    # every ppo_update (same snapshot mechanism already used for
+    # num_workers > 1, just device-crossing instead of process-crossing).
+    rollout_device = torch.device("cpu")
+    update_device_str = train_cfg.get("device", "cpu")
+    update_device = torch.device(update_device_str)
+    if update_device.type == "cuda" and not torch.cuda.is_available():
         print("Requested cuda but not available; falling back to CPU", flush=True)
-        device = torch.device("cpu")
-    print(f"Training on {device}"
-          + (f": {torch.cuda.get_device_name(device)}" if device.type == "cuda" else ""),
-          flush=True)
+        update_device = torch.device("cpu")
+    print(
+        f"Rollout on {rollout_device}, PPO update on {update_device}"
+        + (f": {torch.cuda.get_device_name(update_device)}" if update_device.type == "cuda" else ""),
+        flush=True,
+    )
 
     model_kwargs: Dict[str, Any] = {
         "hidden_dim": model_cfg.get("hidden_dim", 128),
         "num_heads": model_cfg.get("num_heads", 4),
         "num_layers": model_cfg.get("num_layers", 3),
     }
-    policy = SchedulingPolicy(**model_kwargs).to(device)
+    policy = SchedulingPolicy(**model_kwargs).to(update_device)
     optimizer = torch.optim.Adam(policy.parameters(), lr=ppo_cfg.get("lr", 3e-4))
+
+    same_device = update_device == rollout_device
+    rollout_policy = policy if same_device else SchedulingPolicy(**model_kwargs).to(rollout_device)
+
+    def _sync_rollout_policy() -> None:
+        if not same_device:
+            # policy.state_dict() requires policy's lazy input_proj layers to
+            # already be materialized (see warm-up below) — load_state_dict
+            # on the receiving rollout_policy does NOT need that (PyTorch
+            # materializes UninitializedParameter targets from the incoming
+            # tensor shapes as a side effect of the load).
+            rollout_policy.load_state_dict(
+                {k: v.detach().to(rollout_device) for k, v in policy.state_dict().items()}
+            )
 
     start_episode = 1
     if resume is not None:
-        checkpoint = torch.load(resume, weights_only=True, map_location=device)
+        checkpoint = torch.load(resume, weights_only=True, map_location=update_device)
         if isinstance(checkpoint, dict) and "policy" in checkpoint:
             policy.load_state_dict(checkpoint["policy"])
             optimizer.load_state_dict(checkpoint["optimizer"])
@@ -315,6 +340,23 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         else:
             policy.load_state_dict(checkpoint)
         print(f"Resumed from {resume}, starting at episode {start_episode}", flush=True)
+
+    if not same_device and resume is None:
+        # policy's lazy input_proj layers only materialize on a real forward
+        # pass; state_dict() (called inside _sync_rollout_policy) requires
+        # that to have already happened. A resumed checkpoint already carries
+        # materialized shapes via load_state_dict above, so this is only
+        # needed on a fresh run. Uses rollout_policy's own device (CPU) for
+        # the throwaway forward, then copies the resulting shapes/weights
+        # onto policy via the same state_dict round trip, keeping policy on
+        # update_device throughout.
+        _warmup_env = DynamicIntersectionEnv(**env_kwargs)
+        _warmup_duration = min(env_cfg.get("episode_duration", 60.0), 5.0)
+        run_episode(rollout_policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
+        policy.load_state_dict(
+            {k: v.detach().to(update_device) for k, v in rollout_policy.state_dict().items()}
+        )
+    _sync_rollout_policy()
 
     gen = TrafficGenerator(seed=42)
     detection_window = env_cfg.get("detection_window", 10.0)
@@ -352,7 +394,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         # count toward num_episodes/start_episode.
         _warmup_env = DynamicIntersectionEnv(**env_kwargs)
         _warmup_duration = min(episode_duration, 5.0)
-        run_episode(policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
+        run_episode(rollout_policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
 
     best_eval_metric = float("inf")
     best_state = None
@@ -401,6 +443,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
                 mini_batch_size=ppo_cfg.get("mini_batch_size", 16),
             )
             buffer = []
+            _sync_rollout_policy()
 
         if ep % log_interval == 0:
             writer.add_scalar("train/n_vehicles_seen", stats["n_vehicles_seen"], ep)
@@ -439,7 +482,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             )
 
         if ep % eval_interval == 0:
-            eval_wt, eval_comp = _evaluate(policy, env, gen, episode_duration, n_episodes=10)
+            eval_wt, eval_comp = _evaluate(rollout_policy, env, gen, episode_duration, n_episodes=10)
             writer.add_scalar("eval/waiting_time", eval_wt, ep)
             writer.add_scalar("eval/completion_rate", eval_comp, ep)
             print(f"  >>> EVAL waiting_time={eval_wt:.3f}  completion_rate={eval_comp:.2f}", flush=True)
@@ -459,7 +502,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         for episode in range(start_episode, num_episodes + 1):
             ep_start = time.perf_counter()
             arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
-            transitions, stats = run_episode(policy, env, arrivals, episode_duration)
+            transitions, stats = run_episode(rollout_policy, env, arrivals, episode_duration)
             ep_wall = time.perf_counter() - ep_start
             _process_episode(episode, ep_wall, transitions, stats)
     else:
