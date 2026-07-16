@@ -84,12 +84,15 @@ def build_hetero_graph(
     max_vel = max((v.velocity for v in vehicles), default=1.0) or 1.0
     max_tta = max((v.arrival_time - env.current_time for v in vehicles), default=1.0)
     max_tta = max_tta or 1.0
+    ops_by_vid = defaultdict(list)
+    for op in ops:
+        ops_by_vid[op.vehicle_id].append(op)
     veh_feats = []
     for v in vehicles:
         r = v.arrival_time / max_r
         n = len(v.route) / max_route
         vel = v.velocity / max_vel
-        vops = [op for op in ops if op.vehicle_id == v.id]
+        vops = ops_by_vid.get(v.id, [])
         locked_frac = (
             sum(1 for op in vops if op.state == OpState.LOCKED) / len(vops)
             if vops else 0.0
@@ -101,14 +104,26 @@ def build_hetero_graph(
     # ----------------------------------------------------------------
     # Zone nodes  [n_zones, 5]
     # [occupied, time_free, n_competing, x, y]
+    # time_free = the zone's occupancy horizon: the later of the tentative
+    # queue tail (queue order is time order, so the tail holds the max) and
+    # the last locked window. This is the schedule the policy is building,
+    # so it must see it.
     # ----------------------------------------------------------------
-    max_tf = max((z.time_free for z in zones.values()), default=1.0) or 1.0
+    horizon = {
+        zid: (queue[-1].earliest_finish if queue else 0.0)
+        for zid, queue in env._zone_queue.items()
+    }
+    for op in ops:
+        if op.state == OpState.LOCKED and op.earliest_finish > horizon.get(op.zone_id, 0.0):
+            horizon[op.zone_id] = op.earliest_finish
+    max_tf = max(horizon.values(), default=1.0) or 1.0
     max_nc_z = max((z.n_competing for z in zones.values()), default=1) or 1.0
     zone_feats = []
     for zid in zone_ids:
         z = zones[zid]
-        occ = 1.0 if z.time_free > env.current_time + 1e-9 else 0.0
-        tf = z.time_free / max_tf
+        h = horizon.get(zid, 0.0)
+        occ = 1.0 if h > env.current_time + 1e-9 else 0.0
+        tf = h / max_tf
         nc = z.n_competing / max_nc_z
         zone_feats.append([occ, tf, nc, z.x, z.y])
     data["zone"].x = torch.tensor(zone_feats, dtype=torch.float) if zone_feats else torch.zeros((0, 5))

@@ -147,11 +147,14 @@ def run_episode(
                     f"operations open. Likely compute_feasible_set is not converging."
                 )
 
-            mask = compute_feasible_set(env)
-            # Restrict to affected, not-yet-visited ops.
-            for i in range(len(mask)):
-                if i not in affected or i in visited_this_pass:
-                    mask[i] = False
+            # Only the affected, not-yet-visited ops can be chosen this
+            # iteration, so feasibility is computed for just those candidates
+            # (identical mask to computing all ops and zeroing the rest —
+            # feasibility of one op never depends on another's mask entry).
+            candidates = affected - visited_this_pass
+            if not candidates:
+                break
+            mask = compute_feasible_set(env, candidates)
             if not mask.any():
                 break
 
@@ -307,6 +310,15 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         + (f": {torch.cuda.get_device_name(update_device)}" if update_device.type == "cuda" else ""),
         flush=True,
     )
+
+    if update_device.type == "cuda":
+        # Rollout's ~1000+ tiny sequential HGT forwards run measurably FASTER
+        # single-threaded (per-op compute is too small to amortize intra-op
+        # thread coordination — confirmed on dev machine and cluster), and
+        # with the update on CUDA no CPU-side batched op needs threads either.
+        # When the update also runs on CPU, defaults are kept: ppo_update's
+        # batched forwards do benefit from multi-threading there.
+        torch.set_num_threads(1)
 
     model_kwargs: Dict[str, Any] = {
         "hidden_dim": model_cfg.get("hidden_dim", 128),

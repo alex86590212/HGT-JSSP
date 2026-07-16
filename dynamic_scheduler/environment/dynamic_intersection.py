@@ -16,8 +16,20 @@ arrivals and revisable planning:
       * LOCKED: vehicle is within `commit_window` seconds of arrival_time —
         no longer revisable (mirrors "too close to safely replan").
   - Replanning is event-driven: a replan pass happens whenever a new vehicle
-    is detected. All TENTATIVE operations may be revised in that pass; LOCKED
-    operations are frozen.
+    is detected OR an operation locks. All affected TENTATIVE operations may
+    be revised in that pass; LOCKED operations are frozen.
+  - TENTATIVE plans are ZONE-BINDING among themselves: each zone keeps an
+    explicit priority queue of TENTATIVE operations, in the order the policy
+    planned them. Planning an operation appends it to its zone's queue;
+    REPLANNING an operation moves it to the back of the queue (that is the
+    revision semantics — you give up your slot). LOCKED ops leave the queue
+    and become static occupancy windows that tentative ops gap-fill around.
+    All operation times are derived from the queues + locked windows + route
+    chains by a global recompute. This is what gives the policy control over
+    the schedule: the order it plans operations IS the priority order through
+    every conflict zone, exactly like the offline model — without it, timing
+    would collapse to arrival-order FIFO and the policy would have no effect
+    (verified: identical schedules across different random policies).
   - Vehicles whose last operation is LOCKED and finished are removed from the
     graph entirely (decision-irrelevant once complete).
 """
@@ -48,7 +60,7 @@ class DynamicVehicle:
     detected: bool = False     # has entered the detection window
 
 
-@dataclass
+@dataclass(eq=False)  # identity semantics: ops live in zone queues (list.remove)
 class DynamicOperation:
     vehicle_id: int
     zone_id: int
@@ -129,6 +141,21 @@ class DynamicIntersectionEnv:
 
         self._prev_completion_times: Dict[int, float] = {}
 
+        # Zones that gained a LOCKED op during the most recent advance_time
+        # call. Read by affected_op_indices so the next replan pass re-times
+        # TENTATIVE ops in those zones against the now-binding occupancy.
+        self._newly_locked_zones: set = set()
+
+        # Per-zone priority queue of TENTATIVE operations, in policy-planning
+        # order. The schedule is derived from these queues: each op starts no
+        # earlier than its queue predecessor's finish. LOCKED ops are NOT in
+        # the queues — locking converts an op into a static occupancy window
+        # that tentative ops gap-fill around during the time recompute. (An
+        # earlier design kept locked ops in the queues; that forces priority
+        # requeues whenever a tentative op's chain shifts past a locked
+        # successor, and those unchecked requeues created precedence cycles.)
+        self._zone_queue: Dict[int, List[DynamicOperation]] = {}
+
         # Log of vehicles removed after completing their route — captured at
         # removal time since env.vehicles/operations no longer hold them
         # afterward. Each entry: {vehicle_id, arrival_time, finish_time,
@@ -161,6 +188,8 @@ class DynamicIntersectionEnv:
         self.conflict_edges = []
         self.active_conflict_edges = []
         self._prev_completion_times = {}
+        self._newly_locked_zones = set()
+        self._zone_queue = {}
         self.completed_log = []
 
         self._pending_arrivals = sorted(arrivals, key=lambda v: v.arrival_time)
@@ -216,16 +245,25 @@ class DynamicIntersectionEnv:
         return newly_detected
 
     def _lock_near_vehicles(self) -> None:
-        """Transition TENTATIVE ops to LOCKED once within commit_window."""
+        """Transition TENTATIVE ops to LOCKED once within commit_window.
+
+        A locking op leaves its zone's priority queue and becomes a static
+        occupancy window (its times were consistent with the queue at the
+        last recompute and are frozen from here on). Newly locked zones are
+        recorded so the next replan pass lets the policy re-optimize
+        (requeue) TENTATIVE plans around the now irrevocable occupancy."""
         for op in self.operations:
             if op.state != OpState.TENTATIVE:
                 continue
             vehicle = self.vehicles.get(op.vehicle_id)
             if vehicle is None:
                 continue
-            time_to_arrival = vehicle.arrival_time - self.current_time
-            if time_to_arrival <= self.commit_window + 1e-9:
+            if vehicle.arrival_time - self.current_time <= self.commit_window + 1e-9:
                 op.state = OpState.LOCKED
+                self._newly_locked_zones.add(op.zone_id)
+                queue = self._zone_queue.get(op.zone_id)
+                if queue is not None and op in queue:
+                    queue.remove(op)
 
     def _remove_completed_vehicles(self) -> None:
         """Drop vehicles whose last operation is LOCKED and has finished.
@@ -236,10 +274,11 @@ class DynamicIntersectionEnv:
         self.completed_log — this is the only point where that information
         is captured, since the vehicle/its ops are gone afterward.
         """
+        ops_by_vid = self._ops_by_vehicle()
         completed_vids = set()
         finish_by_vid: Dict[int, float] = {}
         for vid, vehicle in self.vehicles.items():
-            ops = [o for o in self.operations if o.vehicle_id == vid]
+            ops = ops_by_vid.get(vid)
             if not ops:
                 continue
             last_op = max(ops, key=lambda o: o.route_position)
@@ -263,6 +302,8 @@ class DynamicIntersectionEnv:
             })
 
         self.operations = [o for o in self.operations if o.vehicle_id not in completed_vids]
+        for zid, queue in self._zone_queue.items():
+            self._zone_queue[zid] = [o for o in queue if o.vehicle_id not in completed_vids]
         for vid in completed_vids:
             del self.vehicles[vid]
         self._rebuild_conflict_edges()
@@ -275,13 +316,24 @@ class DynamicIntersectionEnv:
     # ------------------------------------------------------------------
 
     def _rebuild_conflict_edges(self) -> None:
-        self.conflict_edges = []
-        n = len(self.operations)
-        for i in range(n):
-            for j in range(i + 1, n):
-                oi, oj = self.operations[i], self.operations[j]
-                if oi.zone_id == oj.zone_id and oi.vehicle_id != oj.vehicle_id:
-                    self.conflict_edges.append((i, j))
+        # Group op indices by zone: only same-zone pairs can conflict, so this
+        # is O(n + sum_z k_z^2) instead of the naive O(n^2) all-pairs scan.
+        # Sorted to keep the exact lexicographic (i, j) order the naive scan
+        # produced (edge tensors downstream stay byte-identical).
+        by_zone: Dict[int, List[int]] = {}
+        for i, op in enumerate(self.operations):
+            by_zone.setdefault(op.zone_id, []).append(i)
+        edges = []
+        for indices in by_zone.values():
+            for a_pos in range(len(indices)):
+                i = indices[a_pos]
+                oi = self.operations[i]
+                for b_pos in range(a_pos + 1, len(indices)):
+                    j = indices[b_pos]
+                    if oi.vehicle_id != self.operations[j].vehicle_id:
+                        edges.append((i, j))
+        edges.sort()
+        self.conflict_edges = edges
         # Active = both ops not LOCKED (a LOCKED op's ordering is already
         # resolved and irreversible; only genuinely open pairs remain "active").
         self.active_conflict_edges = [
@@ -310,91 +362,125 @@ class DynamicIntersectionEnv:
     def plan_operation(self, action: int) -> Tuple["DynamicIntersectionEnv", float, bool]:
         """Tentatively (re)plan the operation at index `action`.
 
-        Mirrors IntersectionEnv.step's timing computation, but:
-          - may be called on an op that already has a TENTATIVE plan (a
-            revision), in which case prev_start_time is preserved for the
-            rescheduling-penalty term.
-          - never marks the op as irrevocably done — it becomes TENTATIVE,
-            not LOCKED (locking happens separately via time proximity).
+        Planning = claiming the next slot in the op's zone queue. A first
+        plan appends the op to the queue; a REPLAN moves it to the back
+        (revision gives up the held slot — that is the policy's requeue
+        lever, and prev_start_time is preserved so the rescheduling penalty
+        measures the change). All times are then re-derived from the queues
+        and route chains by _recompute_times — planning ORDER is the schedule.
         """
         op = self.operations[action]
         assert op.state != OpState.LOCKED, f"Operation {action} is locked, cannot replan"
 
         self._prev_completion_times = self._last_finish_per_vehicle()
 
-        vehicle = self.vehicles[op.vehicle_id]
-        start = max(self.current_time, vehicle.arrival_time)
-
-        if op.route_position > 0:
-            pred = self._predecessor_op(op)
-            if pred is not None and pred.state != OpState.UNSCHEDULED:
-                start = max(start, pred.earliest_finish)
-
-        zone = self.zones[op.zone_id]
-        start = max(start, self._zone_free_time(op))
-
-        finish = start + op.processing_time
-
-        # Preserve the previously tentative start time (if any) before
-        # overwriting, so the caller/reward function can measure the change.
+        queue = self._zone_queue.setdefault(op.zone_id, [])
         if op.state == OpState.TENTATIVE:
+            # Preserve the previous start so the caller/reward function can
+            # measure the timing change caused by this revision.
             op.prev_start_time = op.start_time
+            queue.remove(op)
         else:
             op.prev_start_time = None
-
-        op.start_time = start
-        op.earliest_finish = finish
+        queue.append(op)
         op.state = OpState.TENTATIVE
 
-        self._propagate_finish_times(op)
+        self._recompute_times()
 
         reward = self._compute_reward(op)
 
         done = self.current_time >= self.episode_duration
         return self, reward, done
 
-    def _zone_free_time(self, op: DynamicOperation) -> float:
-        """Earliest time op's zone is free, considering only LOCKED occupants
-        (TENTATIVE plans in the same zone are not yet binding)."""
-        zone = self.zones[op.zone_id]
-        locked_finishes = [
-            o.earliest_finish for o in self.operations
-            if o.zone_id == op.zone_id and o.state == OpState.LOCKED and o is not op
-        ]
-        return max([zone.time_free] + locked_finishes) if locked_finishes else zone.time_free
+    def _recompute_times(self) -> None:
+        """Derive all TENTATIVE ops' times from zone queues + route chains.
 
-    def _predecessor_op(self, op: DynamicOperation) -> Optional[DynamicOperation]:
-        for o in self.operations:
-            if o.vehicle_id == op.vehicle_id and o.route_position == op.route_position - 1:
-                return o
-        return None
-
-    def _propagate_finish_times(self, op: DynamicOperation) -> None:
-        ops_sorted = sorted(
-            [o for o in self.operations if o.vehicle_id == op.vehicle_id],
-            key=lambda o: o.route_position,
-        )
-        start_idx = next(
-            (i for i, o in enumerate(ops_sorted) if o.route_position == op.route_position),
-            None,
-        )
-        if start_idx is None:
+        Single Kahn pass over the tentative precedence graph (route edges
+        between tentative ops + consecutive zone-queue edges). LOCKED ops
+        contribute as constants: a locked route predecessor bounds its
+        successor's earliest start, and locked ops' [start, finish) windows
+        are static blockers that tentative ops gap-fill around (an op may
+        run BEFORE a locked window if it fits — locking freezes one op's
+        slot, not the whole zone). Raises on a precedence cycle: the
+        feasibility deadlock check must prevent those from being planned."""
+        tentative = [o for o in self.operations if o.state == OpState.TENTATIVE]
+        if not tentative:
             return
-        for i in range(start_idx, len(ops_sorted) - 1):
-            cur = ops_sorted[i]
-            nxt = ops_sorted[i + 1]
-            if nxt.state == OpState.LOCKED:
-                continue
-            zone_avail = self._zone_free_time(nxt)
-            new_finish = max(cur.earliest_finish, zone_avail) + nxt.processing_time
-            if abs(new_finish - nxt.earliest_finish) < 1e-9:
-                break
-            nxt.earliest_finish = new_finish
+
+        pos_index = {(o.vehicle_id, o.route_position): o for o in self.operations}
+        locked_windows: Dict[int, List[Tuple[float, float]]] = {}
+        for o in self.operations:
+            if o.state == OpState.LOCKED:
+                locked_windows.setdefault(o.zone_id, []).append(
+                    (o.start_time, o.earliest_finish)
+                )
+        for windows in locked_windows.values():
+            windows.sort()
+
+        succs: Dict[int, List[DynamicOperation]] = {}
+        n_preds: Dict[int, int] = {id(o): 0 for o in tentative}
+        earliest: Dict[int, float] = {}
+
+        for o in tentative:
+            base = self.current_time
+            if o.route_position == 0:
+                vehicle = self.vehicles.get(o.vehicle_id)
+                if vehicle is not None:
+                    base = max(base, vehicle.arrival_time)
+            else:
+                pred = pos_index.get((o.vehicle_id, o.route_position - 1))
+                if pred is not None and pred.state == OpState.LOCKED:
+                    base = max(base, pred.earliest_finish)
+            earliest[id(o)] = base
+            route_succ = pos_index.get((o.vehicle_id, o.route_position + 1))
+            if route_succ is not None and route_succ.state == OpState.TENTATIVE:
+                succs.setdefault(id(o), []).append(route_succ)
+                n_preds[id(route_succ)] += 1
+        for queue in self._zone_queue.values():
+            for a, b in zip(queue, queue[1:]):
+                succs.setdefault(id(a), []).append(b)
+                n_preds[id(b)] += 1
+
+        ready = [o for o in tentative if n_preds[id(o)] == 0]
+        processed = 0
+        while ready:
+            o = ready.pop()
+            processed += 1
+            start = earliest[id(o)]
+            for w_start, w_end in locked_windows.get(o.zone_id, ()):
+                if start + o.processing_time <= w_start + 1e-9:
+                    break  # fits entirely before this (sorted) window
+                if start < w_end - 1e-9:
+                    start = w_end  # overlaps: bump past the window
+            o.start_time = start
+            o.earliest_finish = start + o.processing_time
+            for nxt in succs.get(id(o), []):
+                if earliest[id(nxt)] < o.earliest_finish:
+                    earliest[id(nxt)] = o.earliest_finish
+                n_preds[id(nxt)] -= 1
+                if n_preds[id(nxt)] == 0:
+                    ready.append(nxt)
+
+        if processed != len(tentative):
+            raise RuntimeError(
+                "precedence cycle among tentative operations — the "
+                "feasibility deadlock check failed to prevent a cyclic "
+                "zone priority"
+            )
+
+    def _ops_by_vehicle(self) -> Dict[int, List[DynamicOperation]]:
+        """Single-pass grouping of operations by vehicle_id — O(n) instead of
+        an O(n) scan per vehicle for the helpers below."""
+        grouped: Dict[int, List[DynamicOperation]] = {}
+        for o in self.operations:
+            grouped.setdefault(o.vehicle_id, []).append(o)
+        return grouped
 
     def _last_finish_per_vehicle(self) -> Dict[int, float]:
         result = {}
+        ops_by_vid = self._ops_by_vehicle()
         for vid in self.vehicles:
-            ops = [o for o in self.operations if o.vehicle_id == vid]
+            ops = ops_by_vid.get(vid)
             if not ops:
                 continue
             last = max(ops, key=lambda o: o.route_position)
@@ -411,8 +497,9 @@ class DynamicIntersectionEnv:
         biasing the reported waiting time downward (survivorship bias).
         """
         times = []
+        ops_by_vid = self._ops_by_vehicle()
         for vid, vehicle in self.vehicles.items():
-            ops = [o for o in self.operations if o.vehicle_id == vid]
+            ops = ops_by_vid.get(vid)
             if not ops:
                 continue
             last = max(ops, key=lambda o: o.route_position)
@@ -460,6 +547,9 @@ class DynamicIntersectionEnv:
 
         Returns (episode_done, newly_detected_vehicle_ids).
         """
+        # Locks recorded here feed the NEXT replan pass (via
+        # affected_op_indices), so clear the previous pass's set first.
+        self._newly_locked_zones = set()
         self._lock_near_vehicles()
         self._remove_completed_vehicles()
 
@@ -510,18 +600,19 @@ class DynamicIntersectionEnv:
           - it is UNSCHEDULED (it has never been planned; it must be planned
             regardless — this includes all ops of the trigger vehicles), OR
           - it is TENTATIVE and shares a conflict zone with any operation of a
-            trigger vehicle (its optimal timing could genuinely have changed).
+            trigger vehicle (its optimal timing could genuinely have changed), OR
+          - it is TENTATIVE and its zone gained a LOCKED op in the advance_time
+            call that led to this pass: the locked occupancy is now binding, so
+            an overlapping tentative plan must be re-timed before it can lock
+            overlapping it (zone-exclusivity would otherwise be violated).
 
-        TENTATIVE operations in zones untouched by the new arrivals are left
-        as-is: not re-visited, no rescheduling penalty, no wasted transition.
-        This cuts the ~37-replans-per-vehicle churn to only genuinely-affected
-        re-plans, cleaning up the reward signal and speeding up episodes.
-
-        If trigger_vehicle_ids is empty (e.g. a lock/removal-only event with no
-        new detection), returns only UNSCHEDULED ops so nothing already-planned
-        is needlessly disturbed.
+        TENTATIVE operations in zones untouched by new arrivals or new locks
+        are left as-is: not re-visited, no rescheduling penalty, no wasted
+        transition. This cuts the ~37-replans-per-vehicle churn to only
+        genuinely-affected re-plans, cleaning up the reward signal and
+        speeding up episodes.
         """
-        trigger_zones = set()
+        trigger_zones = set(self._newly_locked_zones)
         for vid in trigger_vehicle_ids:
             for op in self.operations:
                 if op.vehicle_id == vid:

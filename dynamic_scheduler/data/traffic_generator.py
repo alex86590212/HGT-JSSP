@@ -82,26 +82,26 @@ class TrafficGenerator:
         # validates online scheduling mechanics under full realistic traffic
         # rather than re-teaching manoeuvre-type difficulty from scratch.
         #
-        # Rates chosen from an iGreedy saturation sweep on the 4x4 intersection
-        # (16 zones, high parallel capacity): rates below ~1/s produce almost
-        # no contention (iGreedy already ~0s waiting, nothing to learn), so the
-        # tiers span mild contention -> genuine saturation where scheduling
-        # quality actually matters:
-        #   easy  1.5/s (~90 veh/60s, iGreedy ~0.8s)
-        #   medium 2.5/s (~150 veh, iGreedy ~1.1s)
-        #   hard  4.0/s (~240 veh, iGreedy ~10.6s, ~69% completion — saturated)
+        # Rates chosen from a contention sweep under REAL zone exclusivity
+        # (tentative plans zone-binding via priority queues; the earlier
+        # 1.5/2.5/4.0 tiers were tuned against physics that let vehicles
+        # overlap in zones and are far past saturation now). Untrained-policy
+        # baseline, 60s episodes:
+        #   easy   0.5/s (~30 veh, wt ~4s,  completion ~0.97 — mild queuing)
+        #   medium 1.0/s (~60 veh, wt ~9s,  completion ~0.89 — real contention)
+        #   hard   1.5/s (~90 veh, wt ~14s, completion ~0.72 — near saturation)
         return self.generate_episode_arrivals(
-            duration, arrival_rate=1.5, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=0.5, manoeuvre_types=list(ROUTES.keys()),
         )
 
     def medium(self, duration: float) -> List[DynamicVehicle]:
         return self.generate_episode_arrivals(
-            duration, arrival_rate=2.5, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=1.0, manoeuvre_types=list(ROUTES.keys()),
         )
 
     def hard(self, duration: float) -> List[DynamicVehicle]:
         return self.generate_episode_arrivals(
-            duration, arrival_rate=4.0, manoeuvre_types=list(ROUTES.keys()),
+            duration, arrival_rate=1.5, manoeuvre_types=list(ROUTES.keys()),
         )
 
 
@@ -116,7 +116,7 @@ def get_curriculum_arrivals(episode: int, gen: TrafficGenerator, duration: float
         return gen.hard(duration)
     else:
         # Mixed regime: sample across the full meaningful contention range,
-        # from mild (1.0/s) through saturation (5.0/s), so the policy
+        # from mild (0.4/s) through saturation (2.0/s), so the policy
         # generalises across traffic densities rather than overfitting one.
-        rate = float(gen.rng.uniform(1.0, 5.0))
+        rate = float(gen.rng.uniform(0.4, 2.0))
         return gen.generate_episode_arrivals(duration, arrival_rate=rate)
