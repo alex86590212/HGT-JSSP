@@ -341,23 +341,6 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             policy.load_state_dict(checkpoint)
         print(f"Resumed from {resume}, starting at episode {start_episode}", flush=True)
 
-    if not same_device and resume is None:
-        # policy's lazy input_proj layers only materialize on a real forward
-        # pass; state_dict() (called inside _sync_rollout_policy) requires
-        # that to have already happened. A resumed checkpoint already carries
-        # materialized shapes via load_state_dict above, so this is only
-        # needed on a fresh run. Uses rollout_policy's own device (CPU) for
-        # the throwaway forward, then copies the resulting shapes/weights
-        # onto policy via the same state_dict round trip, keeping policy on
-        # update_device throughout.
-        _warmup_env = DynamicIntersectionEnv(**env_kwargs)
-        _warmup_duration = min(env_cfg.get("episode_duration", 60.0), 5.0)
-        run_episode(rollout_policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
-        policy.load_state_dict(
-            {k: v.detach().to(update_device) for k, v in rollout_policy.state_dict().items()}
-        )
-    _sync_rollout_policy()
-
     gen = TrafficGenerator(seed=42)
     detection_window = env_cfg.get("detection_window", 10.0)
     commit_window = env_cfg.get("commit_window", 2.5)
@@ -370,6 +353,23 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         "max_proximity_weight": env_cfg.get("max_proximity_weight", 2.0),
     }
     env = DynamicIntersectionEnv(**env_kwargs)
+
+    if not same_device and resume is None:
+        # policy's lazy input_proj layers only materialize on a real forward
+        # pass; state_dict() (called inside _sync_rollout_policy) requires
+        # that to have already happened. A resumed checkpoint already carries
+        # materialized shapes via load_state_dict above, so this is only
+        # needed on a fresh run. Uses rollout_policy's own device (CPU) for
+        # the throwaway forward, then copies the resulting shapes/weights
+        # onto policy via the same state_dict round trip, keeping policy on
+        # update_device throughout.
+        _warmup_env = DynamicIntersectionEnv(**env_kwargs)
+        _warmup_duration = min(episode_duration, 5.0)
+        run_episode(rollout_policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
+        policy.load_state_dict(
+            {k: v.detach().to(update_device) for k, v in rollout_policy.state_dict().items()}
+        )
+    _sync_rollout_policy()
 
     num_episodes = train_cfg.get("num_episodes", 50_000)
     log_interval = train_cfg.get("log_interval", 100)
