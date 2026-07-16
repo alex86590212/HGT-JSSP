@@ -113,19 +113,21 @@ def build_hetero_graph(
         zone_feats.append([occ, tf, nc, z.x, z.y])
     data["zone"].x = torch.tensor(zone_feats, dtype=torch.float) if zone_feats else torch.zeros((0, 5))
 
+    # (vehicle_id, route_position) -> op index, O(1) lookup for the seq/lane
+    # edge builders below instead of an O(n_ops) scan per op/vehicle.
+    op_by_vehicle_pos = {(op.vehicle_id, op.route_position): i for i, op in enumerate(ops)}
+
     # ----------------------------------------------------------------
     # Type-1 seq edges: op(i,j) -> op(i,j+1), directed route order
     # ----------------------------------------------------------------
     seq_src, seq_dst, seq_attr = [], [], []
     for i, op in enumerate(ops):
         if op.route_position < op.route_length - 1:
-            for j, op2 in enumerate(ops):
-                if (op2.vehicle_id == op.vehicle_id
-                        and op2.route_position == op.route_position + 1):
-                    seq_src.append(i)
-                    seq_dst.append(j)
-                    seq_attr.append([op.processing_time / max_p])
-                    break
+            j = op_by_vehicle_pos.get((op.vehicle_id, op.route_position + 1))
+            if j is not None:
+                seq_src.append(i)
+                seq_dst.append(j)
+                seq_attr.append([op.processing_time / max_p])
     _set_edge(data, "operation", "seq", "operation", seq_src, seq_dst, seq_attr, attr_dim=1)
 
     # ----------------------------------------------------------------
@@ -142,16 +144,8 @@ def build_hetero_graph(
             leader = sorted_group[k]
             follower = sorted_group[k + 1]
             gap = follower.arrival_time - leader.arrival_time
-            li = next(
-                (i for i, o in enumerate(ops)
-                 if o.vehicle_id == leader.id and o.route_position == 0),
-                None,
-            )
-            fi = next(
-                (i for i, o in enumerate(ops)
-                 if o.vehicle_id == follower.id and o.route_position == 0),
-                None,
-            )
+            li = op_by_vehicle_pos.get((leader.id, 0))
+            fi = op_by_vehicle_pos.get((follower.id, 0))
             if li is not None and fi is not None:
                 lane_src.append(li)
                 lane_dst.append(fi)
