@@ -1,0 +1,2319 @@
+{
+  "schema_version": 2,
+  "dataset": "SinD",
+  "data_role": "departure_demand",
+  "source_repository": "https://github.com/SOTIF-AVLab/SinD",
+  "source_commit": "bfa6a19695ae259fe07a0ec07012090cd493e8d6",
+  "management_boundary": {
+    "definition": "first inward crossing of the configured radius",
+    "radius_m": 25.0,
+    "time_field": "departure_time_s"
+  },
+  "conversion": {
+    "window_duration_s": 30.0,
+    "entry_radius_m": 25.0,
+    "conflict_radius_m": 18.0,
+    "min_displacement_m": 25.0,
+    "min_departures_per_scenario": 2,
+    "accepted_agent_types": [
+      "car",
+      "truck",
+      "bus"
+    ],
+    "vehicle_type_map": {
+      "car": "passenger",
+      "truck": "truck",
+      "bus": "bus"
+    },
+    "raw_trajectory_use": [
+      "validate_complete_intersection_traversal",
+      "infer_origin_approach",
+      "infer_destination_approach",
+      "detect_management_boundary_departure"
+    ],
+    "excluded_from_training": [
+      "raw_positions",
+      "raw_velocities",
+      "raw_accelerations",
+      "observed_intersection_motion",
+      "observed_exit_time",
+      "traffic_light_state",
+      "signal_violation_label"
+    ]
+  },
+  "intersections": [
+    {
+      "intersection_id": "changchun_changchun_pudong",
+      "city": "Changchun",
+      "map_file": "Changchun/Changchun_Pudong.osm",
+      "intersection_center_m": {
+        "x": -20.5765639247658,
+        "y": -2.997043497321
+      },
+      "scenario_count": 0,
+      "departure_count": 0,
+      "congestion_median_departure_count": null,
+      "recordings": [
+        {
+          "recording_id": "Changchun/changchun_pudong_507_009",
+          "status": "skipped_git_lfs_pointer",
+          "scenario_count": 0,
+          "departure_count": 0
+        }
+      ]
+    },
+    {
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "map_file": "Chongqing/NR_ll2.osm",
+      "intersection_center_m": {
+        "x": 1.1445302232401002,
+        "y": 18.338551256814903
+      },
+      "scenario_count": 31,
+      "departure_count": 117,
+      "congestion_median_departure_count": 4,
+      "recordings": [
+        {
+          "recording_id": "Chongqing/6_22_NR_1",
+          "status": "converted",
+          "scenario_count": 31,
+          "departure_count": 117
+        }
+      ]
+    },
+    {
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "map_file": "Tianjin/map_relink_law_save.osm",
+      "intersection_center_m": {
+        "x": 14.056040382744401,
+        "y": 16.2817433414911
+      },
+      "scenario_count": 21,
+      "departure_count": 60,
+      "congestion_median_departure_count": 3,
+      "recordings": [
+        {
+          "recording_id": "Tianjin/8_2_1",
+          "status": "converted",
+          "scenario_count": 21,
+          "departure_count": 60
+        }
+      ]
+    },
+    {
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "map_file": "Xi'an/Xi'an_Shanglin.osm",
+      "intersection_center_m": {
+        "x": -7.748871775257,
+        "y": 30.2860401988937
+      },
+      "scenario_count": 26,
+      "departure_count": 252,
+      "congestion_median_departure_count": 7.5,
+      "recordings": [
+        {
+          "recording_id": "Xi'an/Xi'an_412_m1",
+          "status": "converted",
+          "scenario_count": 26,
+          "departure_count": 252
+        }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "recording_id": "Changchun/changchun_pudong_507_009",
+      "city": "Changchun",
+      "track_file": "Changchun/changchun_pudong_507_009/Veh_smoothed_tracks.csv",
+      "excluded": {},
+      "intersection_id": "changchun_changchun_pudong",
+      "map_file": "Changchun/Changchun_Pudong.osm",
+      "intersection_center_m": {
+        "x": -20.5765639247658,
+        "y": -2.997043497321
+      },
+      "status": "skipped_git_lfs_pointer",
+      "included_departures": 0,
+      "included_tracks": 0,
+      "scenario_count": 0
+    },
+    {
+      "recording_id": "Chongqing/6_22_NR_1",
+      "city": "Chongqing",
+      "track_file": "Chongqing/6_22_NR_1/Veh_smoothed_tracks.csv",
+      "excluded": {
+        "incomplete_endpoint": 9,
+        "short_displacement": 20,
+        "sparse_window_departure": 6,
+        "unsupported_agent_type": 38
+      },
+      "intersection_id": "chongqing_nr_ll2",
+      "map_file": "Chongqing/NR_ll2.osm",
+      "intersection_center_m": {
+        "x": 1.1445302232401002,
+        "y": 18.338551256814903
+      },
+      "status": "converted",
+      "total_tracks": 190,
+      "included_departures": 117,
+      "included_tracks": 117,
+      "scenario_count": 31
+    },
+    {
+      "recording_id": "Tianjin/8_2_1",
+      "city": "Tianjin",
+      "track_file": "Tianjin/8_2_1/Veh_smoothed_tracks.csv",
+      "excluded": {
+        "incomplete_endpoint": 203,
+        "short_displacement": 3,
+        "sparse_window_departure": 10,
+        "unsupported_agent_type": 335
+      },
+      "intersection_id": "tianjin_map_relink_law_save",
+      "map_file": "Tianjin/map_relink_law_save.osm",
+      "intersection_center_m": {
+        "x": 14.056040382744401,
+        "y": 16.2817433414911
+      },
+      "status": "converted",
+      "total_tracks": 611,
+      "included_departures": 60,
+      "included_tracks": 60,
+      "scenario_count": 21
+    },
+    {
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "city": "Xi'an",
+      "track_file": "Xi'an/Xi'an_412_m1/Veh_smoothed_tracks.csv",
+      "excluded": {
+        "does_not_cross_junction": 90,
+        "incomplete_endpoint": 5,
+        "short_displacement": 13,
+        "sparse_window_departure": 2,
+        "unsupported_agent_type": 61
+      },
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "map_file": "Xi'an/Xi'an_Shanglin.osm",
+      "intersection_center_m": {
+        "x": -7.748871775257,
+        "y": 30.2860401988937
+      },
+      "status": "converted",
+      "total_tracks": 423,
+      "included_departures": 252,
+      "included_tracks": 252,
+      "scenario_count": 26
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0000",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 0,
+      "window_start_s": 0.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 2,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0000.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0001",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 1,
+      "window_start_s": 30.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0001.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0002",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 2,
+      "window_start_s": 60.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 3,
+        "W_in": 3
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.1,
+        "W_in": 0.1
+      },
+      "departure_count": 6,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0002.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0003",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 3,
+      "window_start_s": 90.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 4
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.13333333333333333
+      },
+      "departure_count": 6,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0003.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0004",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 4,
+      "window_start_s": 120.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 3,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.1,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0004.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0006",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 6,
+      "window_start_s": 180.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0006.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0007",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 7,
+      "window_start_s": 210.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0007.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0008",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 8,
+      "window_start_s": 240.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 4,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 0
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.13333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0008.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0009",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 9,
+      "window_start_s": 270.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 2,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0009.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0010",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 10,
+      "window_start_s": 300.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 1,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0010.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0011",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 11,
+      "window_start_s": 330.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0011.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0013",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 13,
+      "window_start_s": 390.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0013.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0014",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 14,
+      "window_start_s": 420.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0014.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0015",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 15,
+      "window_start_s": 450.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0015.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0016",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 16,
+      "window_start_s": 480.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0016.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0017",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 17,
+      "window_start_s": 510.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 3,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.1,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0017.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0018",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 18,
+      "window_start_s": 540.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0018.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0020",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 20,
+      "window_start_s": 600.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 3,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.1,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 6,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0020.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0021",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 21,
+      "window_start_s": 630.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 2,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0021.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0022",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 22,
+      "window_start_s": 660.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 4
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.13333333333333333
+      },
+      "departure_count": 6,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0022.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0023",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 23,
+      "window_start_s": 690.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 2,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.06666666666666667,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0023.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0024",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 24,
+      "window_start_s": 720.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0024.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0025",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 25,
+      "window_start_s": 750.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 2,
+        "W_in": 2
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 4,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0025.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0026",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 26,
+      "window_start_s": 780.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 3,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.1,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0026.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0027",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 27,
+      "window_start_s": 810.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 2,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0027.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0030",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 30,
+      "window_start_s": 900.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 5,
+        "W_in": 0
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.16666666666666666,
+        "W_in": 0.0
+      },
+      "departure_count": 6,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0030.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0031",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 31,
+      "window_start_s": 930.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0031.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0032",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 32,
+      "window_start_s": 960.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 1,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0032.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0033",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 33,
+      "window_start_s": 990.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 2,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.06666666666666667,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0033.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0034",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 34,
+      "window_start_s": 1020.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 3,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.1,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.0
+      },
+      "departure_count": 3,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0034.json"
+    },
+    {
+      "scenario_id": "sind_chongqing_6_22_nr_1_0036",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "chongqing_nr_ll2",
+      "city": "Chongqing",
+      "recording_id": "Chongqing/6_22_NR_1",
+      "window_index": 36,
+      "window_start_s": 1080.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 1,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 5,
+      "path": "intersections/chongqing_nr_ll2/recordings/chongqing_6_22_nr_1/scenario_0036.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0000",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 0,
+      "window_start_s": 0.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 3,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.1,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.0
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0000.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0001",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 1,
+      "window_start_s": 30.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0001.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0002",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 2,
+      "window_start_s": 60.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0002.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0006",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 6,
+      "window_start_s": 180.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0006.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0007",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 7,
+      "window_start_s": 210.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0007.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0008",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 8,
+      "window_start_s": 240.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 3,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.1,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0008.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0009",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 9,
+      "window_start_s": 270.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0009.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0010",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 10,
+      "window_start_s": 300.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0010.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0012",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 12,
+      "window_start_s": 360.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.0
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0012.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0014",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 14,
+      "window_start_s": 420.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.0
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0014.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0016",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 16,
+      "window_start_s": 480.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0016.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0020",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 20,
+      "window_start_s": 600.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 3
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.1
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0020.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0024",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 24,
+      "window_start_s": 720.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0024.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0025",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 25,
+      "window_start_s": 750.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0025.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0028",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 28,
+      "window_start_s": 840.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 2,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0028.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0031",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 31,
+      "window_start_s": 930.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0031.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0032",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 32,
+      "window_start_s": 960.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 3,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.1,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0032.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0034",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 34,
+      "window_start_s": 1020.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 3
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.1
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0034.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0035",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 35,
+      "window_start_s": 1050.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0035.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0036",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 36,
+      "window_start_s": 1080.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 3,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0036.json"
+    },
+    {
+      "scenario_id": "sind_tianjin_8_2_1_0038",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "tianjin_map_relink_law_save",
+      "city": "Tianjin",
+      "recording_id": "Tianjin/8_2_1",
+      "window_index": 38,
+      "window_start_s": 1140.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 2
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.06666666666666667
+      },
+      "departure_count": 4,
+      "path": "intersections/tianjin_map_relink_law_save/recordings/tianjin_8_2_1/scenario_0038.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0000",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 0,
+      "window_start_s": 0.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 13,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 12
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.43333333333333335,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.4
+      },
+      "departure_count": 25,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0000.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0001",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 1,
+      "window_start_s": 30.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 3,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 5
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.1,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.16666666666666666
+      },
+      "departure_count": 8,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0001.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0002",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 2,
+      "window_start_s": 60.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 3,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.1,
+        "W_in": 0.0
+      },
+      "departure_count": 4,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0002.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0003",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 3,
+      "window_start_s": 90.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 2,
+        "S_in": 3,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.06666666666666667,
+        "S_in": 0.1,
+        "W_in": 0.0
+      },
+      "departure_count": 5,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0003.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0004",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 4,
+      "window_start_s": 120.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 8,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 12
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.26666666666666666,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.4
+      },
+      "departure_count": 21,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0004.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0005",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 5,
+      "window_start_s": 150.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 6
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.2
+      },
+      "departure_count": 7,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0005.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0006",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 6,
+      "window_start_s": 180.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 2,
+        "S_in": 4,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.06666666666666667,
+        "S_in": 0.13333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 6,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0006.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0008",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 8,
+      "window_start_s": 240.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 1,
+        "S_in": 1,
+        "W_in": 6
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.2
+      },
+      "departure_count": 9,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0008.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0009",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 9,
+      "window_start_s": 270.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 8
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.26666666666666666
+      },
+      "departure_count": 9,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0009.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0010",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 10,
+      "window_start_s": 300.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 0,
+        "S_in": 3,
+        "W_in": 4
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.1,
+        "W_in": 0.13333333333333333
+      },
+      "departure_count": 8,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0010.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0011",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 11,
+      "window_start_s": 330.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 4,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.13333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 4,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0011.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0013",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 13,
+      "window_start_s": 390.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 10,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 12
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.3333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.4
+      },
+      "departure_count": 22,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0013.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0014",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 14,
+      "window_start_s": 420.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 3
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.1
+      },
+      "departure_count": 3,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0014.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0015",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 15,
+      "window_start_s": 450.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 5,
+        "S_in": 3,
+        "W_in": 0
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.16666666666666666,
+        "S_in": 0.1,
+        "W_in": 0.0
+      },
+      "departure_count": 8,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0015.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0016",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 16,
+      "window_start_s": 480.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 1,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 2,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0016.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0017",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 17,
+      "window_start_s": 510.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 14,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 8
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.4666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.26666666666666666
+      },
+      "departure_count": 23,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0017.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0018",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 18,
+      "window_start_s": 540.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 2,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 4
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.06666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.13333333333333333
+      },
+      "departure_count": 6,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0018.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0019",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 19,
+      "window_start_s": 570.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 4,
+        "S_in": 4,
+        "W_in": 0
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.13333333333333333,
+        "S_in": 0.13333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 8,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0019.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0021",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 21,
+      "window_start_s": 630.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 6,
+        "N_in": 1,
+        "S_in": 2,
+        "W_in": 5
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.2,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.16666666666666666
+      },
+      "departure_count": 14,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0021.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0022",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 22,
+      "window_start_s": 660.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 10,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 8
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.3333333333333333,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.26666666666666666
+      },
+      "departure_count": 18,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0022.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0023",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 23,
+      "window_start_s": 690.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 3,
+        "W_in": 3
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.1,
+        "W_in": 0.1
+      },
+      "departure_count": 7,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0023.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0024",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 24,
+      "window_start_s": 720.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 1,
+        "N_in": 1,
+        "S_in": 3,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.03333333333333333,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.1,
+        "W_in": 0.0
+      },
+      "departure_count": 5,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0024.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0025",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 25,
+      "window_start_s": 750.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 0,
+        "S_in": 1,
+        "W_in": 1
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.0,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.03333333333333333
+      },
+      "departure_count": 2,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0025.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0026",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 26,
+      "window_start_s": 780.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 14,
+        "N_in": 0,
+        "S_in": 0,
+        "W_in": 4
+      },
+      "congestion": "heavy",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.4666666666666667,
+        "N_in": 0.0,
+        "S_in": 0.0,
+        "W_in": 0.13333333333333333
+      },
+      "departure_count": 18,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0026.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0028",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 28,
+      "window_start_s": 840.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 6,
+        "S_in": 1,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.2,
+        "S_in": 0.03333333333333333,
+        "W_in": 0.0
+      },
+      "departure_count": 7,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0028.json"
+    },
+    {
+      "scenario_id": "sind_xi_an_xi_an_412_m1_0029",
+      "source": "sind",
+      "data_role": "departure_demand",
+      "intersection_id": "xi_an_xi_an_shanglin",
+      "city": "Xi'an",
+      "recording_id": "Xi'an/Xi'an_412_m1",
+      "window_index": 29,
+      "window_start_s": 870.0,
+      "departure_horizon_s": 30.0,
+      "management_boundary_radius_m": 25.0,
+      "lane_counts": {
+        "E_in": 0,
+        "N_in": 1,
+        "S_in": 2,
+        "W_in": 0
+      },
+      "congestion": "moderate",
+      "lane_lambdas_veh_per_s": {
+        "E_in": 0.0,
+        "N_in": 0.03333333333333333,
+        "S_in": 0.06666666666666667,
+        "W_in": 0.0
+      },
+      "departure_count": 3,
+      "path": "intersections/xi_an_xi_an_shanglin/recordings/xi_an_xi_an_412_m1/scenario_0029.json"
+    }
+  ]
+}

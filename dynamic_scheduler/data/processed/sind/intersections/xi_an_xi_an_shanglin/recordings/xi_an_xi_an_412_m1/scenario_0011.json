@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_xi_an_xi_an_412_m1_0011",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "xi_an_xi_an_shanglin",
+  "city": "Xi'an",
+  "recording_id": "Xi'an/Xi'an_412_m1",
+  "window_index": 11,
+  "window_start_s": 330.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 0,
+    "N_in": 0,
+    "S_in": 4,
+    "W_in": 0
+  },
+  "departures": [
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 0.5305305305304937,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0011_160",
+      "sequence": 0
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 3.333333333333372,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0011_171",
+      "sequence": 1
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 7.637637637637614,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0011_177",
+      "sequence": 2
+    },
+    {
+      "route_id": "S_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "W",
+      "departure_time_s": 8.238238238238264,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0011_176",
+      "sequence": 3
+    }
+  ],
+  "congestion": "moderate",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.0,
+    "N_in": 0.0,
+    "S_in": 0.13333333333333333,
+    "W_in": 0.0
+  }
+}

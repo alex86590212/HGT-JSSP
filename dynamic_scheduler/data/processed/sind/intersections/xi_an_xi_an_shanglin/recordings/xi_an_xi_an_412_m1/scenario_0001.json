@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_xi_an_xi_an_412_m1_0001",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "xi_an_xi_an_shanglin",
+  "city": "Xi'an",
+  "recording_id": "Xi'an/Xi'an_412_m1",
+  "window_index": 1,
+  "window_start_s": 30.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 3,
+    "N_in": 0,
+    "S_in": 0,
+    "W_in": 5
+  },
+  "departures": [
+    {
+      "route_id": "E_to_S",
+      "vehicle_type": "passenger",
+      "source_lane": "E_in",
+      "source_approach": "E",
+      "destination_approach": "S",
+      "departure_time_s": 2.332332332332331,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_36",
+      "sequence": 0
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 4.63463463463464,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_41",
+      "sequence": 1
+    },
+    {
+      "route_id": "W_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "N",
+      "departure_time_s": 7.637637637637643,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_40",
+      "sequence": 2
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 9.139139139139138,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_42",
+      "sequence": 3
+    },
+    {
+      "route_id": "E_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "E_in",
+      "source_approach": "E",
+      "destination_approach": "W",
+      "departure_time_s": 14.544544544544545,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_45",
+      "sequence": 4
+    },
+    {
+      "route_id": "E_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "E_in",
+      "source_approach": "E",
+      "destination_approach": "W",
+      "departure_time_s": 16.546546546546555,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_47",
+      "sequence": 5
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 18.148148148148152,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_46",
+      "sequence": 6
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 19.04904904904905,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0001_48",
+      "sequence": 7
+    }
+  ],
+  "congestion": "heavy",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.1,
+    "N_in": 0.0,
+    "S_in": 0.0,
+    "W_in": 0.16666666666666666
+  }
+}

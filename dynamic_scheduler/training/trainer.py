@@ -274,7 +274,31 @@ def _rollout_worker(
     return _pack((transitions, stats))
 
 
-def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Optional[str] = None) -> None:
+def train(
+    cfg: Dict[str, Any],
+    output_dir: str = "results_dynamic",
+    resume: Optional[str] = None,
+    arrivals_fn: Optional[Any] = None,
+    eval_fn: Optional[Any] = None,
+    initial_state_dict: Optional[Dict[str, Any]] = None,
+) -> None:
+    """arrivals_fn(episode, gen, episode_duration) -> (arrivals, episode_duration).
+    eval_fn(policy) -> (mean_waiting_time, completion_rate).
+
+    Both default to the synthetic curriculum (get_curriculum_arrivals / the
+    built-in hard-tier _evaluate). Overridden by finetune_sind.py to draw
+    from and evaluate on real SinD scenarios instead — every other mechanic
+    (PPO buffer/update cadence, checkpointing, device split, num_workers) is
+    identical, since only WHAT feeds/scores run_episode changes, not HOW
+    episodes are collected or trained on.
+
+    initial_state_dict: load these policy weights before training starts,
+    WITHOUT touching the optimizer or start_episode (unlike `resume`, which
+    also restores optimizer state and offsets start_episode — appropriate
+    for continuing an interrupted run, not for starting a fresh PPO phase
+    such as fine-tuning on a different data distribution). Mutually
+    exclusive with `resume`.
+    """
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     writer = SummaryWriter(log_dir=str(out / "tb"))
@@ -342,6 +366,10 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
                 {k: v.detach().to(rollout_device) for k, v in policy.state_dict().items()}
             )
 
+    assert resume is None or initial_state_dict is None, (
+        "resume and initial_state_dict are mutually exclusive"
+    )
+
     start_episode = 1
     if resume is not None:
         checkpoint = torch.load(resume, weights_only=True, map_location=update_device)
@@ -352,6 +380,9 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         else:
             policy.load_state_dict(checkpoint)
         print(f"Resumed from {resume}, starting at episode {start_episode}", flush=True)
+    elif initial_state_dict is not None:
+        policy.load_state_dict({k: v.to(update_device) for k, v in initial_state_dict.items()})
+        print(f"Loaded initial weights (fresh optimizer, starting at episode 1)", flush=True)
 
     gen = TrafficGenerator(seed=42)
     detection_window = env_cfg.get("detection_window", 10.0)
@@ -366,15 +397,21 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     }
     env = DynamicIntersectionEnv(**env_kwargs)
 
-    if not same_device and resume is None:
+    if arrivals_fn is None:
+        def arrivals_fn(ep: int, g: TrafficGenerator, dur: float) -> "tuple[list, float]":
+            return get_curriculum_arrivals(ep, g, dur), dur
+
+    if not same_device and resume is None and initial_state_dict is None:
         # policy's lazy input_proj layers only materialize on a real forward
         # pass; state_dict() (called inside _sync_rollout_policy) requires
-        # that to have already happened. A resumed checkpoint already carries
-        # materialized shapes via load_state_dict above, so this is only
-        # needed on a fresh run. Uses rollout_policy's own device (CPU) for
-        # the throwaway forward, then copies the resulting shapes/weights
-        # onto policy via the same state_dict round trip, keeping policy on
-        # update_device throughout.
+        # that to have already happened. A resumed checkpoint, or weights
+        # loaded via initial_state_dict, already carries materialized shapes
+        # via load_state_dict above (a documented side effect: it materializes
+        # UninitializedParameter targets from the incoming tensor shapes), so
+        # this is only needed on a genuinely fresh run. Uses rollout_policy's
+        # own device (CPU) for the throwaway forward, then copies the
+        # resulting shapes/weights onto policy via the same state_dict round
+        # trip, keeping policy on update_device throughout.
         _warmup_env = DynamicIntersectionEnv(**env_kwargs)
         _warmup_duration = min(episode_duration, 5.0)
         run_episode(rollout_policy, _warmup_env, TrafficGenerator(seed=0).easy(_warmup_duration), _warmup_duration)
@@ -494,7 +531,10 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
             )
 
         if ep % eval_interval == 0:
-            eval_wt, eval_comp = _evaluate(rollout_policy, env, gen, episode_duration, n_episodes=10)
+            if eval_fn is not None:
+                eval_wt, eval_comp = eval_fn(rollout_policy)
+            else:
+                eval_wt, eval_comp = _evaluate(rollout_policy, env, gen, episode_duration, n_episodes=10)
             writer.add_scalar("eval/waiting_time", eval_wt, ep)
             writer.add_scalar("eval/completion_rate", eval_comp, ep)
             print(f"  >>> EVAL waiting_time={eval_wt:.3f}  completion_rate={eval_comp:.2f}", flush=True)
@@ -513,8 +553,8 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
     if num_workers <= 1:
         for episode in range(start_episode, num_episodes + 1):
             ep_start = time.perf_counter()
-            arrivals = get_curriculum_arrivals(episode, gen, episode_duration)
-            transitions, stats = run_episode(rollout_policy, env, arrivals, episode_duration)
+            arrivals, ep_duration = arrivals_fn(episode, gen, episode_duration)
+            transitions, stats = run_episode(rollout_policy, env, arrivals, ep_duration)
             ep_wall = time.perf_counter() - ep_start
             _process_episode(episode, ep_wall, transitions, stats)
     else:
@@ -529,7 +569,7 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
         with ProcessPoolExecutor(max_workers=num_workers, initializer=_worker_init) as executor:
             for round_start in range(start_episode, num_episodes + 1, num_workers):
                 round_episodes = list(range(round_start, min(round_start + num_workers, num_episodes + 1)))
-                arrivals_list = [get_curriculum_arrivals(ep, gen, episode_duration) for ep in round_episodes]
+                draws = [arrivals_fn(ep, gen, episode_duration) for ep in round_episodes]
                 # Snapshot CPU weights once per round; workers never mutate
                 # the main process's policy/optimizer. Packed to bytes (see
                 # _pack) so this doesn't go through torch's shared-memory
@@ -541,9 +581,9 @@ def train(cfg: Dict[str, Any], output_dir: str = "results_dynamic", resume: Opti
                 futures = [
                     executor.submit(
                         _rollout_worker, state_dict_bytes, model_kwargs, env_kwargs,
-                        episode_duration, arrivals, ep,
+                        ep_duration, arrivals, ep,
                     )
-                    for ep, arrivals in zip(round_episodes, arrivals_list)
+                    for ep, (arrivals, ep_duration) in zip(round_episodes, draws)
                 ]
                 results = [_unpack(f.result()) for f in futures]
                 per_ep_wall = (time.perf_counter() - round_start_t) / len(round_episodes)
