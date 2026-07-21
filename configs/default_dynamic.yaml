@@ -22,8 +22,8 @@ environment:
   max_proximity_weight: 2.0   # cap on the 1/time_to_arrival proximity weight
 
 training:
-  num_episodes: 50000
-  log_interval: 100
+  num_episodes: 60000
+  log_interval: 25
   eval_interval: 1000
   checkpoint_interval: 5000
   # Rollout episodes are collected in separate single-threaded PROCESSES
