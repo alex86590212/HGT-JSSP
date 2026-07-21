@@ -22,6 +22,16 @@ environment:
   max_proximity_weight: 2.0   # cap on the 1/time_to_arrival proximity weight
 
 training:
+  # Curriculum tiers (easy/medium/hard, boundaries at 8k/25k/50k episodes in
+  # get_curriculum_arrivals) now use REAL-WORLD-calibrated arrival rates
+  # (0.20/0.35/1.00 veh/s, from the SinD dataset — see traffic_generator.py).
+  # Measured per-episode cost at these rates: easy ~0.11s, medium ~0.24s,
+  # hard ~2.0s (hard is far more expensive per episode than before was
+  # relatively, since compute scales with vehicle count and the tiers now
+  # span a realistic range rather than a uniformly saturated one). 60k
+  # episodes keeps the same total-experience budget as the prior (busier)
+  # curriculum; each episode now carries less signal (11-59 vehicles vs the
+  # old 90-240), so episode count was NOT reduced despite lower average cost.
   num_episodes: 60000
   log_interval: 25
   eval_interval: 1000
