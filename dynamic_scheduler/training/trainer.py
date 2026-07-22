@@ -448,7 +448,13 @@ def train(
     best_eval_metric = float("inf")
     best_state = None
 
-    ROLLOUT_N = 8
+    # Episodes of rollout collected into the PPO buffer before each update.
+    # 8 (was) at the new real-world arrival rates (0.20-1.00 veh/s, ~11-59
+    # vehicles/episode) means updates were trained on only ~90-450 tiny,
+    # high-variance transitions — noisy on its own, and compounding with the
+    # wide clip_epsilon that was also in place (see configs/default_dynamic
+    # .yaml). Raised so each update averages over more real experience.
+    ROLLOUT_N = train_cfg.get("rollout_n", 24)
     buffer: List[Transition] = []
     update_stats = {"actor_loss": 0.0, "critic_loss": 0.0, "entropy": 0.0}
 

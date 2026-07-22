@@ -1,10 +1,23 @@
 ppo:
-  clip_epsilon: 0.5
+  # 0.5 (was) let a single update swing an action's probability ratio by up
+  # to +-50%, 2.5x the +-20% every major PPO reference/implementation
+  # converges on (OpenAI Baselines, SB3, CleanRL default 0.1-0.2). Measured
+  # in results_dynamic_realistic/tb: entropy and actor_loss both trended UP
+  # over training instead of settling, with a sharp destabilization spike
+  # exactly at the medium->hard curriculum boundary (ep 25k) -- consistent
+  # with updates not being reined in enough when the reward distribution
+  # shifted. 0.2 is the standard default, not a task-specific guess.
+  clip_epsilon: 0.2
   epochs_per_update: 4
   gamma: 0.99
   gae_lambda: 0.95
   value_loss_coef: 0.5
-  entropy_coef: 0.01
+  # 0.01 alone didn't stop entropy climbing in the unstable run; nudged up
+  # slightly so it has more pull against drift once the clip fix (above)
+  # removes the main destabilizing force. Revisit (0.01<->0.03) once the
+  # next run's entropy curve is checked -- this is the less certain of the
+  # two changes, unlike clip_epsilon which was clearly out of standard range.
+  entropy_coef: 0.02
   max_grad_norm: 0.5
   lr: 3.0e-4
   mini_batch_size: 16
@@ -36,6 +49,12 @@ training:
   log_interval: 25
   eval_interval: 1000
   checkpoint_interval: 5000
+  # Episodes of rollout collected into the PPO buffer before each update
+  # (was hardcoded to 8 in trainer.py). Raised alongside the clip_epsilon
+  # fix above: at ~11-59 vehicles/episode (real-world rates), 8 episodes
+  # was only ~90-450 transitions per update -- too small/noisy a batch,
+  # especially combined with the previously-too-wide clip range.
+  rollout_n: 24
   # Rollout episodes are collected in separate single-threaded PROCESSES
   # (not intra-op threads — measured to make the tiny per-op HGT forwards
   # SLOWER, even with OMP_NUM_THREADS matched to --cpus-per-task). Set this
