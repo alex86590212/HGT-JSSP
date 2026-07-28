@@ -1,4 +1,5 @@
-"""Compare dynamic HGT checkpoint vs iGreedy and LIFO on the online 4x4.
+"""Compare dynamic HGT checkpoint vs iGreedy, LIFO, Backpressure, and EDF on
+the online 4x4.
 
 Mirrors eval_4x4.py (per-tier comparison table, CSV export) for the dynamic
 scheduler: frozen Poisson arrival streams per tier (seeded, identical across
@@ -6,13 +7,25 @@ methods via deepcopy), all methods driven through the SAME episode loop —
 affected-set replanning, zone queues, lock transitions — differing only in
 which feasible operation they pick each step:
 
-  HGT     — deterministic policy argmax (the trained checkpoint)
-  iGreedy — pick the candidate that could START earliest if planned now
-            (online analog of the offline igreedy baseline; the primary
-            baseline, matching the DATE paper's evaluation protocol)
-  LIFO    — pick the candidate whose vehicle arrived MOST recently
-            (inverse of a FIFO/arrival-order rule; a stress-test baseline,
-            not in DATE's protocol — included for reference only)
+  HGT         — deterministic policy argmax (the trained checkpoint)
+  iGreedy     — pick the candidate that could START earliest if planned now
+                (online analog of the offline igreedy baseline; the primary
+                baseline, matching the DATE paper's evaluation protocol)
+  LIFO        — pick the candidate whose vehicle arrived MOST recently
+                (inverse of a FIFO/arrival-order rule; a stress-test
+                baseline, not in DATE's protocol — included for reference)
+  Backpressure — pick the candidate whose ZONE has the largest current
+                backlog (Tassiulas & Ephremides 1992 MaxWeight scheduling,
+                adapted from wireless link scheduling). Throughput/stability
+                -oriented, not delay-oriented — a legitimate baseline
+                precisely because it targets a different objective than
+                waiting time.
+  EDF         — pick the candidate with the earliest theoretical-minimum
+                arrival time AT ITS OWN ZONE (free-flow ETA accounting for
+                route position), not overall episode arrival time. Adapted
+                from Earliest-Deadline-First / Virtual-Clock packet
+                scheduling; a tighter conceptual match to the waiting-time
+                objective than FIFO.
 
 Optionally (--optimality-gap), also reports the restricted-information
 optimal W* from dynamic_scheduler.evaluation.optimal_solver_online — a
@@ -158,6 +171,58 @@ def lifo_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
     return best
 
 
+def backpressure_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+    """Backpressure / MaxWeight scheduling (Tassiulas & Ephremides, 1992):
+    among contending candidates, serve whichever's ZONE currently has the
+    largest backlog (queue differential) — the busiest contention point —
+    rather than ordering by arrival time or soonest achievable start.
+
+    Backlog here is the zone's current TENTATIVE queue length plus anyone
+    already LOCKED into it (still occupying/blocking the zone), the direct
+    analogue of queue-length in the wireless-link formulation this is
+    adapted from. This is a throughput/stability-oriented policy, not a
+    delay-oriented one (a well-documented property of backpressure in the
+    queueing literature) — it's included as a baseline that optimizes a
+    genuinely different objective than waiting time, not a delay heuristic."""
+    best, best_key = -1, None
+    for i in mask.nonzero(as_tuple=True)[0].tolist():
+        op = env.operations[i]
+        zone_id = op.zone_id
+        backlog = len(env._zone_queue.get(zone_id, [])) + sum(
+            1 for o in env.operations if o.zone_id == zone_id and o.state == OpState.LOCKED
+        )
+        vehicle = env.vehicles[op.vehicle_id]
+        # Largest backlog wins; ties broken by arrival time then route order,
+        # same tie-break convention as the other selectors.
+        key = (-backlog, vehicle.arrival_time, op.vehicle_id, op.route_position)
+        if best_key is None or key < best_key:
+            best, best_key = i, key
+    return best
+
+
+def edf_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+    """Earliest-Deadline-First / Virtual-Clock-style scheduling (Liu &
+    Layland 1973; Zhang 1990): serve whichever candidate has the earliest
+    THEORETICAL-MINIMUM arrival time at its own zone — vehicle arrival_time
+    plus the free-flow sum of processing times for every zone earlier in
+    its route — rather than the vehicle's overall episode arrival time
+    (FIFO) or its currently-achievable start (iGreedy). This is a tighter
+    match to the actual objective (finish - theoretical_minimum) than FIFO,
+    since it accounts for vehicles with different route lengths/speeds
+    reaching a given zone at different theoretical times even if they
+    entered the system at the same moment."""
+    best, best_key = -1, None
+    for i in mask.nonzero(as_tuple=True)[0].tolist():
+        op = env.operations[i]
+        vehicle = env.vehicles[op.vehicle_id]
+        free_flow_offset = sum(vehicle.processing_times[:op.route_position])
+        deadline = vehicle.arrival_time + free_flow_offset
+        key = (deadline, op.vehicle_id, op.route_position)
+        if best_key is None or key < best_key:
+            best, best_key = i, key
+    return best
+
+
 def _start_if_planned_now(env: DynamicIntersectionEnv, op: DynamicOperation) -> float:
     """Start time op would get if appended to its zone queue right now —
     same rule as env._recompute_times for a single op: chain/arrival base,
@@ -260,6 +325,8 @@ def main():
     methods = {
         "igreedy": igreedy_select,
         "lifo": lifo_select,
+        "backpressure": backpressure_select,
+        "edf": edf_select,
         "hgt": make_hgt_selector(policy),
     }
 
@@ -314,14 +381,19 @@ def main():
         n = len(scenarios)
         means = {m: {k: v / n for k, v in s.items()} for m, s in sums.items()}
         results[tier] = means
-        imp_ig = (means["igreedy"]["wt"] - means["hgt"]["wt"]) / (means["igreedy"]["wt"] + 1e-9) * 100.0
-        imp_lifo = (means["lifo"]["wt"] - means["hgt"]["wt"]) / (means["lifo"]["wt"] + 1e-9) * 100.0
+        baselines = ["igreedy", "lifo", "backpressure", "edf"]
+        imps = {
+            name: (means[name]["wt"] - means["hgt"]["wt"]) / (means[name]["wt"] + 1e-9) * 100.0
+            for name in baselines
+        }
+        wt_line = "  ".join(
+            f"{name.capitalize()}={means[name]['wt']:.3f}/{means[name]['comp']:.2f}"
+            for name in baselines
+        )
+        imp_line = "  ".join(f"vs {name.capitalize()} {imps[name]:+.1f}%" for name in baselines)
         print(
-            f"[{tier:6s}]  "
-            f"iGreedy={means['igreedy']['wt']:.3f}/{means['igreedy']['comp']:.2f}  "
-            f"LIFO={means['lifo']['wt']:.3f}/{means['lifo']['comp']:.2f}  "
-            f"HGT={means['hgt']['wt']:.3f}/{means['hgt']['comp']:.2f}  "
-            f"| HGT vs iGreedy {imp_ig:+.1f}%  vs LIFO {imp_lifo:+.1f}%"
+            f"[{tier:6s}]  {wt_line}  HGT={means['hgt']['wt']:.3f}/{means['hgt']['comp']:.2f}  "
+            f"| HGT {imp_line}"
         )
         if args.optimality_gap:
             gap_strs = []
@@ -348,11 +420,16 @@ def main():
         m: sum(results[t][m]["wt"] for t in results) / n_tiers
         for m in methods
     }
-    imp_ig = (overall["igreedy"] - overall["hgt"]) / (overall["igreedy"] + 1e-9) * 100.0
-    imp_lifo = (overall["lifo"] - overall["hgt"]) / (overall["lifo"] + 1e-9) * 100.0
+    baselines = ["igreedy", "lifo", "backpressure", "edf"]
+    overall_imps = {
+        name: (overall[name] - overall["hgt"]) / (overall[name] + 1e-9) * 100.0
+        for name in baselines
+    }
+    overall_wt_line = "  ".join(f"{name.capitalize()}={overall[name]:.3f}" for name in baselines)
+    overall_imp_line = "  ".join(f"vs {name.capitalize()} {overall_imps[name]:+.1f}%" for name in baselines)
     print(
-        f"[{'overall':6s}]  iGreedy={overall['igreedy']:.3f}  LIFO={overall['lifo']:.3f}  "
-        f"HGT={overall['hgt']:.3f}  | HGT vs iGreedy {imp_ig:+.1f}%  vs LIFO {imp_lifo:+.1f}%"
+        f"[{'overall':6s}]  {overall_wt_line}  HGT={overall['hgt']:.3f}  "
+        f"| HGT {overall_imp_line}"
     )
 
     if args.output_csv:
