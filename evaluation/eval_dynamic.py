@@ -1,4 +1,4 @@
-"""Compare dynamic HGT checkpoint vs iGreedy and FIFO on the online 4x4.
+"""Compare dynamic HGT checkpoint vs iGreedy on the online 4x4.
 
 Mirrors eval_4x4.py (per-tier comparison table, CSV export) for the dynamic
 scheduler: frozen Poisson arrival streams per tier (seeded, identical across
@@ -8,9 +8,9 @@ which feasible operation they pick each step:
 
   HGT     — deterministic policy argmax (the trained checkpoint)
   iGreedy — pick the candidate that could START earliest if planned now
-            (online analog of the offline igreedy baseline)
-  FIFO    — pick the candidate whose vehicle arrived first (route order
-            within a vehicle): queue priorities collapse to arrival order
+            (online analog of the offline igreedy baseline, and the sole
+            baseline used for comparison here, matching the DATE paper's
+            evaluation protocol)
 
 Metrics per episode: unbiased mean waiting time (completed + in-flight, see
 dynamic_scheduler.utils.metrics) and completion rate. Self-contained episode
@@ -117,18 +117,6 @@ def make_hgt_selector(policy: SchedulingPolicy) -> Selector:
     return select
 
 
-def fifo_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
-    """Earliest-arrived vehicle first; a vehicle's own ops in route order."""
-    best, best_key = -1, None
-    for i in mask.nonzero(as_tuple=True)[0].tolist():
-        op = env.operations[i]
-        vehicle = env.vehicles[op.vehicle_id]
-        key = (vehicle.arrival_time, op.vehicle_id, op.route_position)
-        if best_key is None or key < best_key:
-            best, best_key = i, key
-    return best
-
-
 def igreedy_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
     """Pick the candidate with the earliest achievable start if planned now."""
     best, best_key = -1, None
@@ -183,7 +171,7 @@ def _start_if_planned_now(env: DynamicIntersectionEnv, op: DynamicOperation) -> 
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate dynamic HGT vs iGreedy vs FIFO")
+    parser = argparse.ArgumentParser(description="Evaluate dynamic HGT vs iGreedy")
     parser.add_argument("--checkpoint", default="results_dynamic/checkpoint_best.pt",
                         help="Path to .pt checkpoint")
     parser.add_argument("--config", default="configs/default_dynamic.yaml",
@@ -235,7 +223,6 @@ def main():
         ]
 
     methods = {
-        "fifo": fifo_select,
         "igreedy": igreedy_select,
         "hgt": make_hgt_selector(policy),
     }
@@ -260,14 +247,12 @@ def main():
         n = len(scenarios)
         means = {m: {k: v / n for k, v in s.items()} for m, s in sums.items()}
         results[tier] = means
-        imp_fifo = (means["fifo"]["wt"] - means["hgt"]["wt"]) / (means["fifo"]["wt"] + 1e-9) * 100.0
         imp_ig = (means["igreedy"]["wt"] - means["hgt"]["wt"]) / (means["igreedy"]["wt"] + 1e-9) * 100.0
         print(
             f"[{tier:6s}]  "
-            f"FIFO={means['fifo']['wt']:.3f}/{means['fifo']['comp']:.2f}  "
             f"iGreedy={means['igreedy']['wt']:.3f}/{means['igreedy']['comp']:.2f}  "
             f"HGT={means['hgt']['wt']:.3f}/{means['hgt']['comp']:.2f}  "
-            f"| HGT vs FIFO {imp_fifo:+.1f}%  vs iGreedy {imp_ig:+.1f}%"
+            f"| HGT vs iGreedy {imp_ig:+.1f}%"
         )
 
     n_tiers = len(results)
@@ -275,11 +260,10 @@ def main():
         m: sum(results[t][m]["wt"] for t in results) / n_tiers
         for m in methods
     }
-    imp_fifo = (overall["fifo"] - overall["hgt"]) / (overall["fifo"] + 1e-9) * 100.0
     imp_ig = (overall["igreedy"] - overall["hgt"]) / (overall["igreedy"] + 1e-9) * 100.0
     print(
-        f"[{'overall':6s}]  FIFO={overall['fifo']:.3f}  iGreedy={overall['igreedy']:.3f}  "
-        f"HGT={overall['hgt']:.3f}  | HGT vs FIFO {imp_fifo:+.1f}%  vs iGreedy {imp_ig:+.1f}%"
+        f"[{'overall':6s}]  iGreedy={overall['igreedy']:.3f}  "
+        f"HGT={overall['hgt']:.3f}  | HGT vs iGreedy {imp_ig:+.1f}%"
     )
 
     if args.output_csv:
