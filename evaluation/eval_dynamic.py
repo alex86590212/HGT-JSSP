@@ -1,4 +1,4 @@
-"""Compare dynamic HGT checkpoint vs iGreedy on the online 4x4.
+"""Compare dynamic HGT checkpoint vs iGreedy and LIFO on the online 4x4.
 
 Mirrors eval_4x4.py (per-tier comparison table, CSV export) for the dynamic
 scheduler: frozen Poisson arrival streams per tier (seeded, identical across
@@ -8,9 +8,21 @@ which feasible operation they pick each step:
 
   HGT     — deterministic policy argmax (the trained checkpoint)
   iGreedy — pick the candidate that could START earliest if planned now
-            (online analog of the offline igreedy baseline, and the sole
-            baseline used for comparison here, matching the DATE paper's
-            evaluation protocol)
+            (online analog of the offline igreedy baseline; the primary
+            baseline, matching the DATE paper's evaluation protocol)
+  LIFO    — pick the candidate whose vehicle arrived MOST recently
+            (inverse of a FIFO/arrival-order rule; a stress-test baseline,
+            not in DATE's protocol — included for reference only)
+
+Optionally (--optimality-gap), also reports the restricted-information
+optimal W* from dynamic_scheduler.evaluation.optimal_solver_online — a
+CP-SAT re-solve at every detection event using only currently-detected
+vehicles and already-LOCKED ops as fixed constraints, i.e. optimal under the
+SAME information boundary the online policy operates under (not the
+full-episode-upfront oracle the offline eval uses, which would score every
+method against a target no online method could ever reach). Off by default:
+each episode needs one CP-SAT solve per detection event, materially slower
+than the other three methods.
 
 Metrics per episode: unbiased mean waiting time (completed + in-flight, see
 dynamic_scheduler.utils.metrics) and completion rate. Self-contained episode
@@ -22,7 +34,7 @@ from __future__ import annotations
 import argparse
 import copy
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
 import yaml
@@ -41,6 +53,8 @@ from dynamic_scheduler.utils.metrics import (
 )
 from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
 from intersection_scheduler.model.policy import SchedulingPolicy
+
+from dynamic_scheduler.evaluation.optimal_solver_online import restricted_optimal_episode
 
 # Same hard caps as trainer.run_episode: generous for any real episode,
 # finite so a non-convergence bug fails loudly instead of hanging.
@@ -130,6 +144,20 @@ def igreedy_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
     return best
 
 
+def lifo_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+    """Most-recently-arrived vehicle first — the inverse priority rule to
+    FIFO. Same tie-break structure (route order within a vehicle), just
+    maximizing arrival_time instead of minimizing it."""
+    best, best_key = -1, None
+    for i in mask.nonzero(as_tuple=True)[0].tolist():
+        op = env.operations[i]
+        vehicle = env.vehicles[op.vehicle_id]
+        key = (-vehicle.arrival_time, op.vehicle_id, op.route_position)
+        if best_key is None or key < best_key:
+            best, best_key = i, key
+    return best
+
+
 def _start_if_planned_now(env: DynamicIntersectionEnv, op: DynamicOperation) -> float:
     """Start time op would get if appended to its zone queue right now —
     same rule as env._recompute_times for a single op: chain/arrival base,
@@ -181,6 +209,13 @@ def main():
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--output-csv", default=None,
                         help="Optional path to save per-scenario CSV results")
+    parser.add_argument("--optimality-gap", action="store_true",
+                        help="Also compute the restricted-information optimal W* per "
+                             "scenario (CP-SAT re-solve at every detection event) and "
+                             "report HGT/iGreedy/LIFO gaps to it. Slow: one CP-SAT solve "
+                             "per detection event per scenario.")
+    parser.add_argument("--gap-time-limit", type=float, default=5.0,
+                        help="Per-solve CP-SAT time limit (seconds) for --optimality-gap")
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -224,16 +259,26 @@ def main():
 
     methods = {
         "igreedy": igreedy_select,
+        "lifo": lifo_select,
         "hgt": make_hgt_selector(policy),
     }
+
+    # Percentage gaps are only meaningful when W* is not near zero — dividing
+    # a small absolute gap by a ~0s optimum produces thousand-percent
+    # artifacts. Same floor/convention as evaluation/eval_gap_4x4.py.
+    _PCT_GAP_WSTAR_FLOOR = 0.05
 
     rows: List[dict] = []
     results = {}
     print()
     for tier, scenarios in scenarios_by_tier.items():
         sums = {m: {"wt": 0.0, "comp": 0.0} for m in methods}
+        pct_gaps: Dict[str, List[float]] = {m: [] for m in methods}
+        abs_gaps: Dict[str, List[float]] = {m: [] for m in methods}
+        n_gap_solved = 0
         for i, arrivals in enumerate(scenarios):
             row = {"tier": tier, "scenario_id": i, "n_vehicles": len(arrivals)}
+            wt_by_method = {}
             for name, selector in methods.items():
                 wt, comp, _ = run_episode_with(
                     make_env(), copy.deepcopy(arrivals), episode_duration, selector,
@@ -242,18 +287,61 @@ def main():
                 sums[name]["comp"] += comp
                 row[f"{name}_waiting_time"] = wt
                 row[f"{name}_completion_rate"] = comp
+                wt_by_method[name] = wt
+
+            if args.optimality_gap:
+                w_star, _n_solved, _n_unsolved = restricted_optimal_episode(
+                    arrivals, episode_duration,
+                    detection_window=env_cfg.get("detection_window", 10.0),
+                    commit_window=env_cfg.get("commit_window", 2.5),
+                    time_limit_seconds=args.gap_time_limit,
+                )
+                row["w_star"] = w_star if w_star is not None else ""
+                row["w_star_solved"] = w_star is not None
+                if w_star is not None:
+                    n_gap_solved += 1
+                    for name, wt in wt_by_method.items():
+                        abs_g = wt - w_star
+                        abs_gaps[name].append(abs_g)
+                        row[f"{name}_abs_gap"] = abs_g
+                        if w_star >= _PCT_GAP_WSTAR_FLOOR:
+                            pct_g = abs_g / w_star * 100.0
+                            pct_gaps[name].append(pct_g)
+                            row[f"{name}_gap_pct"] = pct_g
+
             rows.append(row)
 
         n = len(scenarios)
         means = {m: {k: v / n for k, v in s.items()} for m, s in sums.items()}
         results[tier] = means
         imp_ig = (means["igreedy"]["wt"] - means["hgt"]["wt"]) / (means["igreedy"]["wt"] + 1e-9) * 100.0
+        imp_lifo = (means["lifo"]["wt"] - means["hgt"]["wt"]) / (means["lifo"]["wt"] + 1e-9) * 100.0
         print(
             f"[{tier:6s}]  "
             f"iGreedy={means['igreedy']['wt']:.3f}/{means['igreedy']['comp']:.2f}  "
+            f"LIFO={means['lifo']['wt']:.3f}/{means['lifo']['comp']:.2f}  "
             f"HGT={means['hgt']['wt']:.3f}/{means['hgt']['comp']:.2f}  "
-            f"| HGT vs iGreedy {imp_ig:+.1f}%"
+            f"| HGT vs iGreedy {imp_ig:+.1f}%  vs LIFO {imp_lifo:+.1f}%"
         )
+        if args.optimality_gap:
+            gap_strs = []
+            for name in methods:
+                if abs_gaps[name]:
+                    mean_abs = sum(abs_gaps[name]) / len(abs_gaps[name])
+                    if pct_gaps[name]:
+                        mean_pct = sum(pct_gaps[name]) / len(pct_gaps[name])
+                        gap_strs.append(f"{name}={mean_abs:+.3f}s ({mean_pct:+.1f}%)")
+                    else:
+                        # No scenario cleared the pct-gap W* floor (all
+                        # near-zero optimums) — percentage is unstable there,
+                        # but the absolute-second gap is still meaningful.
+                        gap_strs.append(f"{name}={mean_abs:+.3f}s (pct n/a, W*~0)")
+                else:
+                    gap_strs.append(f"{name}=n/a")
+            print(
+                f"          restricted-optimal solved {n_gap_solved}/{n} scenarios  "
+                f"| gap to W*: {'  '.join(gap_strs)}"
+            )
 
     n_tiers = len(results)
     overall = {
@@ -261,9 +349,10 @@ def main():
         for m in methods
     }
     imp_ig = (overall["igreedy"] - overall["hgt"]) / (overall["igreedy"] + 1e-9) * 100.0
+    imp_lifo = (overall["lifo"] - overall["hgt"]) / (overall["lifo"] + 1e-9) * 100.0
     print(
-        f"[{'overall':6s}]  iGreedy={overall['igreedy']:.3f}  "
-        f"HGT={overall['hgt']:.3f}  | HGT vs iGreedy {imp_ig:+.1f}%"
+        f"[{'overall':6s}]  iGreedy={overall['igreedy']:.3f}  LIFO={overall['lifo']:.3f}  "
+        f"HGT={overall['hgt']:.3f}  | HGT vs iGreedy {imp_ig:+.1f}%  vs LIFO {imp_lifo:+.1f}%"
     )
 
     if args.output_csv:
@@ -273,8 +362,12 @@ def main():
         fieldnames = ["tier", "scenario_id", "n_vehicles"] + [
             f"{m}_{metric}" for m in methods for metric in ("waiting_time", "completion_rate")
         ]
+        if args.optimality_gap:
+            fieldnames += ["w_star", "w_star_solved"] + [
+                f"{m}_{metric}" for m in methods for metric in ("abs_gap", "gap_pct")
+            ]
         with out_path.open("w", newline="") as f:
-            writer = csv_module.DictWriter(f, fieldnames=fieldnames)
+            writer = csv_module.DictWriter(f, fieldnames=fieldnames, restval="")
             writer.writeheader()
             writer.writerows(rows)
         print(f"\nWrote {len(rows)} rows to {out_path}")
