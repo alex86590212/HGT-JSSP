@@ -141,6 +141,13 @@ class DynamicIntersectionEnv:
 
         self._prev_completion_times: Dict[int, float] = {}
 
+        # Realised delay of vehicles already removed by
+        # _remove_completed_vehicles, and the last total returned by
+        # _total_excess_delay. Both persist across removals so the reward
+        # ledger covers every vehicle ever seen (see _compute_reward).
+        self._completed_delay: float = 0.0
+        self._prev_total_delay: float = 0.0
+
         # Zones that gained a LOCKED op during the most recent advance_time
         # call. Read by affected_op_indices so the next replan pass re-times
         # TENTATIVE ops in those zones against the now-binding occupancy.
@@ -188,6 +195,8 @@ class DynamicIntersectionEnv:
         self.conflict_edges = []
         self.active_conflict_edges = []
         self._prev_completion_times = {}
+        self._completed_delay = 0.0
+        self._prev_total_delay = 0.0
         self._newly_locked_zones = set()
         self._zone_queue = {}
         self.completed_log = []
@@ -300,6 +309,11 @@ class DynamicIntersectionEnv:
                 "finish_time": finish,
                 "waiting_time": waiting_time,
             })
+            # Carry the realised delay into the reward ledger before the
+            # vehicle is deleted below, so _total_excess_delay stays a running
+            # total over ALL vehicles rather than only the currently-active
+            # ones (see _compute_reward).
+            self._completed_delay += waiting_time
 
         self.operations = [o for o in self.operations if o.vehicle_id not in completed_vids]
         for zid, queue in self._zone_queue.items():
@@ -373,6 +387,12 @@ class DynamicIntersectionEnv:
         assert op.state != OpState.LOCKED, f"Operation {action} is locked, cannot replan"
 
         self._prev_completion_times = self._last_finish_per_vehicle()
+        # Re-baseline here, not at the end of the previous plan_operation:
+        # advance_time detects vehicles and locks ops between actions, which
+        # moves total delay for reasons THIS action is not responsible for.
+        # Snapshotting immediately before the change credits each action with
+        # exactly its own effect.
+        self._prev_total_delay = self._total_excess_delay()
 
         queue = self._zone_queue.setdefault(op.zone_id, [])
         if op.state == OpState.TENTATIVE:
@@ -487,6 +507,27 @@ class DynamicIntersectionEnv:
             result[vid] = last.earliest_finish
         return result
 
+    def _total_excess_delay(self) -> float:
+        """Total excess-over-free-flow delay across every vehicle seen so far.
+
+        Active vehicles are measured from their current planned finish;
+        completed ones contribute their realised delay via _completed_delay
+        (they are gone from self.vehicles by then). Same per-vehicle quantity
+        as inflight_waiting_times()/completed_log, summed rather than averaged
+        — see _compute_reward for why the sum, not the mean, is the right
+        per-step signal.
+        """
+        total = self._completed_delay
+        ops_by_vid = self._ops_by_vehicle()
+        for vid, vehicle in self.vehicles.items():
+            ops = ops_by_vid.get(vid)
+            if not ops:
+                continue
+            last = max(ops, key=lambda o: o.route_position)
+            min_finish = vehicle.arrival_time + sum(vehicle.processing_times)
+            total += max(0.0, last.earliest_finish - min_finish)
+        return total
+
     def inflight_waiting_times(self) -> List[float]:
         """Waiting time of vehicles still active (detected, not yet completed)
         at the current moment, using their current planned finish.
@@ -515,13 +556,32 @@ class DynamicIntersectionEnv:
     # ------------------------------------------------------------------
 
     def _compute_reward(self, changed_op: DynamicOperation) -> float:
-        current = self._last_finish_per_vehicle()
-        completion_delta = 0.0
-        for vid, c in current.items():
-            p = self._prev_completion_times.get(vid, c)
-            completion_delta += (c - p)
-        n_active = max(len(self.vehicles), 1)
-        completion_term = -completion_delta / n_active
+        # Delay term: negative change in TOTAL excess delay over every vehicle
+        # seen so far, completed ones included. Three properties this must have
+        # to be a faithful proxy for the reported metric
+        # (utils.metrics.episode_waiting_time_all):
+        #
+        #   1. Excess over free-flow, not raw finish time. Baseline is
+        #      arrival_time + sum(processing_times), matching
+        #      inflight_waiting_times()/_remove_completed_vehicles(). Raw
+        #      earliest_finish charges a vehicle for its own unavoidable
+        #      travel time, so long routes look "bad" however well scheduled.
+        #   2. Completed vehicles keep contributing (via _completed_delay).
+        #      _last_finish_per_vehicle() iterates self.vehicles, and
+        #      _remove_completed_vehicles() deletes finished ones — so delay
+        #      already caused used to silently leave the ledger, and shedding
+        #      a delayed vehicle registered as a reward INCREASE.
+        #   3. No moving denominator. Dividing each step's delta by the
+        #      current vehicle count does not telescope when that count
+        #      changes (it does, constantly: the population turns over
+        #      ~2x per episode), so the episode's summed reward was not any
+        #      fixed transform of total delay. Undivided, the per-step deltas
+        #      telescope to -(total excess delay) over the episode, i.e. the
+        #      reported mean-per-vehicle metric times a per-episode constant.
+        #      Advantage normalisation in ppo_update absorbs that constant.
+        total_delay = self._total_excess_delay()
+        completion_term = -(total_delay - self._prev_total_delay)
+        self._prev_total_delay = total_delay
 
         penalty_term = 0.0
         if changed_op.prev_start_time is not None:

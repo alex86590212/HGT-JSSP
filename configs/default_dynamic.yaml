@@ -48,7 +48,12 @@ training:
   num_episodes: 60000
   log_interval: 25
   eval_interval: 1000
-  checkpoint_interval: 5000
+  # 2000 (was 5000): this run is the first against the corrected reward
+  # (_compute_reward now tracks total excess delay over ALL vehicles seen,
+  # verified to telescope exactly to episode_waiting_time_all). Earlier
+  # snapshots give an abort signal well before 5k episodes if the new
+  # objective misbehaves.
+  checkpoint_interval: 2000
   # Episodes of rollout collected into the PPO buffer before each update
   # (was hardcoded to 8 in trainer.py). Raised alongside the clip_epsilon
   # fix above: at ~11-59 vehicles/episode (real-world rates), 8 episodes
