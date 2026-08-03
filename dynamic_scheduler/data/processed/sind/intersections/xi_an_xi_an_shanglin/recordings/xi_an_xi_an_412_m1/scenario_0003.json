@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_xi_an_xi_an_412_m1_0003",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "xi_an_xi_an_shanglin",
+  "city": "Xi'an",
+  "recording_id": "Xi'an/Xi'an_412_m1",
+  "window_index": 3,
+  "window_start_s": 90.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 0,
+    "N_in": 2,
+    "S_in": 3,
+    "W_in": 0
+  },
+  "departures": [
+    {
+      "route_id": "N_to_S",
+      "vehicle_type": "passenger",
+      "source_lane": "N_in",
+      "source_approach": "N",
+      "destination_approach": "S",
+      "departure_time_s": 10.500500500500522,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0003_75",
+      "sequence": 0
+    },
+    {
+      "route_id": "N_to_S",
+      "vehicle_type": "passenger",
+      "source_lane": "N_in",
+      "source_approach": "N",
+      "destination_approach": "S",
+      "departure_time_s": 15.4054054054054,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0003_78",
+      "sequence": 1
+    },
+    {
+      "route_id": "S_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "E",
+      "departure_time_s": 16.906906906906922,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0003_77",
+      "sequence": 2
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 23.51351351351352,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0003_81",
+      "sequence": 3
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 27.91791791791792,
+      "departure_id": "sind_xi_an_xi_an_412_m1_0003_82",
+      "sequence": 4
+    }
+  ],
+  "congestion": "moderate",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.0,
+    "N_in": 0.06666666666666667,
+    "S_in": 0.1,
+    "W_in": 0.0
+  }
+}

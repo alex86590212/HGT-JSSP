@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_chongqing_6_22_nr_1_0000",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "chongqing_nr_ll2",
+  "city": "Chongqing",
+  "recording_id": "Chongqing/6_22_NR_1",
+  "window_index": 0,
+  "window_start_s": 0.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 0,
+    "N_in": 0,
+    "S_in": 2,
+    "W_in": 1
+  },
+  "departures": [
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 10.11011011011011,
+      "departure_id": "sind_chongqing_6_22_nr_1_0000_26",
+      "sequence": 0
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 27.127127127127128,
+      "departure_id": "sind_chongqing_6_22_nr_1_0000_28",
+      "sequence": 1
+    },
+    {
+      "route_id": "S_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "W",
+      "departure_time_s": 28.728728728728733,
+      "departure_id": "sind_chongqing_6_22_nr_1_0000_29",
+      "sequence": 2
+    }
+  ],
+  "congestion": "moderate",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.0,
+    "N_in": 0.0,
+    "S_in": 0.06666666666666667,
+    "W_in": 0.03333333333333333
+  }
+}

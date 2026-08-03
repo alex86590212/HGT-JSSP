@@ -1,0 +1,45 @@
+ppo:
+  # Same as default_dynamic.yaml. Fine-tuning is a fresh PPO phase (see
+  # finetune_sind.py's initial_state_dict path, not resume=) but on a policy
+  # that's already converged -- no reason to change the update dynamics.
+  clip_epsilon: 0.2
+  epochs_per_update: 4
+  gamma: 0.99
+  gae_lambda: 0.95
+  value_loss_coef: 0.5
+  entropy_coef: 0.02
+  max_grad_norm: 0.5
+  lr: 3.0e-4
+  mini_batch_size: 16
+
+model:
+  hidden_dim: 128
+  num_heads: 4
+  num_layers: 3
+
+environment:
+  detection_window: 10.0
+  commit_window: 2.5
+  episode_duration: 60.0
+  penalty_coef: 0.1
+  max_proximity_weight: 2.0
+
+training:
+  # num_episodes/eval_interval/log_interval are all overwritten by
+  # finetune_sind.py from --epochs/--eval-interval and the SinD split size --
+  # values here are placeholders, never actually used.
+  num_episodes: 1
+  log_interval: 1
+  eval_interval: 1
+  # checkpoint_interval is NOT overwritten (finetune_sind.py uses setdefault,
+  # not assignment) -- explicit here so a checkpoint lands every 2 epochs
+  # (104 episodes) instead of the script's own default of "only at the very
+  # end". The 60k-episode main run swung through a multi-thousand-episode
+  # destabilization window mid-training that was invisible until we pulled
+  # TensorBoard after the fact; on a run 60x shorter that same blind spot
+  # would mean no fallback at all if the final state is worse than partway
+  # through.
+  checkpoint_interval: 104
+  rollout_n: 24
+  num_workers: 1
+  device: cpu

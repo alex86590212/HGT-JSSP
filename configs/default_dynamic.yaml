@@ -1,0 +1,76 @@
+ppo:
+  # 0.5 (was) let a single update swing an action's probability ratio by up
+  # to +-50%, 2.5x the +-20% every major PPO reference/implementation
+  # converges on (OpenAI Baselines, SB3, CleanRL default 0.1-0.2). Measured
+  # in results_dynamic_realistic/tb: entropy and actor_loss both trended UP
+  # over training instead of settling, with a sharp destabilization spike
+  # exactly at the medium->hard curriculum boundary (ep 25k) -- consistent
+  # with updates not being reined in enough when the reward distribution
+  # shifted. 0.2 is the standard default, not a task-specific guess.
+  clip_epsilon: 0.2
+  epochs_per_update: 4
+  gamma: 0.99
+  gae_lambda: 0.95
+  value_loss_coef: 0.5
+  # 0.01 alone didn't stop entropy climbing in the unstable run; nudged up
+  # slightly so it has more pull against drift once the clip fix (above)
+  # removes the main destabilizing force. Revisit (0.01<->0.03) once the
+  # next run's entropy curve is checked -- this is the less certain of the
+  # two changes, unlike clip_epsilon which was clearly out of standard range.
+  entropy_coef: 0.02
+  max_grad_norm: 0.5
+  lr: 3.0e-4
+  mini_batch_size: 16
+
+model:
+  hidden_dim: 128
+  num_heads: 4
+  num_layers: 3
+
+environment:
+  detection_window: 10.0      # seconds before arrival a vehicle becomes visible, aprox 180m
+  commit_window: 2.5          # seconds before arrival a tentative plan locks aprox 30m
+  episode_duration: 60.0      # wall-clock seconds per training episode
+  penalty_coef: 0.1           # weight of the rescheduling penalty vs waiting objective
+  max_proximity_weight: 2.0   # cap on the 1/time_to_arrival proximity weight
+
+training:
+  # Curriculum tiers (easy/medium/hard, boundaries at 8k/25k/50k episodes in
+  # get_curriculum_arrivals) now use REAL-WORLD-calibrated arrival rates
+  # (0.20/0.35/1.00 veh/s, from the SinD dataset — see traffic_generator.py).
+  # Measured per-episode cost at these rates: easy ~0.11s, medium ~0.24s,
+  # hard ~2.0s (hard is far more expensive per episode than before was
+  # relatively, since compute scales with vehicle count and the tiers now
+  # span a realistic range rather than a uniformly saturated one). 60k
+  # episodes keeps the same total-experience budget as the prior (busier)
+  # curriculum; each episode now carries less signal (11-59 vehicles vs the
+  # old 90-240), so episode count was NOT reduced despite lower average cost.
+  num_episodes: 60000
+  log_interval: 25
+  eval_interval: 1000
+  # 2000 (was 5000): this run is the first against the corrected reward
+  # (_compute_reward now tracks total excess delay over ALL vehicles seen,
+  # verified to telescope exactly to episode_waiting_time_all). Earlier
+  # snapshots give an abort signal well before 5k episodes if the new
+  # objective misbehaves.
+  checkpoint_interval: 2000
+  # Episodes of rollout collected into the PPO buffer before each update
+  # (was hardcoded to 8 in trainer.py). Raised alongside the clip_epsilon
+  # fix above: at ~11-59 vehicles/episode (real-world rates), 8 episodes
+  # was only ~90-450 transitions per update -- too small/noisy a batch,
+  # especially combined with the previously-too-wide clip range.
+  rollout_n: 24
+  # Rollout episodes are collected in separate single-threaded PROCESSES
+  # (not intra-op threads — measured to make the tiny per-op HGT forwards
+  # SLOWER, even with OMP_NUM_THREADS matched to --cpus-per-task). Set this
+  # to match --cpus-per-task in the sbatch script; keep OMP_NUM_THREADS=1
+  # (and the MKL/OPENBLAS/NUMEXPR equivalents) regardless of this value.
+  # 1 = plain serial loop, no ProcessPoolExecutor/IPC overhead at all — use
+  # this on single-CPU machines.
+  num_workers: 1
+  # Rollout (data collection) always runs on CPU regardless of this setting —
+  # it's ~1000+ tiny SEQUENTIAL forwards per episode, measured ~10x slower on
+  # GPU (kernel-launch overhead per tiny call dominates). device only controls
+  # where ppo_update's BATCHED forward/backward passes run, which is a good
+  # GPU fit (mirrors the offline model). Set to "cpu" if you have no GPU.
+  device: cuda

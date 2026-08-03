@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_chongqing_6_22_nr_1_0017",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "chongqing_nr_ll2",
+  "city": "Chongqing",
+  "recording_id": "Chongqing/6_22_NR_1",
+  "window_index": 17,
+  "window_start_s": 510.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 0,
+    "N_in": 1,
+    "S_in": 3,
+    "W_in": 1
+  },
+  "departures": [
+    {
+      "route_id": "S_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "W",
+      "departure_time_s": 10.02002002002002,
+      "departure_id": "sind_chongqing_6_22_nr_1_0017_92",
+      "sequence": 0
+    },
+    {
+      "route_id": "S_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "E",
+      "departure_time_s": 10.62062062062067,
+      "departure_id": "sind_chongqing_6_22_nr_1_0017_90",
+      "sequence": 1
+    },
+    {
+      "route_id": "N_to_S",
+      "vehicle_type": "passenger",
+      "source_lane": "N_in",
+      "source_approach": "N",
+      "destination_approach": "S",
+      "departure_time_s": 18.528528528528522,
+      "departure_id": "sind_chongqing_6_22_nr_1_0017_93",
+      "sequence": 2
+    },
+    {
+      "route_id": "S_to_N",
+      "vehicle_type": "passenger",
+      "source_lane": "S_in",
+      "source_approach": "S",
+      "destination_approach": "N",
+      "departure_time_s": 23.133133133133175,
+      "departure_id": "sind_chongqing_6_22_nr_1_0017_95",
+      "sequence": 3
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 23.933933933933965,
+      "departure_id": "sind_chongqing_6_22_nr_1_0017_94",
+      "sequence": 4
+    }
+  ],
+  "congestion": "heavy",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.0,
+    "N_in": 0.03333333333333333,
+    "S_in": 0.1,
+    "W_in": 0.03333333333333333
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "scenario_id": "sind_tianjin_8_2_1_0031",
+  "source": "sind",
+  "data_role": "departure_demand",
+  "intersection_id": "tianjin_map_relink_law_save",
+  "city": "Tianjin",
+  "recording_id": "Tianjin/8_2_1",
+  "window_index": 31,
+  "window_start_s": 930.0,
+  "departure_horizon_s": 30.0,
+  "management_boundary_radius_m": 25.0,
+  "lane_counts": {
+    "E_in": 2,
+    "N_in": 0,
+    "S_in": 0,
+    "W_in": 2
+  },
+  "departures": [
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 7.03703703703708,
+      "departure_id": "sind_tianjin_8_2_1_0031_479",
+      "sequence": 0
+    },
+    {
+      "route_id": "E_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "E_in",
+      "source_approach": "E",
+      "destination_approach": "W",
+      "departure_time_s": 20.250250250250218,
+      "departure_id": "sind_tianjin_8_2_1_0031_480",
+      "sequence": 1
+    },
+    {
+      "route_id": "W_to_E",
+      "vehicle_type": "passenger",
+      "source_lane": "W_in",
+      "source_approach": "W",
+      "destination_approach": "E",
+      "departure_time_s": 20.850850850850808,
+      "departure_id": "sind_tianjin_8_2_1_0031_483",
+      "sequence": 2
+    },
+    {
+      "route_id": "E_to_W",
+      "vehicle_type": "passenger",
+      "source_lane": "E_in",
+      "source_approach": "E",
+      "destination_approach": "W",
+      "departure_time_s": 21.551551551551558,
+      "departure_id": "sind_tianjin_8_2_1_0031_481",
+      "sequence": 3
+    }
+  ],
+  "congestion": "heavy",
+  "lane_lambdas_veh_per_s": {
+    "E_in": 0.06666666666666667,
+    "N_in": 0.0,
+    "S_in": 0.0,
+    "W_in": 0.06666666666666667
+  }
+}
