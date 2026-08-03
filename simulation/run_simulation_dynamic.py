@@ -36,8 +36,12 @@ Differences from the static view, reflecting what's actually new here:
 
 Usage:
     PYTHONPATH=. python simulation/run_simulation_dynamic.py --checkpoint results_dynamic_realistic_v2/checkpoint_best.pt
-    PYTHONPATH=. python simulation/run_simulation_dynamic.py --mode both --tier hard --seed 7
-    PYTHONPATH=. python simulation/run_simulation_dynamic.py --mode igreedy --no-gui
+    PYTHONPATH=. python simulation/run_simulation_dynamic.py --mode all --tier hard --seed 7
+    PYTHONPATH=. python simulation/run_simulation_dynamic.py --mode edf --no-gui
+
+--mode all runs hgt, igreedy, lifo, backpressure, edf in sequence (one
+animation window each, in --no-gui mode one printed summary each) — same
+five methods evaluation/eval_dynamic.py compares.
 """
 
 from __future__ import annotations
@@ -77,9 +81,9 @@ from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
 from intersection_scheduler.model.policy import SchedulingPolicy
 
 try:
-    from evaluation.eval_dynamic import igreedy_select, lifo_select
+    from evaluation.eval_dynamic import igreedy_select, lifo_select, backpressure_select, edf_select
 except ImportError:
-    igreedy_select = lifo_select = None  # --mode hgt only still works without this
+    igreedy_select = lifo_select = backpressure_select = edf_select = None  # --mode hgt only still works without this
 
 
 # Same hard caps as trainer.run_episode / eval_dynamic.run_episode_with.
@@ -679,7 +683,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", default="results_dynamic_realistic_v2/checkpoint_best.pt")
     parser.add_argument("--config", default="configs/default_dynamic.yaml")
-    parser.add_argument("--mode", choices=["hgt", "igreedy", "lifo", "both"], default="hgt")
+    parser.add_argument("--mode", choices=["hgt", "igreedy", "lifo", "backpressure", "edf", "all"], default="hgt")
     parser.add_argument("--tier", choices=["easy", "medium", "hard"], default="hard")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--speed", type=float, default=1.0,
@@ -708,7 +712,7 @@ def main() -> None:
         print(f"  v{v.id}: {v.manoeuvre:6s}  route={v.route}  "
               f"arrival={v.arrival_time:.2f}s  vel={v.velocity:.1f}m/s")
 
-    modes = ["hgt", "igreedy"] if args.mode == "both" else [args.mode]
+    modes = ["hgt", "igreedy", "lifo", "backpressure", "edf"] if args.mode == "all" else [args.mode]
 
     for mode in modes:
         env = DynamicIntersectionEnv(
@@ -742,6 +746,14 @@ def main() -> None:
             if lifo_select is None:
                 raise RuntimeError("Could not import lifo_select from evaluation.eval_dynamic")
             selector = lifo_select
+        elif mode == "backpressure":
+            if backpressure_select is None:
+                raise RuntimeError("Could not import backpressure_select from evaluation.eval_dynamic")
+            selector = backpressure_select
+        elif mode == "edf":
+            if edf_select is None:
+                raise RuntimeError("Could not import edf_select from evaluation.eval_dynamic")
+            selector = edf_select
         else:
             raise ValueError(mode)
 
