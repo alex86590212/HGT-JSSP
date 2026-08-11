@@ -1,0 +1,1 @@
+<routes><vType id="car" length="5.0" minGap="2.5" maxSpeed="15" accel="2.6" decel="4.5" /><vehicle id="0" type="car" depart="12.02" departSpeed="13.15"><route edges="A3A2" /></vehicle><vehicle id="1" type="car" depart="19.28" departSpeed="12.57"><route edges="D0D1 D1D2 D2D3" /></vehicle></routes>
