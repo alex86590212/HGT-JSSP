@@ -97,6 +97,7 @@ def _solve_restricted(
 
     for v in detected:
         arrival = int(round(v.arrival_time * SCALE))
+        n = len(v.route)
         for j, (zone_id, p) in enumerate(zip(v.route, v.processing_times)):
             key = (v.id, j)
             dur = max(1, int(round(p * SCALE)))
@@ -110,23 +111,41 @@ def _solve_restricted(
                 e = int(round(w_end * SCALE))
                 start = model.NewConstant(s)
                 end = model.NewConstant(e)
-                interval = model.NewIntervalVar(start, e - s, end, f"iv_{v.id}_{j}")
             else:
                 lb = max(arrival, now)
                 start = model.NewIntVar(lb, horizon, f"s_{v.id}_{j}")
                 end = model.NewIntVar(lb, horizon, f"e_{v.id}_{j}")
-                interval = model.NewIntervalVar(start, dur, end, f"iv_{v.id}_{j}")
+                # end must equal start + this op's own processing time — the
+                # block_interval below constrains the BLOCKING window (start
+                # to the next op's start), not this actual duration, so it
+                # has to be enforced separately.
+                model.Add(end == start + dur)
 
             start_vars[key] = start
             end_vars[key] = end
-            intervals_by_zone.setdefault(zone_id, []).append(interval)
 
         # Type-1: route order (skipped between two already-locked ops — both
         # constant, and locking already guaranteed their consistency).
-        for j in range(len(v.route) - 1):
+        for j in range(n - 1):
             if (v.id, j) in locked_windows and (v.id, j + 1) in locked_windows:
                 continue
             model.Add(start_vars[(v.id, j + 1)] >= end_vars[(v.id, j)])
+
+        # Blocking (Huang et al. Section III-A): a vehicle retains its
+        # current zone until it starts moving into its next one, not just
+        # until its own processing time ends. Applies to locked windows too
+        # — a locked op still blocks its zone until its (locked or free)
+        # successor starts.
+        for j, zone_id in enumerate(v.route):
+            key = (v.id, j)
+            start = start_vars[key]
+            block_end = start_vars[(v.id, j + 1)] if j < n - 1 else end_vars[key]
+            block_size = model.NewIntVar(0, horizon, f"blocksize_{v.id}_{j}")
+            model.Add(block_size == block_end - start)
+            block_interval = model.NewIntervalVar(
+                start, block_size, block_end, f"blockiv_{v.id}_{j}"
+            )
+            intervals_by_zone.setdefault(zone_id, []).append(block_interval)
 
     # Type-2: same-lane order on the first operation only, mirrors
     # feasibility._same_lane_leaders_planned / optimal_solver's Type-2.
@@ -143,7 +162,7 @@ def _solve_restricted(
                 continue
             model.Add(start_vars[(follower.id, 0)] >= end_vars[(leader.id, 0)])
 
-    # Type-3: zone exclusivity.
+    # Type-3: zone exclusivity, with blocking (see block_interval above).
     for zone_id, intervals in intervals_by_zone.items():
         if len(intervals) > 1:
             model.AddNoOverlap(intervals)

@@ -415,31 +415,64 @@ class DynamicIntersectionEnv:
     def _recompute_times(self) -> None:
         """Derive all TENTATIVE ops' times from zone queues + route chains.
 
-        Single Kahn pass over the tentative precedence graph (route edges
-        between tentative ops + consecutive zone-queue edges). LOCKED ops
-        contribute as constants: a locked route predecessor bounds its
-        successor's earliest start, and locked ops' [start, finish) windows
-        are static blockers that tentative ops gap-fill around (an op may
-        run BEFORE a locked window if it fits — locking freezes one op's
-        slot, not the whole zone). Raises on a precedence cycle: the
-        feasibility deadlock check must prevent those from being planned."""
+        Kahn pass over the tentative precedence graph. LOCKED ops contribute
+        as constants: a locked route predecessor bounds its successor's
+        earliest start.
+
+        Blocking (Huang et al. Section III-A): an operation retains its zone
+        until its route successor STARTS, not just until it itself finishes.
+        So the bound a zone-queue predecessor `a` imposes on the next vehicle
+        `b` queued behind it in the same zone is really imposed by `a`'s own
+        route successor — the true "release" event — not by `a` itself:
+          - if that successor is TENTATIVE, it's a real precedence edge
+            (`start_succs`): b must wait for it to be TIMED (not just
+            finished — its START is the release moment), so it must be
+            processed by this same Kahn pass before b.
+          - if that successor is LOCKED, its start_time is already a fixed
+            constant — folded directly into b's earliest bound, no edge or
+            waiting needed.
+          - if `a` has no route successor (last op on its route) or that
+            successor isn't planned yet, there's nothing to redirect
+            through: b waits on `a`'s own finish, exactly as in the
+            non-blocking model (`finish_succs`).
+        Route precedence itself (Eq. route_precedence) is unaffected by any
+        of this: a vehicle's own progression to its next zone still only
+        requires s_{i,k+1} >= c_{i,k}.
+
+        This mirrors, edge for edge, the redirect `feasibility.py`'s deadlock
+        check applies before an operation is ever planned — so the graph
+        built here is acyclic by construction and a single Kahn pass always
+        finds a valid timing (raises otherwise, meaning that guarantee was
+        violated).
+
+        A LOCKED operation's own zone also needs this redirect: whichever
+        TENTATIVE op is the HEAD of that zone's queue is the one actually
+        adjacent to it (queues only ever lose members from the front via
+        locking, so the head is exactly "whatever used to be queued right
+        after the now-locked op"). Every other member of that queue is
+        already correctly bounded transitively, through the head, by the
+        ordinary zone-queue edges above — so only the head needs a direct
+        edge from each locked op in its zone, with the same redirect rule.
+        (This drops the old per-op-per-locked-window gap-fill scan, which
+        re-derived that value independently for every op in the zone instead
+        of relying on the chain — harmless when a window was a true
+        constant, but a source of circular reads once its own release could
+        depend on a TENTATIVE successor still being timed by this same
+        pass.)"""
         tentative = [o for o in self.operations if o.state == OpState.TENTATIVE]
         if not tentative:
             return
 
         pos_index = {(o.vehicle_id, o.route_position): o for o in self.operations}
-        locked_windows: Dict[int, List[Tuple[float, float]]] = {}
-        for o in self.operations:
-            if o.state == OpState.LOCKED:
-                locked_windows.setdefault(o.zone_id, []).append(
-                    (o.start_time, o.earliest_finish)
-                )
-        for windows in locked_windows.values():
-            windows.sort()
 
-        succs: Dict[int, List[DynamicOperation]] = {}
+        # finish_succs[source] -> targets bounded by source.earliest_finish
+        # (route precedence; zone-queue edges with no successor to redirect
+        # through). start_succs[source] -> targets bounded by
+        # source.start_time (the true blocking redirect).
+        finish_succs: Dict[int, List[DynamicOperation]] = {}
+        start_succs: Dict[int, List[DynamicOperation]] = {}
         n_preds: Dict[int, int] = {id(o): 0 for o in tentative}
-        earliest: Dict[int, float] = {}
+        earliest_base: Dict[int, float] = {}
 
         for o in tentative:
             base = self.current_time
@@ -451,37 +484,94 @@ class DynamicIntersectionEnv:
                 pred = pos_index.get((o.vehicle_id, o.route_position - 1))
                 if pred is not None and pred.state == OpState.LOCKED:
                     base = max(base, pred.earliest_finish)
-            earliest[id(o)] = base
+            earliest_base[id(o)] = base
             route_succ = pos_index.get((o.vehicle_id, o.route_position + 1))
             if route_succ is not None and route_succ.state == OpState.TENTATIVE:
-                succs.setdefault(id(o), []).append(route_succ)
+                finish_succs.setdefault(id(o), []).append(route_succ)
                 n_preds[id(route_succ)] += 1
-        for queue in self._zone_queue.values():
-            for a, b in zip(queue, queue[1:]):
-                succs.setdefault(id(a), []).append(b)
+
+        def redirect(a: "DynamicOperation", b: "DynamicOperation") -> None:
+            # `a` is always TENTATIVE here (a zone-queue member), so it WILL
+            # be processed by the ready-loop below — the fallback edge
+            # a -> b is safe as a real, eventually-firing precedence edge.
+            route_succ_a = pos_index.get((a.vehicle_id, a.route_position + 1))
+            if route_succ_a is None or route_succ_a.state == OpState.UNSCHEDULED:
+                finish_succs.setdefault(id(a), []).append(b)
+                n_preds[id(b)] += 1
+            elif route_succ_a.state == OpState.LOCKED:
+                earliest_base[id(b)] = max(earliest_base[id(b)], route_succ_a.start_time)
+            else:
+                start_succs.setdefault(id(route_succ_a), []).append(b)
                 n_preds[id(b)] += 1
 
-        ready = [o for o in tentative if n_preds[id(o)] == 0]
+        def redirect_from_locked(locked_op: "DynamicOperation", b: "DynamicOperation") -> None:
+            # locked_op is NEVER processed by the ready-loop (it's not in
+            # `tentative`), so unlike `redirect`, its own fallback case must
+            # also fold as a constant — an edge sourced from it would strand
+            # `b` forever, since nothing would ever trigger the decrement.
+            route_succ = pos_index.get((locked_op.vehicle_id, locked_op.route_position + 1))
+            if route_succ is None or route_succ.state == OpState.UNSCHEDULED:
+                earliest_base[id(b)] = max(earliest_base[id(b)], locked_op.earliest_finish)
+            elif route_succ.state == OpState.LOCKED:
+                earliest_base[id(b)] = max(earliest_base[id(b)], route_succ.start_time)
+            else:
+                start_succs.setdefault(id(route_succ), []).append(b)
+                n_preds[id(b)] += 1
+
+        for queue in self._zone_queue.values():
+            for a, b in zip(queue, queue[1:]):
+                redirect(a, b)
+            if queue:
+                head = queue[0]
+                for o in self.operations:
+                    if o.state == OpState.LOCKED and o.zone_id == head.zone_id:
+                        redirect_from_locked(o, head)
+
+        n_preds_iter = dict(n_preds)
+        earliest = dict(earliest_base)
+        ready = [o for o in tentative if n_preds_iter[id(o)] == 0]
         processed = 0
         while ready:
             o = ready.pop()
             processed += 1
-            start = earliest[id(o)]
-            for w_start, w_end in locked_windows.get(o.zone_id, ()):
-                if start + o.processing_time <= w_start + 1e-9:
-                    break  # fits entirely before this (sorted) window
-                if start < w_end - 1e-9:
-                    start = w_end  # overlaps: bump past the window
-            o.start_time = start
-            o.earliest_finish = start + o.processing_time
-            for nxt in succs.get(id(o), []):
+            o.start_time = earliest[id(o)]
+            o.earliest_finish = o.start_time + o.processing_time
+
+            for nxt in finish_succs.get(id(o), ()):
                 if earliest[id(nxt)] < o.earliest_finish:
                     earliest[id(nxt)] = o.earliest_finish
-                n_preds[id(nxt)] -= 1
-                if n_preds[id(nxt)] == 0:
+                n_preds_iter[id(nxt)] -= 1
+                if n_preds_iter[id(nxt)] == 0:
+                    ready.append(nxt)
+
+            for nxt in start_succs.get(id(o), ()):
+                if earliest[id(nxt)] < o.start_time:
+                    earliest[id(nxt)] = o.start_time
+                n_preds_iter[id(nxt)] -= 1
+                if n_preds_iter[id(nxt)] == 0:
                     ready.append(nxt)
 
         if processed != len(tentative):
+            import os
+            if os.environ.get("DEBUG_BLOCKING"):
+                stuck = [o for o in tentative if n_preds_iter[id(o)] > 0]
+                stuck_ids = {id(o) for o in stuck}
+                by_id = {id(o): o for o in self.operations}
+                def lbl(o):
+                    return f"vid={o.vehicle_id},zone={o.zone_id},pos={o.route_position}"
+                print(f"STUCK ({len(stuck)} ops):", flush=True)
+                for o in stuck:
+                    print(f"  {lbl(o)} n_preds_left={n_preds_iter[id(o)]}", flush=True)
+                for source_id, targets in finish_succs.items():
+                    for t in targets:
+                        if id(t) in stuck_ids:
+                            src = by_id.get(source_id)
+                            print(f"  FINISH {lbl(src) if src else source_id} -> {lbl(t)}", flush=True)
+                for source_id, targets in start_succs.items():
+                    for t in targets:
+                        if id(t) in stuck_ids:
+                            src = by_id.get(source_id)
+                            print(f"  START  {lbl(src) if src else source_id} -> {lbl(t)}", flush=True)
             raise RuntimeError(
                 "precedence cycle among tentative operations — the "
                 "feasibility deadlock check failed to prevent a cyclic "

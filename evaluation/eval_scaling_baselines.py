@@ -24,9 +24,11 @@ from dynamic_scheduler.environment.dynamic_intersection import DynamicIntersecti
 from dynamic_scheduler.evaluation.optimal_solver_online import restricted_optimal_episode
 from evaluation.eval_dynamic import (
     backpressure_select,
+    edf_priority_inheritance_select,
     edf_select,
     igreedy_select,
     lifo_select,
+    make_logit_routing_selector,
     run_episode_with,
 )
 from intersection_scheduler.data.scenario_generator_4x4 import ZONE_POSITIONS
@@ -35,7 +37,13 @@ METHODS = {
     "igreedy": igreedy_select,
     "lifo": lifo_select,
     "backpressure": backpressure_select,
+    "logit_routing": make_logit_routing_selector(eta=10.0, seed=0),
     "edf": edf_select,
+    # Main adapted-iEDF candidate: priority inheritance over the zone-
+    # blocking graph (see edf_priority_inheritance_select's docstring).
+    # Supersedes the earlier edf_discounted_select ablation (still in
+    # eval_dynamic.py, just not wired in here).
+    "edf_prio_inherit": edf_priority_inheritance_select,
 }
 
 
@@ -83,8 +91,13 @@ def _run_methods_for_rate(rate, seeds, n_scenarios, episode_duration, make_env):
         row[f"{name}_wt_std"] = std(per_seed_wt[name])
         row[f"{name}_comp_mean"] = mean(per_seed_comp[name])
     ig, ed, bp = row["igreedy_wt_mean"], row["edf_wt_mean"], row["backpressure_wt_mean"]
+    lg = row["logit_routing_wt_mean"]
+    edd = row["edf_prio_inherit_wt_mean"]
     row["edf_vs_igreedy_pct"] = (ig - ed) / ig * 100 if ig > 0.01 else float("nan")
     row["edf_vs_bp_pct"] = (bp - ed) / bp * 100 if bp > 0.01 else float("nan")
+    row["edf_vs_logit_pct"] = (lg - ed) / lg * 100 if lg > 0.01 else float("nan")
+    row["edf_prio_inherit_vs_igreedy_pct"] = (ig - edd) / ig * 100 if ig > 0.01 else float("nan")
+    row["edf_prio_inherit_vs_edf_pct"] = (ed - edd) / ed * 100 if ed > 0.01 else float("nan")
     return row, first_seed_scenarios, first_seed_wt
 
 
@@ -127,8 +140,10 @@ def _wstar_gap_for_rate(row, scenarios, wt_by_method, episode_duration,
     row["n_wstar_unsolved"] = n_unsolved
     row["w_star"] = mean(wstars) if wstars else float("nan")
     for name, key in (("edf", "edf_gap_to_wstar_pct"),
+                       ("edf_prio_inherit", "edf_prio_inherit_gap_to_wstar_pct"),
                        ("igreedy", "igreedy_gap_to_wstar_pct"),
-                       ("backpressure", "bp_gap_to_wstar_pct")):
+                       ("backpressure", "bp_gap_to_wstar_pct"),
+                       ("logit_routing", "logit_gap_to_wstar_pct")):
         row[key] = mean(pct_gaps[name]) if pct_gaps[name] else mean(abs_gaps[name])
 
 
@@ -165,22 +180,32 @@ def main():
     header = ["rate", "n_veh_avg"]
     for name in METHODS:
         header += [f"{name}_wt_mean", f"{name}_wt_std", f"{name}_comp_mean"]
-    header += ["edf_vs_igreedy_pct", "edf_vs_bp_pct"]
+    header += ["edf_vs_igreedy_pct", "edf_vs_bp_pct", "edf_vs_logit_pct",
+               "edf_prio_inherit_vs_igreedy_pct", "edf_prio_inherit_vs_edf_pct"]
     if args.optimality_gap:
         header += ["w_star", "n_wstar_solved", "n_wstar_unsolved",
-                    "edf_gap_to_wstar_pct", "igreedy_gap_to_wstar_pct", "bp_gap_to_wstar_pct"]
+                    "edf_gap_to_wstar_pct", "edf_prio_inherit_gap_to_wstar_pct",
+                    "igreedy_gap_to_wstar_pct", "bp_gap_to_wstar_pct",
+                    "logit_gap_to_wstar_pct"]
 
     for rate in args.rates:
         row, first_seed_scenarios, first_seed_wt = _run_methods_for_rate(
             rate, args.seeds, args.n_scenarios, episode_duration, make_env,
         )
         ig, ed, bp = row["igreedy_wt_mean"], row["edf_wt_mean"], row["backpressure_wt_mean"]
+        lg = row["logit_routing_wt_mean"]
+        edd = row["edf_prio_inherit_wt_mean"]
 
         print(f"rate={rate:.2f}  n_veh={row['n_veh_avg']:.1f}  "
               f"igreedy={ig:.4f}±{row['igreedy_wt_std']:.4f}  "
               f"bp={bp:.4f}±{row['backpressure_wt_std']:.4f}  "
+              f"logit={lg:.4f}±{row['logit_routing_wt_std']:.4f}  "
               f"edf={ed:.4f}±{row['edf_wt_std']:.4f}  "
-              f"vs_ig={row['edf_vs_igreedy_pct']:+.1f}%  vs_bp={row['edf_vs_bp_pct']:+.1f}%")
+              f"edf_prio={edd:.4f}±{row['edf_prio_inherit_wt_std']:.4f}  "
+              f"vs_ig={row['edf_vs_igreedy_pct']:+.1f}%  vs_bp={row['edf_vs_bp_pct']:+.1f}%  "
+              f"vs_logit={row['edf_vs_logit_pct']:+.1f}%  "
+              f"prio_vs_ig={row['edf_prio_inherit_vs_igreedy_pct']:+.1f}%  "
+              f"prio_vs_edf={row['edf_prio_inherit_vs_edf_pct']:+.1f}%")
 
         if args.optimality_gap:
             _wstar_gap_for_rate(
@@ -191,15 +216,20 @@ def main():
             # printed here (not the pooled 3-seed means above) so nothing
             # side-by-side on this line is ever a sample mismatch.
             seed0_ed = mean(first_seed_wt["edf"])
+            seed0_edd = mean(first_seed_wt["edf_prio_inherit"])
             seed0_ig = mean(first_seed_wt["igreedy"])
             seed0_bp = mean(first_seed_wt["backpressure"])
+            seed0_lg = mean(first_seed_wt["logit_routing"])
             print(f"    [seed0-only, n={len(first_seed_scenarios)}]  "
-                  f"igreedy={seed0_ig:.4f}  bp={seed0_bp:.4f}  edf={seed0_ed:.4f}  "
+                  f"igreedy={seed0_ig:.4f}  bp={seed0_bp:.4f}  logit={seed0_lg:.4f}  "
+                  f"edf={seed0_ed:.4f}  edf_prio={seed0_edd:.4f}  "
                   f"W*={row['w_star']:.4f} (n_solved={row['n_wstar_solved']}, "
                   f"n_unsolved={row['n_wstar_unsolved']})")
             print(f"    edf_gap={row['edf_gap_to_wstar_pct']:+.1f}%  "
+                  f"edf_prio_gap={row['edf_prio_inherit_gap_to_wstar_pct']:+.1f}%  "
                   f"igreedy_gap={row['igreedy_gap_to_wstar_pct']:+.1f}%  "
-                  f"bp_gap={row['bp_gap_to_wstar_pct']:+.1f}%")
+                  f"bp_gap={row['bp_gap_to_wstar_pct']:+.1f}%  "
+                  f"logit_gap={row['logit_gap_to_wstar_pct']:+.1f}%")
 
         rows.append(row)
 
