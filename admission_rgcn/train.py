@@ -222,6 +222,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     ap.add_argument("--episodes", type=int, default=None, help="override train.num_episodes")
     ap.add_argument("--workers", type=int, default=None, help="override train.num_workers")
     ap.add_argument("--no-defer", action="store_true", help="order-only policy (env.allow_defer=false)")
+    ap.add_argument("--seed", type=int, default=None, help="override seed (init and training scenario stream)")
     args = ap.parse_args(argv)
 
     ckpt = torch.load(args.resume, weights_only=False) if args.resume else None  # noqa: S301
@@ -235,6 +236,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         cfg["train"]["num_workers"] = args.workers
     if args.no_defer:
         cfg["env"]["allow_defer"] = False
+    if args.seed is not None:
+        cfg["seed"] = args.seed
     tcfg, pcfg = cfg["train"], cfg["ppo"]
 
     os.makedirs(args.output, exist_ok=True)
