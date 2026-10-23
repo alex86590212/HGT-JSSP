@@ -1,7 +1,7 @@
 """Seed sweep and deferral ablation: train and evaluate N seeds with and
 without the DEFER action, one output directory per (variant, seed).
 
-Each run trains `--episodes` episodes, then evaluates checkpoint_last.pt on
+Each run trains `--episodes` episodes, then evaluates checkpoint_best.pt (or last) on
 the paper protocol (eval seeds 1-3 x 15 scenarios x 8 rates) against iGreedy,
 LIFO and Backpressure. Finished runs (eval_final.csv present) are skipped and
 interrupted runs resume from checkpoint_last.pt, so the script can be re-run.
@@ -47,7 +47,7 @@ def run_one(variant: str, seed: int, args: argparse.Namespace) -> Tuple[str, int
     if run_cmd(train, os.path.join(out, "train.log")) != 0:
         return variant, seed, False
 
-    evaluate = py + ["admission_rgcn.evaluate", "--checkpoint", last, "--seeds", "1", "2", "3",
+    evaluate = py + ["admission_rgcn.evaluate", "--checkpoint", os.path.join(out, f"checkpoint_{args.ckpt}.pt"), "--seeds", "1", "2", "3",
                      "--n-scenarios", "15", "--baselines", "igreedy", "lifo", "backpressure",
                      "--workers", str(args.workers), "--output-csv", final_csv]
     ok = run_cmd(evaluate, os.path.join(out, "eval.log")) == 0
@@ -61,6 +61,8 @@ def main() -> None:
     ap.add_argument("--seeds", type=int, nargs="+", default=list(range(10)))
     ap.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS))
     ap.add_argument("--episodes", type=int, default=4000)
+    ap.add_argument("--ckpt", choices=("best", "last"), default="best",
+                    help="checkpoint to evaluate (best = lowest in-training eval wait on scenario seed 0)")
     ap.add_argument("--parallel", type=int, default=2, help="runs executed at the same time")
     ap.add_argument("--workers", type=int, default=4, help="rollout/eval processes per run")
     args = ap.parse_args()
