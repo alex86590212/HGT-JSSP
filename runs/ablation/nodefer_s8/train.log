@@ -1,0 +1,2191 @@
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+2026-10-24 00:36:47.001150: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-10-24 00:36:47.015044: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1792795007.030921  424101 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1792795007.035937  424101 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1792795007.052644  424101 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795007.052666  424101 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795007.052669  424101 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795007.052671  424101 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2026-10-24 00:36:47.056271: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/__init__.py:132: UserWarning: A NumPy version >=1.21.6 and <1.28.0 is required for this version of SciPy (detected version 2.2.6)
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 46, in <module>
+    from tensorflow.python.keras.engine import training_arrays_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_arrays_v1.py", line 37, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 71, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 8, in <module>
+    from keras.src.wrappers.fixes import _routing_enabled
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/fixes.py", line 2, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 11, in <module>
+    from keras.src.wrappers.utils import TargetReshaper
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/utils.py", line 4, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 16, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+Training admission R-GCN: 4000 episodes, rate U[0.1, 1.2], defer=off, workers=4, params=512,515, output=runs/ablation/nodefer_s8
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+2026-10-24 00:36:59.290173: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-10-24 00:36:59.290173: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-10-24 00:36:59.290180: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-10-24 00:36:59.290194: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-10-24 00:36:59.303308: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-10-24 00:36:59.303314: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-10-24 00:36:59.303337: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-10-24 00:36:59.303364: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1792795019.318626  424119 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1792795019.318730  424115 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1792795019.318729  424120 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1792795019.318759  424118 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1792795019.323541  424119 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+E0000 00:00:1792795019.323580  424115 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+E0000 00:00:1792795019.323589  424120 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+E0000 00:00:1792795019.323599  424118 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1792795019.338676  424118 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338677  424119 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338696  424118 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338700  424119 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338701  424118 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338691  424120 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338704  424119 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338705  424118 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338710  424119 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338710  424120 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338713  424120 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338714  424120 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338770  424115 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338793  424115 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338795  424115 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1792795019.338797  424115 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2026-10-24 00:36:59.342273: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-24 00:36:59.342272: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-24 00:36:59.342273: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-10-24 00:36:59.342275: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/__init__.py:132: UserWarning: A NumPy version >=1.21.6 and <1.28.0 is required for this version of SciPy (detected version 2.2.6)
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 46, in <module>
+    from tensorflow.python.keras.engine import training_arrays_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_arrays_v1.py", line 37, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/__init__.py:132: UserWarning: A NumPy version >=1.21.6 and <1.28.0 is required for this version of SciPy (detected version 2.2.6)
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 71, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/__init__.py:132: UserWarning: A NumPy version >=1.21.6 and <1.28.0 is required for this version of SciPy (detected version 2.2.6)
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 46, in <module>
+    from tensorflow.python.keras.engine import training_arrays_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_arrays_v1.py", line 37, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 71, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 46, in <module>
+    from tensorflow.python.keras.engine import training_arrays_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_arrays_v1.py", line 37, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 71, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/__init__.py:132: UserWarning: A NumPy version >=1.21.6 and <1.28.0 is required for this version of SciPy (detected version 2.2.6)
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 46, in <module>
+    from tensorflow.python.keras.engine import training_arrays_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_arrays_v1.py", line 37, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 13, in <module>
+    from tensorflow._api.v2.__internal__ import feature_column
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/_api/v2/__internal__/feature_column/__init__.py", line 8, in <module>
+    from tensorflow.python.feature_column.feature_column_v2 import DenseColumn # line: 1777
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column_v2.py", line 38, in <module>
+    from tensorflow.python.feature_column import feature_column as fc_old
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/feature_column/feature_column.py", line 41, in <module>
+    from tensorflow.python.layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/layers/base.py", line 16, in <module>
+    from tensorflow.python.keras.legacy_tf_layers import base
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/__init__.py", line 25, in <module>
+    from tensorflow.python.keras import models
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/models.py", line 25, in <module>
+    from tensorflow.python.keras.engine import training_v1
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/python/keras/engine/training_v1.py", line 71, in <module>
+    from scipy.sparse import issparse  # pylint: disable=g-import-not-at-top
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 8, in <module>
+    from keras.src.wrappers.fixes import _routing_enabled
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/fixes.py", line 2, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 11, in <module>
+    from keras.src.wrappers.utils import TargetReshaper
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/utils.py", line 4, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 16, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 8, in <module>
+    from keras.src.wrappers.fixes import _routing_enabled
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/fixes.py", line 2, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 11, in <module>
+    from keras.src.wrappers.utils import TargetReshaper
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/utils.py", line 4, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 16, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 8, in <module>
+    from keras.src.wrappers.fixes import _routing_enabled
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/fixes.py", line 2, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 8, in <module>
+    from keras.src.wrappers.fixes import _routing_enabled
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/fixes.py", line 2, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 11, in <module>
+    from keras.src.wrappers.utils import TargetReshaper
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/utils.py", line 4, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 11, in <module>
+    from keras.src.wrappers.utils import TargetReshaper
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/utils.py", line 4, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 16, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.2.6 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "<string>", line 1, in <module>
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 125, in _main
+    prepare(preparation_data)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 234, in prepare
+    _fixup_main_from_name(data['init_main_from_name'])
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/multiprocessing/spawn.py", line 258, in _fixup_main_from_name
+    main_content = runpy.run_module(mod_name,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 209, in run_module
+    return _run_module_code(code, init_globals, run_name, mod_spec)
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 96, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home4/s5539099/test/HGT-JSSP/admission_rgcn/train.py", line 28, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py", line 12, in <module>
+    from .writer import FileWriter, SummaryWriter  # noqa: F401
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/writer.py", line 19, in <module>
+    from ._embedding import get_embedding_info, make_mat, make_sprite, make_tsv, write_pbtxt
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/torch/utils/tensorboard/_embedding.py", line 10, in <module>
+    _HAS_GFILE_JOIN = hasattr(tf.io.gfile, "join")
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 65, in __getattr__
+    return getattr(load_once(self), attr_name)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 97, in wrapper
+    cache[arg] = f(arg)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/lazy.py", line 50, in load_once
+    module = load_fn()
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 45, in tf
+    import tensorflow
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorflow/__init__.py", line 468, in <module>
+    importlib.import_module("keras.src.optimizers")
+  File "/cvmfs/hpc.rug.nl/versions/2023.01/rocky8/x86_64/amd/zen3/software/Python/3.10.4-GCCcore-11.3.0/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/__init__.py", line 7, in <module>
+    from keras import _tf_keras as _tf_keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/__init__.py", line 1, in <module>
+    from keras._tf_keras import keras
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/_tf_keras/keras/__init__.py", line 28, in <module>
+    from keras import wrappers as wrappers
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/wrappers/__init__.py", line 7, in <module>
+    from keras.src.wrappers.sklearn_wrapper import (
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/__init__.py", line 1, in <module>
+    from keras.src.wrappers.sklearn_wrapper import SKLearnClassifier
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/keras/src/wrappers/sklearn_wrapper.py", line 16, in <module>
+    import sklearn
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/__init__.py", line 87, in <module>
+    from .base import clone
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/base.py", line 19, in <module>
+    from .utils import _IS_32BIT
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/sklearn/utils/__init__.py", line 16, in <module>
+    from scipy.sparse import issparse
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/__init__.py", line 274, in <module>
+    from ._csr import *
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/scipy/sparse/_csr.py", line 11, in <module>
+    from ._sparsetools import (csr_tocsc, csr_tobsr, csr_count_blocks,
+Traceback (most recent call last):
+  File "/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py", line 42, in tf
+    from tensorboard.compat import notf  # noqa: F401
+ImportError: cannot import name 'notf' from 'tensorboard.compat' (/home4/s5539099/test/.env-cuda/lib/python3.10/site-packages/tensorboard/compat/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+AttributeError: _ARRAY_API not found
+[eval ep 0] mean wait R-GCN=0.4987 iGreedy=0.4159 (-19.92%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-4.0%  0.35:-21.0%  0.50:-17.4%  0.65:-5.1%  0.80:-2.8%  1.00:-14.6%  1.20:-30.7%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep     64/4000  rate=0.63  wait R-GCN=0.4069 iG=0.4160 (+2.21%)  W/T/L=24/20/20  defer=0.000  dec/ep=109  actor=0.0018 critic=1.0737 ent=1.129 kl=0.0007  0.93s/ep  ETA 1.0h
+ep    128/4000  rate=0.60  wait R-GCN=0.3829 iG=0.3653 (-4.81%)  W/T/L=21/18/25  defer=0.000  dec/ep=107  actor=-0.0034 critic=0.7133 ent=1.140 kl=-0.0001  0.77s/ep  ETA 0.8h
+ep    160/4000  rate=0.67  wait R-GCN=0.5062 iG=0.5001 (-1.22%)  W/T/L=10/12/10  defer=0.000  dec/ep=131  actor=-0.0008 critic=0.5899 ent=1.137 kl=0.0019  0.77s/ep  ETA 0.8h
+ep    224/4000  rate=0.69  wait R-GCN=0.4706 iG=0.4781 (+1.58%)  W/T/L=27/13/24  defer=0.000  dec/ep=136  actor=-0.0079 critic=0.4567 ent=1.127 kl=0.0048  0.77s/ep  ETA 0.8h
+ep    256/4000  rate=0.61  wait R-GCN=0.3473 iG=0.3423 (-1.48%)  W/T/L=12/6/14  defer=0.000  dec/ep=117  actor=-0.0073 critic=0.3626 ent=1.119 kl=0.0046  0.75s/ep  ETA 0.8h
+ep    320/4000  rate=0.62  wait R-GCN=0.4732 iG=0.4761 (+0.61%)  W/T/L=28/17/19  defer=0.000  dec/ep=118  actor=-0.0068 critic=0.5091 ent=1.090 kl=0.0049  0.74s/ep  ETA 0.8h
+ep    352/4000  rate=0.61  wait R-GCN=0.4817 iG=0.4398 (-9.52%)  W/T/L=14/8/10  defer=0.000  dec/ep=107  actor=-0.0033 critic=0.4274 ent=1.090 kl=0.0069  0.73s/ep  ETA 0.7h
+ep    416/4000  rate=0.70  wait R-GCN=0.5126 iG=0.5002 (-2.47%)  W/T/L=18/14/32  defer=0.000  dec/ep=135  actor=-0.0061 critic=0.5000 ent=1.059 kl=0.0029  0.73s/ep  ETA 0.7h
+ep    480/4000  rate=0.71  wait R-GCN=0.4824 iG=0.4789 (-0.74%)  W/T/L=24/16/24  defer=0.000  dec/ep=136  actor=-0.0100 critic=0.4319 ent=1.077 kl=0.0031  0.74s/ep  ETA 0.7h
+ep    512/4000  rate=0.66  wait R-GCN=0.4263 iG=0.4519 (+5.67%)  W/T/L=14/6/12  defer=0.000  dec/ep=122  actor=-0.0110 critic=0.5249 ent=1.074 kl=0.0084  0.74s/ep  ETA 0.7h
+[eval ep 512] mean wait R-GCN=0.4739 iGreedy=0.4159 (-13.97%, worst rate -38.9%)
+    0.10:+0.0%  0.20:+7.2%  0.35:-6.1%  0.50:-38.9%  0.65:-21.1%  0.80:-6.0%  1.00:+4.4%  1.20:-27.8%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep    576/4000  rate=0.61  wait R-GCN=0.3608 iG=0.3576 (-0.90%)  W/T/L=20/22/22  defer=0.000  dec/ep=109  actor=-0.0094 critic=0.4513 ent=1.037 kl=0.0051  0.75s/ep  ETA 0.7h
+ep    608/4000  rate=0.58  wait R-GCN=0.4019 iG=0.3893 (-3.26%)  W/T/L=10/5/17  defer=0.000  dec/ep=98  actor=0.0006 critic=0.6569 ent=1.014 kl=0.0043  0.73s/ep  ETA 0.7h
+ep    672/4000  rate=0.69  wait R-GCN=0.4663 iG=0.4862 (+4.08%)  W/T/L=29/15/20  defer=0.000  dec/ep=131  actor=0.0039 critic=0.6587 ent=1.067 kl=0.0066  0.74s/ep  ETA 0.7h
+ep    704/4000  rate=0.66  wait R-GCN=0.4206 iG=0.4247 (+0.95%)  W/T/L=16/7/9  defer=0.000  dec/ep=134  actor=-0.0086 critic=0.5416 ent=1.050 kl=0.0061  0.74s/ep  ETA 0.7h
+ep    768/4000  rate=0.62  wait R-GCN=0.3783 iG=0.3754 (-0.76%)  W/T/L=21/23/20  defer=0.000  dec/ep=113  actor=-0.0104 critic=0.5234 ent=1.023 kl=0.0077  0.73s/ep  ETA 0.7h
+ep    800/4000  rate=0.55  wait R-GCN=0.3312 iG=0.3082 (-7.47%)  W/T/L=7/14/11  defer=0.000  dec/ep=93  actor=-0.0123 critic=0.4062 ent=0.981 kl=0.0094  0.72s/ep  ETA 0.6h
+ep    864/4000  rate=0.66  wait R-GCN=0.4536 iG=0.4407 (-2.93%)  W/T/L=21/20/23  defer=0.000  dec/ep=121  actor=-0.0101 critic=0.3611 ent=0.962 kl=0.0068  0.72s/ep  ETA 0.6h
+ep    928/4000  rate=0.69  wait R-GCN=0.5044 iG=0.4937 (-2.17%)  W/T/L=21/14/29  defer=0.000  dec/ep=132  actor=-0.0079 critic=0.6172 ent=0.981 kl=0.0068  0.72s/ep  ETA 0.6h
+ep    960/4000  rate=0.63  wait R-GCN=0.4317 iG=0.4359 (+0.98%)  W/T/L=10/7/15  defer=0.000  dec/ep=119  actor=-0.0086 critic=0.5200 ent=0.995 kl=0.0071  0.72s/ep  ETA 0.6h
+ep   1024/4000  rate=0.62  wait R-GCN=0.4534 iG=0.4299 (-5.46%)  W/T/L=19/16/29  defer=0.000  dec/ep=110  actor=-0.0125 critic=0.3653 ent=0.968 kl=0.0098  0.72s/ep  ETA 0.6h
+[eval ep 1024] mean wait R-GCN=0.4399 iGreedy=0.4159 (-5.78%, worst rate -31.9%)
+    0.10:+0.0%  0.20:-4.0%  0.35:-2.2%  0.50:-14.2%  0.65:-31.9%  0.80:-8.7%  1.00:+10.5%  1.20:-2.8%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep   1056/4000  rate=0.58  wait R-GCN=0.4205 iG=0.3873 (-8.57%)  W/T/L=11/7/14  defer=0.000  dec/ep=91  actor=-0.0066 critic=0.5485 ent=0.950 kl=0.0077  0.72s/ep  ETA 0.6h
+ep   1120/4000  rate=0.67  wait R-GCN=0.4606 iG=0.4333 (-6.30%)  W/T/L=18/15/31  defer=0.000  dec/ep=122  actor=-0.0112 critic=0.5227 ent=0.946 kl=0.0089  0.72s/ep  ETA 0.6h
+ep   1152/4000  rate=0.69  wait R-GCN=0.4675 iG=0.4266 (-9.58%)  W/T/L=9/5/18  defer=0.000  dec/ep=120  actor=-0.0107 critic=0.3413 ent=0.949 kl=0.0124  0.72s/ep  ETA 0.6h
+ep   1216/4000  rate=0.62  wait R-GCN=0.4108 iG=0.3908 (-5.11%)  W/T/L=16/17/31  defer=0.000  dec/ep=110  actor=-0.0113 critic=0.4274 ent=0.888 kl=0.0104  0.71s/ep  ETA 0.6h
+ep   1280/4000  rate=0.66  wait R-GCN=0.4036 iG=0.3827 (-5.47%)  W/T/L=22/15/27  defer=0.000  dec/ep=119  actor=-0.0087 critic=0.3621 ent=0.905 kl=0.0130  0.71s/ep  ETA 0.5h
+ep   1312/4000  rate=0.72  wait R-GCN=0.5330 iG=0.4699 (-13.43%)  W/T/L=8/8/16  defer=0.000  dec/ep=135  actor=-0.0107 critic=0.4875 ent=0.899 kl=0.0087  0.71s/ep  ETA 0.5h
+ep   1376/4000  rate=0.64  wait R-GCN=0.4264 iG=0.3911 (-9.01%)  W/T/L=23/18/23  defer=0.000  dec/ep=122  actor=0.0091 critic=0.3909 ent=0.898 kl=0.0087  0.71s/ep  ETA 0.5h
+ep   1408/4000  rate=0.61  wait R-GCN=0.4252 iG=0.4187 (-1.54%)  W/T/L=11/12/9  defer=0.000  dec/ep=102  actor=-0.0101 critic=0.4344 ent=0.895 kl=0.0102  0.71s/ep  ETA 0.5h
+ep   1472/4000  rate=0.67  wait R-GCN=0.4293 iG=0.4448 (+3.48%)  W/T/L=26/17/21  defer=0.000  dec/ep=118  actor=-0.0221 critic=0.4335 ent=0.874 kl=0.0108  0.71s/ep  ETA 0.5h
+ep   1504/4000  rate=0.62  wait R-GCN=0.3675 iG=0.3332 (-10.30%)  W/T/L=9/11/12  defer=0.000  dec/ep=107  actor=-0.0125 critic=0.3239 ent=0.850 kl=0.0101  0.71s/ep  ETA 0.5h
+[eval ep 1504] mean wait R-GCN=0.4359 iGreedy=0.4159 (-4.81%, worst rate -15.4%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-5.3%  0.50:-15.4%  0.65:-7.8%  0.80:-5.9%  1.00:+5.6%  1.20:-7.0%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep   1568/4000  rate=0.67  wait R-GCN=0.4988 iG=0.4913 (-1.53%)  W/T/L=31/16/17  defer=0.000  dec/ep=126  actor=-0.0181 critic=0.7746 ent=0.854 kl=0.0120  0.72s/ep  ETA 0.5h
+ep   1600/4000  rate=0.68  wait R-GCN=0.4477 iG=0.4458 (-0.43%)  W/T/L=11/10/11  defer=0.000  dec/ep=122  actor=-0.0082 critic=0.5893 ent=0.835 kl=0.0136  0.71s/ep  ETA 0.5h
+ep   1664/4000  rate=0.57  wait R-GCN=0.3644 iG=0.3560 (-2.37%)  W/T/L=20/26/18  defer=0.000  dec/ep=98  actor=-0.0088 critic=0.3888 ent=0.841 kl=0.0118  0.71s/ep  ETA 0.5h
+ep   1728/4000  rate=0.66  wait R-GCN=0.4881 iG=0.4769 (-2.35%)  W/T/L=25/19/20  defer=0.000  dec/ep=133  actor=-0.0132 critic=0.4434 ent=0.897 kl=0.0117  0.71s/ep  ETA 0.4h
+ep   1760/4000  rate=0.69  wait R-GCN=0.4915 iG=0.4841 (-1.53%)  W/T/L=10/9/13  defer=0.000  dec/ep=116  actor=-0.0110 critic=0.7474 ent=0.831 kl=0.0128  0.71s/ep  ETA 0.4h
+ep   1824/4000  rate=0.62  wait R-GCN=0.3850 iG=0.3798 (-1.36%)  W/T/L=23/16/25  defer=0.000  dec/ep=120  actor=-0.0073 critic=0.5586 ent=0.863 kl=0.0131  0.71s/ep  ETA 0.4h
+ep   1856/4000  rate=0.62  wait R-GCN=0.3762 iG=0.3386 (-11.11%)  W/T/L=4/11/17  defer=0.000  dec/ep=92  actor=-0.0137 critic=0.4441 ent=0.818 kl=0.0096  0.71s/ep  ETA 0.4h
+ep   1920/4000  rate=0.73  wait R-GCN=0.4887 iG=0.4831 (-1.15%)  W/T/L=23/15/26  defer=0.000  dec/ep=140  actor=-0.0156 critic=1.1805 ent=0.847 kl=0.0115  0.71s/ep  ETA 0.4h
+ep   1952/4000  rate=0.59  wait R-GCN=0.3660 iG=0.3644 (-0.43%)  W/T/L=12/8/12  defer=0.000  dec/ep=97  actor=0.0146 critic=0.3889 ent=0.818 kl=0.0201  0.71s/ep  ETA 0.4h
+ep   2016/4000  rate=0.59  wait R-GCN=0.4275 iG=0.4041 (-5.80%)  W/T/L=18/23/23  defer=0.000  dec/ep=104  actor=-0.0105 critic=0.6669 ent=0.810 kl=0.0107  0.70s/ep  ETA 0.4h
+[eval ep 2016] mean wait R-GCN=0.4285 iGreedy=0.4159 (-3.03%, worst rate -14.5%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-4.3%  0.50:-2.5%  0.65:-2.7%  0.80:+7.8%  1.00:+4.2%  1.20:-14.5%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep   2080/4000  rate=0.64  wait R-GCN=0.4264 iG=0.3881 (-9.87%)  W/T/L=17/16/31  defer=0.000  dec/ep=110  actor=-0.0117 critic=0.6080 ent=0.808 kl=0.0079  0.71s/ep  ETA 0.4h
+ep   2112/4000  rate=0.65  wait R-GCN=0.4646 iG=0.4090 (-13.58%)  W/T/L=6/9/17  defer=0.000  dec/ep=115  actor=-0.0125 critic=0.5430 ent=0.818 kl=0.0131  0.71s/ep  ETA 0.4h
+ep   2176/4000  rate=0.71  wait R-GCN=0.4498 iG=0.4325 (-4.01%)  W/T/L=26/18/20  defer=0.000  dec/ep=129  actor=-0.0105 critic=0.3819 ent=0.855 kl=0.0125  0.71s/ep  ETA 0.4h
+ep   2208/4000  rate=0.67  wait R-GCN=0.4280 iG=0.4005 (-6.87%)  W/T/L=8/7/17  defer=0.000  dec/ep=132  actor=-0.0129 critic=0.3782 ent=0.847 kl=0.0105  0.71s/ep  ETA 0.4h
+ep   2272/4000  rate=0.64  wait R-GCN=0.4048 iG=0.3982 (-1.66%)  W/T/L=23/16/25  defer=0.000  dec/ep=112  actor=-0.0123 critic=0.3014 ent=0.833 kl=0.0117  0.71s/ep  ETA 0.3h
+ep   2304/4000  rate=0.65  wait R-GCN=0.4746 iG=0.4342 (-9.31%)  W/T/L=13/6/13  defer=0.000  dec/ep=111  actor=-0.0136 critic=0.4196 ent=0.843 kl=0.0111  0.70s/ep  ETA 0.3h
+ep   2368/4000  rate=0.67  wait R-GCN=0.4727 iG=0.4506 (-4.91%)  W/T/L=13/18/33  defer=0.000  dec/ep=125  actor=-0.0074 critic=0.4491 ent=0.819 kl=0.0145  0.70s/ep  ETA 0.3h
+ep   2400/4000  rate=0.63  wait R-GCN=0.3872 iG=0.4119 (+6.00%)  W/T/L=9/13/10  defer=0.000  dec/ep=111  actor=-0.0102 critic=0.5157 ent=0.841 kl=0.0108  0.70s/ep  ETA 0.3h
+ep   2464/4000  rate=0.72  wait R-GCN=0.5679 iG=0.6062 (+6.33%)  W/T/L=30/12/22  defer=0.000  dec/ep=141  actor=-0.0071 critic=0.6213 ent=0.805 kl=0.0122  0.71s/ep  ETA 0.3h
+ep   2528/4000  rate=0.64  wait R-GCN=0.4759 iG=0.4490 (-6.01%)  W/T/L=20/19/25  defer=0.000  dec/ep=113  actor=-0.0103 critic=0.5174 ent=0.780 kl=0.0131  0.71s/ep  ETA 0.3h
+[eval ep 2528] mean wait R-GCN=0.4181 iGreedy=0.4159 (-0.54%, worst rate -10.1%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-4.3%  0.50:+9.2%  0.65:-3.8%  0.80:+4.2%  1.00:+10.3%  1.20:-10.1%
+    new best -> runs/ablation/nodefer_s8/checkpoint_best.pt
+ep   2560/4000  rate=0.71  wait R-GCN=0.4335 iG=0.4417 (+1.86%)  W/T/L=10/8/14  defer=0.000  dec/ep=144  actor=-0.0045 critic=0.4385 ent=0.810 kl=0.0152  0.71s/ep  ETA 0.3h
+ep   2624/4000  rate=0.66  wait R-GCN=0.4852 iG=0.4325 (-12.17%)  W/T/L=14/15/35  defer=0.000  dec/ep=120  actor=-0.0036 critic=0.5840 ent=0.755 kl=0.0167  0.71s/ep  ETA 0.3h
+ep   2656/4000  rate=0.62  wait R-GCN=0.4041 iG=0.3904 (-3.50%)  W/T/L=8/11/13  defer=0.000  dec/ep=126  actor=-0.0082 critic=0.3036 ent=0.797 kl=0.0130  0.71s/ep  ETA 0.3h
+ep   2720/4000  rate=0.66  wait R-GCN=0.4503 iG=0.4241 (-6.18%)  W/T/L=21/16/27  defer=0.000  dec/ep=116  actor=-0.0091 critic=0.5938 ent=0.703 kl=0.0098  0.71s/ep  ETA 0.3h
+ep   2752/4000  rate=0.57  wait R-GCN=0.4311 iG=0.3946 (-9.23%)  W/T/L=6/13/13  defer=0.000  dec/ep=108  actor=-0.0121 critic=0.3151 ent=0.748 kl=0.0124  0.71s/ep  ETA 0.2h
+ep   2816/4000  rate=0.58  wait R-GCN=0.3934 iG=0.3700 (-6.32%)  W/T/L=18/23/23  defer=0.000  dec/ep=112  actor=-0.0090 critic=0.4498 ent=0.772 kl=0.0156  0.71s/ep  ETA 0.2h
+ep   2880/4000  rate=0.67  wait R-GCN=0.3978 iG=0.3432 (-15.91%)  W/T/L=16/15/33  defer=0.000  dec/ep=122  actor=-0.0133 critic=0.4356 ent=0.789 kl=0.0156  0.71s/ep  ETA 0.2h
+ep   2912/4000  rate=0.68  wait R-GCN=0.5004 iG=0.4991 (-0.26%)  W/T/L=9/13/10  defer=0.000  dec/ep=120  actor=-0.0095 critic=0.5674 ent=0.773 kl=0.0080  0.71s/ep  ETA 0.2h
+ep   2976/4000  rate=0.60  wait R-GCN=0.4241 iG=0.3987 (-6.38%)  W/T/L=19/13/32  defer=0.000  dec/ep=114  actor=-0.0136 critic=0.3620 ent=0.790 kl=0.0156  0.71s/ep  ETA 0.2h
+ep   3008/4000  rate=0.71  wait R-GCN=0.3858 iG=0.4447 (+13.26%)  W/T/L=14/9/9  defer=0.000  dec/ep=142  actor=-0.0039 critic=0.4272 ent=0.788 kl=0.0149  0.71s/ep  ETA 0.2h
+[eval ep 3008] mean wait R-GCN=0.4277 iGreedy=0.4159 (-2.86%, worst rate -9.8%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-5.3%  0.50:+0.8%  0.65:-4.8%  0.80:+5.3%  1.00:+1.4%  1.20:-9.8%
+ep   3072/4000  rate=0.70  wait R-GCN=0.5341 iG=0.5621 (+4.97%)  W/T/L=29/14/21  defer=0.000  dec/ep=130  actor=-0.0076 critic=0.5115 ent=0.765 kl=0.0107  0.71s/ep  ETA 0.2h
+ep   3104/4000  rate=0.62  wait R-GCN=0.3582 iG=0.3784 (+5.35%)  W/T/L=13/10/9  defer=0.000  dec/ep=107  actor=-0.0002 critic=0.6838 ent=0.744 kl=0.0171  0.71s/ep  ETA 0.2h
+ep   3168/4000  rate=0.71  wait R-GCN=0.5433 iG=0.5510 (+1.40%)  W/T/L=27/14/23  defer=0.000  dec/ep=135  actor=-0.0116 critic=0.4842 ent=0.791 kl=0.0140  0.71s/ep  ETA 0.2h
+ep   3200/4000  rate=0.70  wait R-GCN=0.4649 iG=0.4432 (-4.89%)  W/T/L=10/12/10  defer=0.000  dec/ep=143  actor=-0.0104 critic=0.4213 ent=0.775 kl=0.0131  0.71s/ep  ETA 0.2h
+ep   3264/4000  rate=0.73  wait R-GCN=0.4864 iG=0.4539 (-7.15%)  W/T/L=23/10/31  defer=0.000  dec/ep=148  actor=-0.0056 critic=0.3907 ent=0.737 kl=0.0139  0.72s/ep  ETA 0.1h
+ep   3328/4000  rate=0.67  wait R-GCN=0.4302 iG=0.4101 (-4.91%)  W/T/L=18/17/29  defer=0.000  dec/ep=126  actor=-0.0107 critic=0.5240 ent=0.752 kl=0.0179  0.72s/ep  ETA 0.1h
+ep   3360/4000  rate=0.74  wait R-GCN=0.5057 iG=0.4890 (-3.40%)  W/T/L=9/12/11  defer=0.000  dec/ep=158  actor=-0.0053 critic=0.3391 ent=0.832 kl=0.0117  0.72s/ep  ETA 0.1h
+ep   3424/4000  rate=0.70  wait R-GCN=0.4571 iG=0.4657 (+1.85%)  W/T/L=28/17/19  defer=0.000  dec/ep=131  actor=-0.0077 critic=0.3664 ent=0.789 kl=0.0142  0.72s/ep  ETA 0.1h
+ep   3456/4000  rate=0.64  wait R-GCN=0.5295 iG=0.5064 (-4.56%)  W/T/L=10/13/9  defer=0.000  dec/ep=113  actor=-0.0057 critic=0.7260 ent=0.821 kl=0.0104  0.72s/ep  ETA 0.1h
+ep   3520/4000  rate=0.62  wait R-GCN=0.4214 iG=0.3733 (-12.89%)  W/T/L=17/20/27  defer=0.000  dec/ep=114  actor=-0.0036 critic=0.5082 ent=0.833 kl=0.0136  0.72s/ep  ETA 0.1h
+[eval ep 3520] mean wait R-GCN=0.4570 iGreedy=0.4159 (-9.88%, worst rate -17.9%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-6.5%  0.50:-12.7%  0.65:-1.0%  0.80:-16.4%  1.00:-0.3%  1.20:-17.9%
+ep   3552/4000  rate=0.63  wait R-GCN=0.4463 iG=0.3952 (-12.91%)  W/T/L=13/5/14  defer=0.000  dec/ep=114  actor=-0.0120 critic=0.4146 ent=0.761 kl=0.0124  0.72s/ep  ETA 0.1h
+ep   3616/4000  rate=0.62  wait R-GCN=0.4756 iG=0.4835 (+1.64%)  W/T/L=18/21/25  defer=0.000  dec/ep=102  actor=-0.0041 critic=1.1135 ent=0.793 kl=0.0084  0.72s/ep  ETA 0.1h
+ep   3680/4000  rate=0.60  wait R-GCN=0.4079 iG=0.3661 (-11.42%)  W/T/L=13/21/30  defer=0.000  dec/ep=105  actor=-0.0318 critic=0.4939 ent=0.723 kl=0.0075  0.71s/ep  ETA 0.1h
+ep   3712/4000  rate=0.66  wait R-GCN=0.5373 iG=0.4854 (-10.70%)  W/T/L=10/7/15  defer=0.000  dec/ep=120  actor=-0.0093 critic=0.5674 ent=0.772 kl=0.0052  0.71s/ep  ETA 0.1h
+ep   3776/4000  rate=0.62  wait R-GCN=0.3774 iG=0.3656 (-3.23%)  W/T/L=20/19/25  defer=0.000  dec/ep=111  actor=-0.0102 critic=0.4190 ent=0.775 kl=0.0092  0.71s/ep  ETA 0.0h
+ep   3808/4000  rate=0.57  wait R-GCN=0.3458 iG=0.3066 (-12.79%)  W/T/L=5/12/15  defer=0.000  dec/ep=95  actor=-0.0117 critic=0.5799 ent=0.725 kl=0.0135  0.71s/ep  ETA 0.0h
+ep   3872/4000  rate=0.63  wait R-GCN=0.4871 iG=0.4863 (-0.16%)  W/T/L=22/14/28  defer=0.000  dec/ep=119  actor=-0.0078 critic=0.5129 ent=0.732 kl=0.0130  0.71s/ep  ETA 0.0h
+ep   3904/4000  rate=0.67  wait R-GCN=0.4802 iG=0.4517 (-6.33%)  W/T/L=9/7/16  defer=0.000  dec/ep=130  actor=-0.0082 critic=0.3533 ent=0.778 kl=0.0168  0.71s/ep  ETA 0.0h
+ep   3968/4000  rate=0.66  wait R-GCN=0.4551 iG=0.4453 (-2.20%)  W/T/L=26/17/21  defer=0.000  dec/ep=118  actor=-0.0121 critic=0.5286 ent=0.808 kl=0.0086  0.71s/ep  ETA 0.0h
+ep   4000/4000  rate=0.70  wait R-GCN=0.5112 iG=0.4603 (-11.04%)  W/T/L=11/6/15  defer=0.000  dec/ep=125  actor=-0.0018 critic=0.7136 ent=0.759 kl=0.0118  0.71s/ep  ETA 0.0h
+[eval ep 4000] mean wait R-GCN=0.4247 iGreedy=0.4159 (-2.12%, worst rate -8.9%)
+    0.10:+0.0%  0.20:-8.2%  0.35:-6.5%  0.50:+1.9%  0.65:+1.7%  0.80:-0.4%  1.00:+4.9%  1.20:-8.9%
+Done in 0.79h. Best eval mean wait 0.4181 -> runs/ablation/nodefer_s8/checkpoint_best.pt
