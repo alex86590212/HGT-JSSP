@@ -82,7 +82,7 @@ The default protocol uses 8 arrival rates (0.10 to 1.20), seeds 0 to 2, and 15 s
 | Flag | Meaning |
 |---|---|
 | `--rates`, `--seeds`, `--n-scenarios` | Evaluation grid |
-| `--baselines` | Any of `igreedy edf backpressure lifo edf_prio_inherit edf_commitment_exchange` (iGreedy is always included) |
+| `--baselines` | Any of `igreedy backpressure lifo` (iGreedy is always included) |
 | `--wstar` | Also solve the restricted-information optimum `W*` with CP-SAT (slow) |
 | `--wstar-time-limit` | Seconds per CP-SAT solve (default 5) |
 | `--workers` | Evaluation processes (default 4) |

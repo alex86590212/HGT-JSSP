@@ -24,7 +24,7 @@ from admission_rgcn.train import TIE_EPS, _episode_kwargs
 from dynamic_scheduler.evaluation.gapfree_admission_solver import restricted_gapfree_optimal_episode
 from evaluation.eval_gapfree_admission import METHODS
 
-DEFAULT_BASELINES = ["igreedy", "edf", "backpressure", "lifo", "edf_prio_inherit", "edf_commitment_exchange"]
+DEFAULT_BASELINES = ["igreedy", "backpressure", "lifo"]
 
 
 def mean(xs):

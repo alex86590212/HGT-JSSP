@@ -48,7 +48,7 @@ The default protocol uses 8 arrival rates (0.10 to 1.20), seeds 0 to 2, and 15 s
 | :------- | :--- | :---------- |
 | `checkpoint` | str | trained checkpoint to evaluate |
 | `rates`, `seeds`, `n-scenarios` | list, list, int | evaluation grid |
-| `baselines` | list | any of `igreedy edf backpressure lifo edf_prio_inherit edf_commitment_exchange` (iGreedy is always included) |
+| `baselines` | list | any of `igreedy backpressure lifo` (iGreedy is always included) |
 | `wstar` | flag | also solve the restricted-information optimum `W*` with CP-SAT (slow) |
 | `wstar-time-limit` | float | seconds per CP-SAT solve (default: 5) |
 | `workers` | int | number of evaluation processes (default: 4) |
@@ -56,7 +56,7 @@ The default protocol uses 8 arrival rates (0.10 to 1.20), seeds 0 to 2, and 15 s
 
 ## Baseline and Optimal Solutions
 
-The baselines (iGreedy, EDF, Backpressure, LIFO and two EDF variants) run in the same environment as the learned policy. To evaluate the baselines alone, without a trained model,
+The baselines (iGreedy, Backpressure and LIFO) run in the same environment as the learned policy. To evaluate the baselines alone, without a trained model,
 ```
 PYTHONPATH=. python3 evaluation/eval_gapfree_admission.py \
   --output-csv gapfree_admission_results.csv
