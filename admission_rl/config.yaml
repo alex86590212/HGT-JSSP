@@ -1,0 +1,45 @@
+seed: 0
+
+env:
+  episode_duration: 60.0
+  detection_window: 10.0
+  commit_window: 2.5
+  allow_defer: true
+  defer_step: 0.5
+  max_hold: 2.0             # max seconds of consecutive defers before an admission is forced
+
+model:
+  hidden_dim: 128
+  num_heads: 4
+  num_layers: 3
+  defer_init_bias: -2.0
+
+train:
+  num_episodes: 15000
+  rate_min: 0.1
+  rate_max: 1.2
+  rollout_episodes: 32      # episodes per PPO update
+  num_workers: 4            # rollout processes; leaves cores free for background use
+  torch_threads: 2          # main-process threads for the PPO update
+  reward_scale: 10.0
+  igreedy_baseline: true    # return = scale * (W_igreedy - W_policy)
+  log_interval: 50
+  eval_interval: 500
+  checkpoint_interval: 500
+
+ppo:
+  lr: 3.0e-4
+  gamma: 1.0
+  gae_lambda: 0.95
+  clip_epsilon: 0.2
+  epochs: 4
+  mini_batch_size: 256
+  value_loss_coef: 0.5
+  entropy_coef: 0.01
+  entropy_coef_final: 0.001
+  max_grad_norm: 0.5
+
+eval:
+  rates: [0.10, 0.20, 0.35, 0.50, 0.65, 0.80, 1.00, 1.20]
+  seeds: [0]
+  n_scenarios: 5

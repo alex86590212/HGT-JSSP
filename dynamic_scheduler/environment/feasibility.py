@@ -86,10 +86,39 @@ class _FeasibilityContext:
         }
         # Next tentative op in each zone queue (queue order = priority order;
         # queues contain only TENTATIVE ops — locked ops are static windows).
-        self.queue_next: Dict[int, "DynamicOperation"] = {}
+        #
+        # Blocking (Huang et al. Section III-A): a precedes b in the queue,
+        # but a's zone doesn't actually release for b until a's OWN route
+        # successor starts (a retains its zone until then) — so the true
+        # must-precede source is a's route successor, not a itself. Falls
+        # back to a when a has no route successor (last op on its route) or
+        # that successor isn't planned yet (nothing to redirect through). A
+        # single op can be the redirect target for one queue edge AND a's
+        # regular queue source for another, so this is list-valued.
+        self.queue_next: Dict[int, List["DynamicOperation"]] = {}
+
+        def add_redirect(a: "DynamicOperation", b: "DynamicOperation") -> None:
+            route_succ_a = self.pos_index.get((a.vehicle_id, a.route_position + 1))
+            source = (
+                route_succ_a
+                if route_succ_a is not None and route_succ_a.state != OpState.UNSCHEDULED
+                else a
+            )
+            self.queue_next.setdefault(id(source), []).append(b)
+
         for queue in env._zone_queue.values():
             for a, b in zip(queue, queue[1:]):
-                self.queue_next[id(a)] = b
+                add_redirect(a, b)
+            # A LOCKED operation's own zone needs the same redirect into
+            # whichever TENTATIVE op is the head of that zone's queue: queues
+            # only ever lose members from the front via locking, so the head
+            # is exactly "whatever used to be queued right after the
+            # now-locked op" — mirrors _recompute_times's identical edge.
+            if queue:
+                head = queue[0]
+                for o in env.operations:
+                    if o.state == OpState.LOCKED and o.zone_id == head.zone_id:
+                        add_redirect(o, head)
         self.unscheduled_by_zone: Dict[int, List["DynamicOperation"]] = {}
         for o in env.operations:
             if o.state == OpState.UNSCHEDULED:
@@ -125,7 +154,7 @@ def _check_feasible(
 
     # 5. No deadlock: appending op to the back of its zone queue must not
     #    create a precedence cycle.
-    if _would_cause_deadlock(op, ctx):
+    if _would_cause_deadlock(op, env, ctx):
         return False
 
     return True
@@ -158,7 +187,9 @@ def _same_lane_leaders_planned(
     return True
 
 
-def _would_cause_deadlock(x: "DynamicOperation", ctx: _FeasibilityContext) -> bool:
+def _would_cause_deadlock(
+    x: "DynamicOperation", env: "DynamicIntersectionEnv", ctx: _FeasibilityContext
+) -> bool:
     """DFS from the hypothetically-placed candidate X for a cycle through X.
 
     Neighbors follow the hard 'must precede' edges described in the module
@@ -167,21 +198,72 @@ def _would_cause_deadlock(x: "DynamicOperation", ctx: _FeasibilityContext) -> bo
     WHITE, GRAY, BLACK = 0, 1, 2
     color: Dict[int, int] = {}
 
+    # Blocking redirect, X's side, case 3 — X's own FUTURE zone-queue
+    # predecessor: X lands at the back of its zone's queue, so whoever is
+    # CURRENTLY last there (excluding X itself, for a replan already sitting
+    # somewhere in that queue) becomes X's immediate predecessor the moment
+    # this placement commits. That op's true release (its own route
+    # successor, if TENTATIVE) must precede X — ctx has no edge for this
+    # yet, since it was built from the queue as it stood BEFORE X's
+    # insertion. This is an edge INTO x (tail_source -> x), so it belongs on
+    # tail_source's outgoing neighbors, not x's — computed once here since
+    # it never changes across the DFS.
+    tail_source: Optional["DynamicOperation"] = None
+    others = [m for m in env._zone_queue.get(x.zone_id, []) if m is not x]
+    if others:
+        tail = others[-1]
+        route_succ_tail = ctx.pos_index.get((tail.vehicle_id, tail.route_position + 1))
+        candidate_source = (
+            route_succ_tail
+            if route_succ_tail is not None and route_succ_tail.state != OpState.UNSCHEDULED
+            else tail
+        )
+        if candidate_source is not x:
+            tail_source = candidate_source
+
     def neighbors(o: "DynamicOperation") -> Iterable["DynamicOperation"]:
         route_succ = ctx.pos_index.get((o.vehicle_id, o.route_position + 1))
         if route_succ is not None:
             yield route_succ
+        if tail_source is not None and o is tail_source:
+            yield x
         if o is x:
             # X sits at the back of its queue: it precedes only the ops that
             # will be queued after it, i.e. the still-unscheduled ones.
             for u in ctx.unscheduled_by_zone.get(o.zone_id, []):
                 if u is not x:
                     yield u
+            # Blocking redirect, X's side, case 1 — X is a REPLAN (already
+            # TENTATIVE): ctx was built from the CURRENT (pre-replan) state,
+            # so if X is already the correctly-redirected release source for
+            # some OTHER zone's queue successor (via X's own route
+            # predecessor's zone membership, resolved when ctx was built),
+            # that edge is a real, currently-binding obligation X carries
+            # into its new back-of-queue slot — it must still be yielded
+            # here, since the generic `o.state != UNSCHEDULED` branch below
+            # is never reached for o is x (this branch returns).
+            for existing_target in ctx.queue_next.get(id(o), ()):
+                if existing_target is not x:
+                    yield existing_target
+            # Blocking redirect, X's side, case 2 — X is a FRESH placement
+            # (was UNSCHEDULED): ctx.queue_next was built with X still
+            # UNSCHEDULED, so any existing zone-queue edge sourced from X's
+            # own route predecessor was left un-redirected (pointing from
+            # the predecessor itself, per the same fallback rule used at
+            # context-build time). Placing X changes that predecessor's true
+            # release to X's own start — so X inherits that edge here, at the
+            # one moment its route predecessor's successor identity actually
+            # changes from "unscheduled" to "X".
+            pred = ctx.pos_index.get((o.vehicle_id, o.route_position - 1))
+            if pred is not None:
+                for b_of_pred in ctx.queue_next.get(id(pred), ()):
+                    if b_of_pred is not x:
+                        yield b_of_pred
             return
         if o.state != OpState.UNSCHEDULED:
-            nxt = ctx.queue_next.get(id(o))
-            if nxt is not None and nxt is not x:
-                yield nxt
+            for nxt in ctx.queue_next.get(id(o), ()):
+                if nxt is not x:
+                    yield nxt
             if o.zone_id == x.zone_id:
                 yield x
             for u in ctx.unscheduled_by_zone.get(o.zone_id, []):

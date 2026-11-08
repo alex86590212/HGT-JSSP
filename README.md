@@ -15,14 +15,21 @@ this project:
 
 The repository currently contains two related implementations:
 
-1. `intersection_scheduler/`: the main learning-based research code. It creates
+1. `intersection_scheduler/`: learning-based research code. It creates
    synthetic intersection scenarios, converts them into heterogeneous graphs,
    trains a Heterogeneous Graph Transformer (HGT) policy with PPO, and evaluates
    it against an iGreedy baseline.
-2. `src/` plus `sumo/`: a SUMO/TraCI traffic simulation pipeline. It observes
-   live vehicles in SUMO, builds a JSSP-style graph, schedules vehicles with an
-   FCFS reservation scheduler, controls SUMO stop/release behavior, and writes
-   logs and safety metrics.
+2. `admission_rgcn/`: the R-GCN admission policy (the focus of the current
+   paper, see `paper_rgcn/`). Instead of choosing individual operations, the
+   controller reserves every conflict zone along a vehicle's whole route before
+   entry (gap-free reservations). A Relational GCN policy trained with PPO
+   decides which pending vehicle to admit, or whether to defer, and is compared
+   with rule-based admission baselines (iGreedy, EDF, Backpressure, LIFO) and a
+   CP-SAT reference `W*`. See [admission_rgcn/README.md](admission_rgcn/README.md)
+   for training, evaluation, and ablation commands.
+
+The gap-free admission environment and the baselines shared by the HGT
+(`admission_rl/`) and R-GCN policies live in `dynamic_scheduler/`.
 
 If you are new to this project, start with the mental model below, then read the
 folder guide.
@@ -30,6 +37,7 @@ folder guide.
 ## Contents
 
 - [Quick Start](#quick-start)
+- [R-GCN Admission Policy](#r-gcn-admission-policy)
 - [Project Mental Model](#project-mental-model)
 - [Main Workflows](#main-workflows)
 - [Folder-By-Folder Guide](#folder-by-folder-guide)
@@ -91,26 +99,22 @@ Run the HGT/iGreedy replay animation:
 python simulation/run_simulation.py --checkpoint results_v2/checkpoint_best.pt --mode both --difficulty hard
 ```
 
-Run the modular SUMO/FCFS batch pipeline:
+## R-GCN Admission Policy
 
-```powershell
-python -m src.main --mode headless --scheduler fcfs
+Train, evaluate against the baselines, and run the deferral ablation (run from
+the repository root; details in [admission_rgcn/README.md](admission_rgcn/README.md)):
+
+```bash
+PYTHONPATH=. python -m admission_rgcn.train --output runs/admission_rgcn
+PYTHONPATH=. python -m admission_rgcn.evaluate \
+    --checkpoint runs/admission_rgcn/checkpoint_best.pt \
+    --output-csv runs/admission_rgcn/eval_final.csv
+PYTHONPATH=. python -m admission_rgcn.run_ablation --out runs/ablation --episodes 4000
+PYTHONPATH=. python -m admission_rgcn.summarize_ablation --dir runs/ablation
 ```
 
-Run the deterministic controller test scenario without SUMO:
-
-```powershell
-python -m src.main --mode test-scenarios --scheduler fcfs
-```
-
-Run the live SUMO visual debugger:
-
-```powershell
-python -m src.main --mode debug --scheduler fcfs
-```
-
-The SUMO commands require SUMO tools such as `sumo`, `sumo-gui`, and
-`netconvert` to be installed and available on your `PATH`.
+Paper figures and tables are produced from `paper_rgcn/`
+(`make_scaling_plot.py`, `build_tables.py`).
 
 ## Project Mental Model
 
@@ -198,28 +202,15 @@ Entry point:
 python simulation/run_simulation.py --mode both
 ```
 
-This does not run SUMO. It uses the synthetic `intersection_scheduler`
+It uses the synthetic `intersection_scheduler`
 environment, solves a scenario with HGT and/or iGreedy, then animates the solved
 schedule with matplotlib.
-
-### 5. Run SUMO With FCFS Control
-
-Entry point:
-
-```powershell
-python -m src.main --mode headless --scheduler fcfs
-```
-
-This path uses SUMO and TraCI. It observes approaching vehicles, builds a
-NetworkX JSSP graph, schedules reservations with FCFS, sends stop/release
-commands to SUMO, validates safety, and writes metrics.
 
 ## Folder-By-Folder Guide
 
 ### `intersection_scheduler/`
 
-This is the main HGT/PPO research package. It is self-contained and does not
-need SUMO for training or evaluation.
+This is the main HGT/PPO research package. It is self-contained.
 
 #### `intersection_scheduler/environment/`
 
@@ -298,126 +289,18 @@ This folder contains pytest tests for the learning package.
 - `test_model.py` checks HGT forward passes, policy masking, scalar value
   output, and PPO gradient sanity.
 
-### `src/`
-
-This is the modular SUMO/TraCI FCFS controller pipeline. It is older or
-auxiliary compared with `intersection_scheduler/`, but it is important because
-it connects the scheduling idea to live traffic simulation.
-
-#### `src/main.py`
-
-Canonical entry point for the SUMO/FCFS experiment pipeline.
-
-It supports:
-
-- `--mode headless`: run batch SUMO experiments without GUI.
-- `--mode debug`: run SUMO GUI plus live JSSP graph visualization.
-- `--mode test-scenarios`: run deterministic graph/scheduler tests without SUMO.
-- `--scheduler fcfs`: use the implemented FCFS scheduler.
-- `--scheduler greedy`: currently a placeholder and intentionally not
-  implemented.
-
-#### `src/common/`
-
-Shared model aliases and small data classes.
-
-- `models.py` re-exports key TraCI runner records and defines shared
-  `ControlResult`, `SafetyViolation`, and `EpisodeMetrics` structures.
-
-#### `src/config/`
-
-Configuration loading helpers.
-
-- `load_config.py` loads JSON files from `configs/`.
-- It also resolves paths relative to the project root.
-
-#### `src/constraints/`
-
-Scheduler-independent feasibility logic for the SUMO controller.
-
-- `feasibility.py` defines `FeasibilityChecker`.
-- It checks Type-1 route order, Type-2 same-lane order, Type-3 conflict-zone
-  occupancy, arrival time, blocking behavior, and deadlock risk.
-- It defines a mutable `ScheduleState` used while building reservations.
-
-#### `src/evaluation/`
-
-Logging, metrics, and safety validation.
-
-- `metrics.py` computes throughput, delay, waiting time, stops, runtime, safety
-  violations, and collision metrics.
-- `episode_logger.py` writes per-episode CSV/JSON artifacts.
-- `safety_validator.py` records conflict-zone occupancy intervals and reports
-  unsafe overlaps.
-
-#### `src/graph/`
-
-JSSP graph construction and validation.
-
-- `conflict_zones.py` defines four named conflict zones and route-to-zone
-  mappings for the single intersection.
-- `jssp_graph_builder.py` re-exports live graph-building helpers from the TraCI
-  runner.
-- `graph_validator.py` checks graph node fields, edge fields, and route-zone
-  consistency.
-- `static_jssp_example.py` builds a deterministic example graph without SUMO and
-  can export JSON/PNG artifacts.
-
-#### `src/schedulers/`
-
-Scheduler interfaces and implementations.
-
-- `base.py` defines the scheduler interface.
-- `fcfs_scheduler.py` wraps the conflict-zone-aware FCFS reservation scheduler.
-- `greedy_scheduler.py` is a placeholder and raises `NotImplementedError`.
-
-#### `src/sumo_interface/`
-
-SUMO and TraCI integration.
-
-- `traci_runner.py` is the largest file in this path. It starts SUMO, observes
-  vehicles, builds JSSP graphs, schedules reservations, applies stop/release
-  commands, logs graph steps, and returns run summaries.
-- `vehicle_observer.py` wraps vehicle observation helpers.
-- `vehicle_controller.py` wraps vehicle stop/release helpers.
-
-#### `src/visualization/`
-
-Live graph debugging for SUMO runs.
-
-- `graph_debugger.py` opens a matplotlib view beside SUMO GUI.
-- It shows the current JSSP timing-conflict graph, FCFS order, reservations,
-  stopped vehicles, released vehicles, and edge counts.
-
 ### `configs/`
 
-Configuration files used by both major paths.
+Configuration files.
 
 - `default.yaml` configures PPO, the HGT model, training episode count, logging
   interval, evaluation interval, and checkpoint interval.
-- `experiment_config.json` configures the SUMO experiment mode, scheduler,
-  scenario, seeds, simulation horizon, output directory, and logging behavior.
-- `intersection_config.json` maps scenario names to SUMO config files, defines
-  incoming lanes/edges, control distances, scheduling clearances, conflict-zone
-  geometry, and route-to-conflict-zone sequences.
 - `vehicle_types.json` defines nominal per-zone processing times for passenger,
   delivery, truck, and bus vehicle types.
 
 ### `scripts/`
 
 Helper scripts and compatibility wrappers.
-
-- `generate_single_intersection.py` generates the SUMO single-intersection
-  network, route files, baseline demand, hard demand, detectors, `.sumocfg`
-  files, and the local SUMO README. It can also call `netconvert` if SUMO is
-  installed.
-- `build_intersection_jssp_graph.py` is a compatibility wrapper around
-  `src.graph.static_jssp_example`.
-- `run_traci_fcfs_controller.py` is a compatibility wrapper around the modular
-  TraCI runner. New runs should usually use `python -m src.main`.
-- `run_visual_debug_controller.py` is a compatibility wrapper around the live
-  graph debugger. New debug runs should usually use `python -m src.main
-  --mode debug`.
 
 ### `simulation/`
 
@@ -428,24 +311,6 @@ Synthetic schedule replay and visualization.
 - It then animates the solved schedule with a 3x3 intersection map, optional
   JSSP graph panel, and debug statistics.
 - This is useful for understanding how the learned policy and iGreedy differ
-  without starting SUMO.
-
-### `sumo/single_intersection/`
-
-Generated SUMO files for a single unsignalized four-way intersection.
-
-- `single_intersection.nod.xml`: node definitions.
-- `single_intersection.edg.xml`: edge definitions.
-- `single_intersection.con.xml`: allowed turning connections.
-- `single_intersection.net.xml`: compiled SUMO network.
-- `routes.rou.xml`: vehicle types and route definitions.
-- `demand.rou.xml`: baseline deterministic demand.
-- `hard_demand.rou.xml`: bursty stress-test demand.
-- `additional.add.xml`: optional inbound lane detectors.
-- `single_intersection.sumocfg`: baseline runnable SUMO configuration.
-- `single_intersection_hard.sumocfg`: hard SUMO scenario configuration.
-- `README.md`: local explanation of the SUMO network and how to regenerate it.
-- `detectors.out.xml`: detector output generated by SUMO.
 
 ### `results/` And `results_v2/`
 
@@ -476,26 +341,6 @@ may have been intended for a separate or vendored HGT implementation.
 
 ## Technology And Methodology
 
-### SUMO
-
-SUMO stands for Simulation of Urban Mobility. It is an open-source microscopic
-traffic simulator. "Microscopic" means it simulates individual vehicles rather
-than only aggregate traffic flow.
-
-In this repo, SUMO is used by the `src/` pipeline to create a real traffic
-simulation around a single intersection.
-
-### TraCI
-
-TraCI means Traffic Control Interface. It lets Python control a running SUMO
-simulation. The code uses TraCI to:
-
-- read vehicle positions, lanes, speeds, and route IDs
-- estimate vehicle arrival times
-- stop vehicles before the intersection
-- release selected vehicles
-- detect collisions and simulation completion
-
 ### JSSP
 
 JSSP means Job Shop Scheduling Problem. A classical JSSP has jobs, machines,
@@ -513,7 +358,6 @@ A conflict zone is an area inside the intersection where routes may collide or
 overlap. If two vehicles need the same conflict zone, the scheduler must choose
 an order.
 
-The SUMO controller path uses four zones named `z1`, `z2`, `z3`, and `z4`.
 The synthetic HGT path uses a 3x3 grid of numbered zones.
 
 ### Heterogeneous Graph
@@ -581,13 +425,6 @@ At each step, it chooses the feasible operation from the earliest-arriving
 vehicle, with tie-breaks by route position and vehicle ID.
 
 It is simpler than HGT and provides a comparison point for learning.
-
-### FCFS
-
-FCFS means First Come, First Served. The SUMO controller path uses FCFS as a
-reservation scheduler. Vehicles are prioritized by estimated arrival time, but
-the schedule reserves individual conflict zones rather than locking the whole
-intersection.
 
 ### TensorBoard
 
@@ -681,26 +518,16 @@ Some scripts import additional tools that are not currently listed in
 `requirements.txt`:
 
 - `matplotlib`: used by `plot_training.py`, `simulation/run_simulation.py`, and
-  visual graph debugging.
-- `networkx`: used for NetworkX JSSP graphs in the SUMO/debug path.
-- `traci`: used to control SUMO from Python.
-- SUMO command-line programs: `sumo`, `sumo-gui`, and `netconvert`.
-
-If the SUMO or visualization commands fail with missing imports or missing
-executables, install those optional tools in the active environment and make
-sure SUMO is on your system `PATH`.
+  the replay animation.
 
 ## Reference Links
 
-- [SUMO documentation](https://sumo.dlr.de/docs/index.html)
-- [TraCI documentation](https://sumo.dlr.de/docs/TraCI/index.html)
 - [PyTorch documentation](https://docs.pytorch.org/docs/2.12/index.html)
 - [PyTorch Geometric HGTConv](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.HGTConv.html)
 - [Proximal Policy Optimization paper](https://arxiv.org/abs/1707.06347)
 - [Heterogeneous Graph Transformer paper](https://arxiv.org/abs/2003.01332)
 - [Generalized Advantage Estimation paper](https://arxiv.org/abs/1506.02438)
 - [OR-Tools Job Shop explanation](https://developers.google.com/optimization/scheduling/job_shop)
-- [NetworkX DiGraph documentation](https://networkx.org/documentation/stable/reference/classes/digraph.html)
 
 ## Suggested Reading Order
 
@@ -719,15 +546,10 @@ If this is your first time opening the project, read files in this order:
    understand learning.
 9. `eval.py` and `intersection_scheduler/utils/metrics.py` to understand
    evaluation.
-10. `src/main.py` if you want the SUMO/TraCI controller path.
 
 ## Current Limitations
 
-- The HGT/PPO training environment is synthetic and separate from the SUMO
-  controller path.
-- The SUMO controller currently implements FCFS. The `GreedyScheduler` in
-  `src/schedulers/greedy_scheduler.py` is only a placeholder.
 - Existing checkpoints should be interpreted with the bug-fix caveats in
   `NOTES.md`.
-- Optional visualization and SUMO dependencies may need to be installed
-  separately from `requirements.txt`.
+- Optional visualization dependencies such as `matplotlib` may need to be
+  installed separately from `requirements.txt`.

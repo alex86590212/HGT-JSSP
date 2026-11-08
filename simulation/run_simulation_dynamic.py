@@ -683,7 +683,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", default="results_dynamic_realistic_v2/checkpoint_best.pt")
     parser.add_argument("--config", default="configs/default_dynamic.yaml")
-    parser.add_argument("--mode", choices=["hgt", "igreedy", "lifo", "backpressure", "edf", "all"], default="hgt")
+    parser.add_argument("--mode", choices=["hgt", "igreedy", "lifo", "backpressure", "edf", "all", "baselines"], default="hgt")
     parser.add_argument("--tier", choices=["easy", "medium", "hard"], default="hard")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--speed", type=float, default=1.0,
@@ -712,7 +712,12 @@ def main() -> None:
         print(f"  v{v.id}: {v.manoeuvre:6s}  route={v.route}  "
               f"arrival={v.arrival_time:.2f}s  vel={v.velocity:.1f}m/s")
 
-    modes = ["hgt", "igreedy", "lifo", "backpressure", "edf"] if args.mode == "all" else [args.mode]
+    if args.mode == "all":
+        modes = ["hgt", "igreedy", "lifo", "backpressure", "edf"]
+    elif args.mode == "baselines":
+        modes = ["igreedy", "lifo", "backpressure", "edf"]
+    else:
+        modes = [args.mode]
 
     for mode in modes:
         env = DynamicIntersectionEnv(

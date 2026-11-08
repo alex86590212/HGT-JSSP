@@ -6,7 +6,10 @@ Models the same three constraint types as the trained env/feasibility checker:
     earlier-arriving vehicle's first operation must finish before the later
     vehicle's first operation starts (matches
     intersection_scheduler.environment.feasibility._same_lane_leaders_done).
-  Type-3 (zone exclusivity): no two vehicles occupy the same zone at once.
+  Type-3 (zone exclusivity, with blocking): no two vehicles occupy the same
+    zone at once, and a vehicle retains its zone until it starts moving into
+    its route successor's zone (Huang et al. Section III-A) — not just until
+    its own processing time ends.
 """
 
 from __future__ import annotations
@@ -82,16 +85,20 @@ def solve_optimal(
     for v in vehicles:
         arrival = int(round(v.arrival_time * SCALE))
         durs = []
+        n = len(v.route)
         for j, (zone_id, p) in enumerate(zip(v.route, v.processing_times)):
             dur = max(1, int(round(p * SCALE)))
             durs.append(dur)
             start = model.NewIntVar(arrival, horizon, f"s_{v.id}_{j}")
             end = model.NewIntVar(arrival, horizon, f"e_{v.id}_{j}")
-            interval = model.NewIntervalVar(start, dur, end, f"iv_{v.id}_{j}")
+            # end must equal start + this op's own processing time — the
+            # block_interval below constrains the BLOCKING window (start to
+            # the next op's start), not this actual duration, so it has to
+            # be enforced separately.
+            model.Add(end == start + dur)
 
             start_vars[(v.id, j)] = start
             end_vars[(v.id, j)] = end
-            intervals_by_zone.setdefault(zone_id, []).append(interval)
             ops_by_zone.setdefault(zone_id, []).append((v.id, j, start, end))
 
             # Vehicle cannot start before it arrives (position 0) — already
@@ -101,8 +108,23 @@ def solve_optimal(
         scaled_durations[v.id] = durs
 
         # Type-1: route order — op(i,j+1) starts no earlier than op(i,j) ends
-        for j in range(len(v.route) - 1):
+        for j in range(n - 1):
             model.Add(start_vars[(v.id, j + 1)] >= end_vars[(v.id, j)])
+
+        # Blocking (Huang et al. Section III-A): a vehicle retains its
+        # current zone until it starts moving into its next one — the zone
+        # is not released at c_{i,j}, only once s_{i,j+1} begins. The last
+        # operation on a route has no successor to block for, so it still
+        # releases at its own end.
+        for j, zone_id in enumerate(v.route):
+            start = start_vars[(v.id, j)]
+            block_end = start_vars[(v.id, j + 1)] if j < n - 1 else end_vars[(v.id, j)]
+            block_size = model.NewIntVar(0, horizon, f"blocksize_{v.id}_{j}")
+            model.Add(block_size == block_end - start)
+            block_interval = model.NewIntervalVar(
+                start, block_size, block_end, f"blockiv_{v.id}_{j}"
+            )
+            intervals_by_zone.setdefault(zone_id, []).append(block_interval)
 
     # Type-2: same-lane order on the first operation only (mirrors
     # _same_lane_leaders_done, which only gates route_position == 0).

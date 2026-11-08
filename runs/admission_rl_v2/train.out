@@ -1,0 +1,370 @@
+Training admission HGT: 15000 episodes, rate U[0.1, 1.2], defer=on, workers=4, params=885,472, output=runs/admission_rl_v2
+[eval ep 0] mean wait HGT=0.5036 iGreedy=0.4159 (-21.09%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-8.2%  0.35:-25.9%  0.50:-31.0%  0.65:+1.5%  0.80:-3.4%  1.00:+3.6%  1.20:-44.5%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep     64/15000  rate=0.68  wait HGT=0.5398 iG=0.5110 (-5.63%)  W/T/L=20/7/37  defer=0.112  dec/ep=177  actor=-0.0161 critic=0.7875 ent=1.141 kl=0.0134  0.69s/ep  ETA 2.9h
+ep    128/15000  rate=0.73  wait HGT=0.4722 iG=0.4334 (-8.96%)  W/T/L=21/6/37  defer=0.202  dec/ep=211  actor=-0.0025 critic=0.3049 ent=1.158 kl=0.0070  0.71s/ep  ETA 2.9h
+ep    160/15000  rate=0.67  wait HGT=0.3553 iG=0.3286 (-8.14%)  W/T/L=9/5/18  defer=0.205  dec/ep=186  actor=-0.0027 critic=0.2992 ent=1.191 kl=0.0049  0.69s/ep  ETA 2.9h
+ep    224/15000  rate=0.64  wait HGT=0.4751 iG=0.4545 (-4.53%)  W/T/L=25/8/31  defer=0.235  dec/ep=192  actor=-0.0038 critic=0.2707 ent=1.141 kl=0.0058  0.68s/ep  ETA 2.8h
+ep    256/15000  rate=0.66  wait HGT=0.4430 iG=0.3846 (-15.19%)  W/T/L=5/5/22  defer=0.171  dec/ep=189  actor=-0.0040 critic=0.2292 ent=1.122 kl=0.0047  0.68s/ep  ETA 2.8h
+ep    320/15000  rate=0.69  wait HGT=0.4649 iG=0.4247 (-9.48%)  W/T/L=15/15/34  defer=0.165  dec/ep=202  actor=-0.0045 critic=0.2819 ent=1.126 kl=0.0039  0.69s/ep  ETA 2.8h
+ep    352/15000  rate=0.64  wait HGT=0.4338 iG=0.4481 (+3.18%)  W/T/L=11/6/15  defer=0.120  dec/ep=153  actor=-0.0035 critic=0.7045 ent=1.044 kl=0.0011  0.67s/ep  ETA 2.7h
+ep    416/15000  rate=0.63  wait HGT=0.4190 iG=0.4151 (-0.94%)  W/T/L=19/13/32  defer=0.134  dec/ep=164  actor=-0.0052 critic=0.4635 ent=1.073 kl=0.0065  0.65s/ep  ETA 2.6h
+ep    480/15000  rate=0.64  wait HGT=0.4347 iG=0.4555 (+4.55%)  W/T/L=20/12/32  defer=0.197  dec/ep=184  actor=-0.0024 critic=0.4015 ent=1.127 kl=0.0082  0.65s/ep  ETA 2.6h
+ep    512/15000  rate=0.66  wait HGT=0.4572 iG=0.4513 (-1.30%)  W/T/L=10/6/16  defer=0.227  dec/ep=195  actor=-0.0061 critic=0.2773 ent=1.115 kl=0.0079  0.65s/ep  ETA 2.6h
+[eval ep 512] mean wait HGT=0.4841 iGreedy=0.4159 (-16.40%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-8.2%  0.35:-33.4%  0.50:+0.6%  0.65:-7.7%  0.80:+6.6%  1.00:-1.0%  1.20:-31.9%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep    576/15000  rate=0.64  wait HGT=0.4767 iG=0.4556 (-4.63%)  W/T/L=25/10/29  defer=0.212  dec/ep=185  actor=-0.0051 critic=0.2861 ent=1.110 kl=0.0058  0.66s/ep  ETA 2.7h
+ep    608/15000  rate=0.70  wait HGT=0.5570 iG=0.5914 (+5.82%)  W/T/L=16/4/12  defer=0.222  dec/ep=215  actor=-0.0059 critic=0.2996 ent=1.112 kl=0.0078  0.67s/ep  ETA 2.7h
+ep    672/15000  rate=0.65  wait HGT=0.4505 iG=0.4585 (+1.73%)  W/T/L=31/9/24  defer=0.303  dec/ep=195  actor=-0.0056 critic=0.3242 ent=1.122 kl=0.0082  0.67s/ep  ETA 2.7h
+ep    704/15000  rate=0.59  wait HGT=0.4611 iG=0.4292 (-7.44%)  W/T/L=8/8/16  defer=0.307  dec/ep=170  actor=-0.0008 critic=0.4734 ent=1.095 kl=0.0060  0.66s/ep  ETA 2.6h
+ep    768/15000  rate=0.64  wait HGT=0.4019 iG=0.4474 (+10.17%)  W/T/L=34/12/18  defer=0.337  dec/ep=202  actor=-0.0173 critic=0.2602 ent=1.117 kl=0.0065  0.66s/ep  ETA 2.6h
+ep    800/15000  rate=0.62  wait HGT=0.3533 iG=0.3544 (+0.31%)  W/T/L=15/3/14  defer=0.303  dec/ep=194  actor=-0.0039 critic=0.2044 ent=1.114 kl=0.0096  0.66s/ep  ETA 2.6h
+ep    864/15000  rate=0.69  wait HGT=0.4462 iG=0.4753 (+6.12%)  W/T/L=35/9/20  defer=0.283  dec/ep=200  actor=-0.0032 critic=0.2369 ent=1.122 kl=0.0092  0.66s/ep  ETA 2.6h
+ep    928/15000  rate=0.60  wait HGT=0.4018 iG=0.4114 (+2.33%)  W/T/L=27/13/24  defer=0.248  dec/ep=176  actor=-0.0077 critic=0.2448 ent=1.076 kl=0.0086  0.71s/ep  ETA 2.8h
+ep    960/15000  rate=0.62  wait HGT=0.3309 iG=0.3395 (+2.52%)  W/T/L=13/7/12  defer=0.258  dec/ep=166  actor=-0.0116 critic=0.1481 ent=1.082 kl=0.0090  0.73s/ep  ETA 2.8h
+ep   1024/15000  rate=0.65  wait HGT=0.3970 iG=0.4082 (+2.74%)  W/T/L=22/9/33  defer=0.247  dec/ep=196  actor=-0.0165 critic=0.2238 ent=1.033 kl=0.0122  0.73s/ep  ETA 2.8h
+[eval ep 1024] mean wait HGT=0.4296 iGreedy=0.4159 (-3.30%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+7.2%  0.35:-29.7%  0.50:-9.9%  0.65:+15.8%  0.80:+2.1%  1.00:+16.7%  1.20:-5.5%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep   1056/15000  rate=0.60  wait HGT=0.3586 iG=0.3825 (+6.25%)  W/T/L=10/11/11  defer=0.224  dec/ep=177  actor=-0.0118 critic=0.2108 ent=1.065 kl=0.0072  0.74s/ep  ETA 2.9h
+ep   1120/15000  rate=0.66  wait HGT=0.4255 iG=0.4290 (+0.82%)  W/T/L=21/16/27  defer=0.279  dec/ep=209  actor=-0.0039 critic=0.2678 ent=1.087 kl=0.0067  0.74s/ep  ETA 2.9h
+ep   1152/15000  rate=0.70  wait HGT=0.5997 iG=0.5954 (-0.72%)  W/T/L=13/3/16  defer=0.304  dec/ep=240  actor=-0.0048 critic=0.5051 ent=1.101 kl=0.0092  0.75s/ep  ETA 2.9h
+ep   1216/15000  rate=0.71  wait HGT=0.4775 iG=0.4594 (-3.96%)  W/T/L=25/7/32  defer=0.269  dec/ep=215  actor=0.0012 critic=0.3721 ent=1.070 kl=0.0127  0.75s/ep  ETA 2.9h
+ep   1280/15000  rate=0.59  wait HGT=0.3340 iG=0.2963 (-12.70%)  W/T/L=17/13/34  defer=0.286  dec/ep=175  actor=-0.0125 critic=0.2415 ent=1.033 kl=0.0070  0.74s/ep  ETA 2.8h
+ep   1312/15000  rate=0.65  wait HGT=0.3099 iG=0.3263 (+5.04%)  W/T/L=16/6/10  defer=0.283  dec/ep=190  actor=-0.0099 critic=0.1502 ent=1.067 kl=0.0107  0.74s/ep  ETA 2.8h
+ep   1376/15000  rate=0.63  wait HGT=0.4342 iG=0.4502 (+3.55%)  W/T/L=31/10/23  defer=0.309  dec/ep=195  actor=-0.0055 critic=0.3647 ent=1.060 kl=0.0126  0.74s/ep  ETA 2.8h
+ep   1408/15000  rate=0.62  wait HGT=0.3470 iG=0.3257 (-6.53%)  W/T/L=12/7/13  defer=0.366  dec/ep=200  actor=-0.0106 critic=0.1698 ent=1.040 kl=0.0083  0.74s/ep  ETA 2.8h
+ep   1472/15000  rate=0.65  wait HGT=0.4491 iG=0.4848 (+7.37%)  W/T/L=34/5/25  defer=0.404  dec/ep=209  actor=-0.0071 critic=0.3959 ent=1.053 kl=0.0127  0.74s/ep  ETA 2.8h
+ep   1504/15000  rate=0.65  wait HGT=0.3432 iG=0.3799 (+9.66%)  W/T/L=14/9/9  defer=0.390  dec/ep=210  actor=-0.0073 critic=0.2068 ent=1.045 kl=0.0099  0.74s/ep  ETA 2.8h
+[eval ep 1504] mean wait HGT=0.4216 iGreedy=0.4159 (-1.38%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+2.5%  0.35:-17.7%  0.50:-39.0%  0.65:+28.8%  0.80:+8.2%  1.00:+8.3%  1.20:+1.0%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep   1568/15000  rate=0.63  wait HGT=0.3807 iG=0.3771 (-0.96%)  W/T/L=27/7/30  defer=0.436  dec/ep=210  actor=-0.0081 critic=0.2152 ent=1.012 kl=0.0130  0.76s/ep  ETA 2.8h
+ep   1600/15000  rate=0.68  wait HGT=0.4511 iG=0.4478 (-0.74%)  W/T/L=11/6/15  defer=0.459  dec/ep=271  actor=-0.0070 critic=0.1769 ent=0.988 kl=0.0103  0.77s/ep  ETA 2.9h
+ep   1664/15000  rate=0.70  wait HGT=0.4236 iG=0.4604 (+7.99%)  W/T/L=36/6/22  defer=0.467  dec/ep=263  actor=-0.0102 critic=0.2024 ent=0.938 kl=0.0149  0.77s/ep  ETA 2.9h
+ep   1728/15000  rate=0.57  wait HGT=0.3189 iG=0.3491 (+8.65%)  W/T/L=26/9/29  defer=0.506  dec/ep=225  actor=-0.0096 critic=0.1906 ent=0.968 kl=0.0120  0.77s/ep  ETA 2.9h
+ep   1760/15000  rate=0.60  wait HGT=0.3549 iG=0.3462 (-2.51%)  W/T/L=17/5/10  defer=0.488  dec/ep=231  actor=-0.0102 critic=0.1845 ent=0.968 kl=0.0152  0.77s/ep  ETA 2.8h
+ep   1824/15000  rate=0.66  wait HGT=0.3585 iG=0.3926 (+8.70%)  W/T/L=33/9/22  defer=0.518  dec/ep=261  actor=-0.0061 critic=0.1541 ent=0.927 kl=0.0151  0.78s/ep  ETA 2.8h
+ep   1856/15000  rate=0.71  wait HGT=0.3902 iG=0.4429 (+11.88%)  W/T/L=17/8/7  defer=0.514  dec/ep=261  actor=-0.0065 critic=0.2123 ent=0.915 kl=0.0123  0.78s/ep  ETA 2.8h
+ep   1920/15000  rate=0.63  wait HGT=0.3210 iG=0.3470 (+7.50%)  W/T/L=33/11/20  defer=0.552  dec/ep=251  actor=-0.0078 critic=0.1789 ent=0.883 kl=0.0113  0.78s/ep  ETA 2.8h
+ep   1952/15000  rate=0.68  wait HGT=0.3822 iG=0.4036 (+5.29%)  W/T/L=17/2/13  defer=0.532  dec/ep=275  actor=-0.0067 critic=0.1369 ent=0.928 kl=0.0128  0.78s/ep  ETA 2.8h
+ep   2016/15000  rate=0.64  wait HGT=0.3588 iG=0.4003 (+10.37%)  W/T/L=35/7/22  defer=0.573  dec/ep=276  actor=-0.0113 critic=0.1246 ent=0.863 kl=0.0152  0.78s/ep  ETA 2.8h
+[eval ep 2016] mean wait HGT=0.4445 iGreedy=0.4159 (-6.89%, worst rate -133.3%)
+    0.10:-78.6%  0.20:-133.3%  0.35:-64.3%  0.50:-21.7%  0.65:+14.2%  0.80:-0.4%  1.00:+5.9%  1.20:+12.1%
+ep   2080/15000  rate=0.65  wait HGT=0.3681 iG=0.4448 (+17.24%)  W/T/L=35/7/22  defer=0.607  dec/ep=302  actor=-0.0032 critic=0.1410 ent=0.838 kl=0.0128  0.83s/ep  ETA 3.0h
+ep   2112/15000  rate=0.72  wait HGT=0.3715 iG=0.3985 (+6.78%)  W/T/L=17/4/11  defer=0.609  dec/ep=328  actor=-0.0048 critic=0.1007 ent=0.848 kl=0.0128  0.83s/ep  ETA 3.0h
+ep   2176/15000  rate=0.67  wait HGT=0.3952 iG=0.4311 (+8.33%)  W/T/L=33/6/25  defer=0.623  dec/ep=326  actor=-0.0113 critic=0.1089 ent=0.844 kl=0.0104  0.84s/ep  ETA 3.0h
+ep   2208/15000  rate=0.73  wait HGT=0.4058 iG=0.5019 (+19.15%)  W/T/L=23/2/7  defer=0.597  dec/ep=351  actor=-0.0074 critic=0.1017 ent=0.863 kl=0.0133  0.84s/ep  ETA 3.0h
+ep   2272/15000  rate=0.72  wait HGT=0.4072 iG=0.4892 (+16.78%)  W/T/L=42/7/15  defer=0.592  dec/ep=330  actor=-0.0094 critic=0.1099 ent=0.879 kl=0.0128  0.85s/ep  ETA 3.0h
+ep   2304/15000  rate=0.74  wait HGT=0.4493 iG=0.4829 (+6.97%)  W/T/L=15/1/16  defer=0.598  dec/ep=332  actor=-0.0091 critic=0.1423 ent=0.854 kl=0.0111  0.85s/ep  ETA 3.0h
+ep   2368/15000  rate=0.61  wait HGT=0.3098 iG=0.3372 (+8.12%)  W/T/L=30/13/21  defer=0.619  dec/ep=262  actor=-0.0129 critic=0.1269 ent=0.872 kl=0.0164  0.85s/ep  ETA 3.0h
+ep   2400/15000  rate=0.67  wait HGT=0.3445 iG=0.3933 (+12.42%)  W/T/L=22/2/8  defer=0.615  dec/ep=293  actor=-0.0107 critic=0.1139 ent=0.843 kl=0.0109  0.85s/ep  ETA 3.0h
+ep   2464/15000  rate=0.68  wait HGT=0.3892 iG=0.4335 (+10.20%)  W/T/L=34/3/27  defer=0.600  dec/ep=302  actor=-0.0077 critic=0.0962 ent=0.839 kl=0.0135  0.85s/ep  ETA 3.0h
+ep   2528/15000  rate=0.67  wait HGT=0.3505 iG=0.4225 (+17.03%)  W/T/L=36/7/21  defer=0.593  dec/ep=289  actor=-0.0067 critic=0.1667 ent=0.824 kl=0.0150  0.86s/ep  ETA 3.0h
+[eval ep 2528] mean wait HGT=0.3434 iGreedy=0.4159 (+17.42%, worst rate -36.6%)
+    0.10:+0.0%  0.20:-36.6%  0.35:-7.7%  0.50:-14.5%  0.65:+30.9%  0.80:+10.2%  1.00:+31.4%  1.20:+30.1%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep   2560/15000  rate=0.64  wait HGT=0.4090 iG=0.4316 (+5.23%)  W/T/L=17/6/9  defer=0.625  dec/ep=283  actor=-0.0080 critic=0.2446 ent=0.803 kl=0.0154  0.88s/ep  ETA 3.1h
+ep   2624/15000  rate=0.64  wait HGT=0.4171 iG=0.4299 (+2.96%)  W/T/L=34/7/23  defer=0.593  dec/ep=305  actor=-0.0081 critic=0.2177 ent=0.858 kl=0.0136  0.89s/ep  ETA 3.1h
+ep   2656/15000  rate=0.63  wait HGT=0.3552 iG=0.3678 (+3.40%)  W/T/L=14/6/12  defer=0.562  dec/ep=270  actor=-0.0097 critic=0.1441 ent=0.894 kl=0.0138  0.89s/ep  ETA 3.0h
+ep   2720/15000  rate=0.62  wait HGT=0.3728 iG=0.4178 (+10.77%)  W/T/L=34/10/20  defer=0.586  dec/ep=274  actor=-0.0065 critic=0.1900 ent=0.857 kl=0.0142  0.89s/ep  ETA 3.0h
+ep   2752/15000  rate=0.56  wait HGT=0.3664 iG=0.4187 (+12.47%)  W/T/L=17/4/11  defer=0.624  dec/ep=267  actor=-0.0083 critic=0.1623 ent=0.827 kl=0.0134  0.89s/ep  ETA 3.0h
+ep   2816/15000  rate=0.65  wait HGT=0.3679 iG=0.3986 (+7.69%)  W/T/L=32/9/23  defer=0.605  dec/ep=290  actor=-0.0089 critic=0.2207 ent=0.824 kl=0.0119  0.89s/ep  ETA 3.0h
+ep   2880/15000  rate=0.57  wait HGT=0.3002 iG=0.3117 (+3.71%)  W/T/L=28/7/29  defer=0.656  dec/ep=274  actor=-0.0118 critic=0.1470 ent=0.753 kl=0.0167  0.89s/ep  ETA 3.0h
+ep   2912/15000  rate=0.61  wait HGT=0.3209 iG=0.3936 (+18.49%)  W/T/L=22/5/5  defer=0.711  dec/ep=359  actor=-0.0080 critic=0.1342 ent=0.695 kl=0.0273  0.89s/ep  ETA 3.0h
+ep   2976/15000  rate=0.63  wait HGT=0.4206 iG=0.4650 (+9.54%)  W/T/L=36/7/21  defer=0.665  dec/ep=328  actor=-0.0137 critic=0.1306 ent=0.762 kl=0.0154  0.89s/ep  ETA 3.0h
+ep   3008/15000  rate=0.56  wait HGT=0.3279 iG=0.3872 (+15.30%)  W/T/L=17/5/10  defer=0.678  dec/ep=276  actor=-0.0067 critic=0.1188 ent=0.705 kl=0.0209  0.89s/ep  ETA 3.0h
+[eval ep 3008] mean wait HGT=0.3465 iGreedy=0.4159 (+16.68%, worst rate -10.2%)
+    0.10:+0.0%  0.20:-1.6%  0.35:-10.2%  0.50:+15.3%  0.65:+34.2%  0.80:+17.0%  1.00:+20.5%  1.20:+18.9%
+ep   3072/15000  rate=0.70  wait HGT=0.3908 iG=0.4713 (+17.09%)  W/T/L=39/7/18  defer=0.660  dec/ep=373  actor=-0.0071 critic=0.1004 ent=0.741 kl=0.0214  0.92s/ep  ETA 3.1h
+ep   3104/15000  rate=0.71  wait HGT=0.3804 iG=0.4978 (+23.58%)  W/T/L=21/4/7  defer=0.669  dec/ep=390  actor=-0.0084 critic=0.1158 ent=0.760 kl=0.0204  0.93s/ep  ETA 3.1h
+ep   3168/15000  rate=0.66  wait HGT=0.4282 iG=0.4840 (+11.53%)  W/T/L=35/9/20  defer=0.688  dec/ep=380  actor=-0.0099 critic=0.1042 ent=0.699 kl=0.0198  0.93s/ep  ETA 3.1h
+ep   3200/15000  rate=0.66  wait HGT=0.3448 iG=0.4321 (+20.19%)  W/T/L=22/5/5  defer=0.666  dec/ep=347  actor=-0.0056 critic=0.0937 ent=0.745 kl=0.0233  0.94s/ep  ETA 3.1h
+ep   3264/15000  rate=0.64  wait HGT=0.3608 iG=0.4055 (+11.01%)  W/T/L=38/6/20  defer=0.688  dec/ep=340  actor=-0.0060 critic=0.0861 ent=0.686 kl=0.0216  0.94s/ep  ETA 3.1h
+ep   3328/15000  rate=0.59  wait HGT=0.3140 iG=0.3681 (+14.70%)  W/T/L=26/14/24  defer=0.686  dec/ep=314  actor=-0.0097 critic=0.1157 ent=0.723 kl=0.0159  0.94s/ep  ETA 3.0h
+ep   3360/15000  rate=0.58  wait HGT=0.3326 iG=0.3628 (+8.33%)  W/T/L=18/3/11  defer=0.727  dec/ep=337  actor=-0.0046 critic=0.1233 ent=0.654 kl=0.0165  0.94s/ep  ETA 3.0h
+ep   3424/15000  rate=0.68  wait HGT=0.3922 iG=0.4240 (+7.51%)  W/T/L=28/13/23  defer=0.754  dec/ep=455  actor=-0.0073 critic=0.0794 ent=0.625 kl=0.0174  0.95s/ep  ETA 3.1h
+ep   3456/15000  rate=0.67  wait HGT=0.3430 iG=0.4528 (+24.25%)  W/T/L=21/3/8  defer=0.718  dec/ep=392  actor=-0.0154 critic=0.0881 ent=0.682 kl=0.0184  0.95s/ep  ETA 3.1h
+ep   3520/15000  rate=0.63  wait HGT=0.3577 iG=0.3990 (+10.35%)  W/T/L=32/11/21  defer=0.722  dec/ep=380  actor=-0.0061 critic=0.1103 ent=0.677 kl=0.0212  0.96s/ep  ETA 3.1h
+[eval ep 3520] mean wait HGT=0.4198 iGreedy=0.4159 (-0.95%, worst rate -379.8%)
+    0.10:-379.8%  0.20:-88.6%  0.35:-40.8%  0.50:-33.2%  0.65:+28.3%  0.80:+11.1%  1.00:+10.6%  1.20:+22.7%
+ep   3552/15000  rate=0.67  wait HGT=0.3978 iG=0.5031 (+20.93%)  W/T/L=18/5/9  defer=0.736  dec/ep=429  actor=-0.0049 critic=0.1141 ent=0.647 kl=0.0136  0.99s/ep  ETA 3.1h
+ep   3616/15000  rate=0.66  wait HGT=0.3741 iG=0.4249 (+11.95%)  W/T/L=34/6/24  defer=0.686  dec/ep=369  actor=-0.0064 critic=0.1209 ent=0.725 kl=0.0158  0.99s/ep  ETA 3.1h
+ep   3680/15000  rate=0.65  wait HGT=0.4026 iG=0.4724 (+14.76%)  W/T/L=38/6/20  defer=0.670  dec/ep=352  actor=-0.0100 critic=0.1371 ent=0.773 kl=0.0176  0.99s/ep  ETA 3.1h
+ep   3712/15000  rate=0.67  wait HGT=0.3809 iG=0.4421 (+13.86%)  W/T/L=18/3/11  defer=0.648  dec/ep=351  actor=-0.0108 critic=0.1148 ent=0.787 kl=0.0173  1.00s/ep  ETA 3.1h
+ep   3776/15000  rate=0.65  wait HGT=0.4093 iG=0.4871 (+15.97%)  W/T/L=36/9/19  defer=0.686  dec/ep=381  actor=-0.0094 critic=0.1021 ent=0.713 kl=0.0159  1.00s/ep  ETA 3.1h
+ep   3808/15000  rate=0.64  wait HGT=0.4685 iG=0.4751 (+1.39%)  W/T/L=14/3/15  defer=0.707  dec/ep=419  actor=-0.0092 critic=0.1691 ent=0.680 kl=0.0165  1.01s/ep  ETA 3.1h
+ep   3872/15000  rate=0.65  wait HGT=0.3365 iG=0.3721 (+9.56%)  W/T/L=29/11/24  defer=0.717  dec/ep=409  actor=-0.0103 critic=0.0792 ent=0.666 kl=0.0190  1.01s/ep  ETA 3.1h
+ep   3904/15000  rate=0.54  wait HGT=0.2808 iG=0.3109 (+9.68%)  W/T/L=16/9/7  defer=0.691  dec/ep=279  actor=-0.0109 critic=0.1248 ent=0.684 kl=0.0132  1.01s/ep  ETA 3.1h
+ep   3968/15000  rate=0.60  wait HGT=0.3347 iG=0.3697 (+9.46%)  W/T/L=35/6/23  defer=0.676  dec/ep=342  actor=-0.0112 critic=0.0851 ent=0.706 kl=0.0132  1.02s/ep  ETA 3.1h
+ep   4000/15000  rate=0.71  wait HGT=0.4119 iG=0.4988 (+17.43%)  W/T/L=20/5/7  defer=0.706  dec/ep=452  actor=-0.0091 critic=0.0888 ent=0.661 kl=0.0238  1.02s/ep  ETA 3.1h
+[eval ep 4000] mean wait HGT=0.3646 iGreedy=0.4159 (+12.33%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+44.9%  0.35:-60.7%  0.50:+24.8%  0.65:+38.1%  0.80:+16.8%  1.00:+30.4%  1.20:+20.5%
+ep   4064/15000  rate=0.63  wait HGT=0.3586 iG=0.4086 (+12.23%)  W/T/L=33/12/19  defer=0.677  dec/ep=355  actor=-0.0070 critic=0.1082 ent=0.709 kl=0.0199  1.04s/ep  ETA 3.2h
+ep   4128/15000  rate=0.63  wait HGT=0.3773 iG=0.4406 (+14.38%)  W/T/L=37/10/17  defer=0.693  dec/ep=369  actor=-0.0081 critic=0.0830 ent=0.673 kl=0.0189  1.05s/ep  ETA 3.2h
+ep   4160/15000  rate=0.64  wait HGT=0.3590 iG=0.4077 (+11.94%)  W/T/L=17/6/9  defer=0.679  dec/ep=336  actor=-0.0085 critic=0.0962 ent=0.683 kl=0.0162  1.05s/ep  ETA 3.2h
+ep   4224/15000  rate=0.72  wait HGT=0.4248 iG=0.4978 (+14.65%)  W/T/L=43/9/12  defer=0.663  dec/ep=400  actor=-0.0116 critic=0.1229 ent=0.728 kl=0.0220  1.05s/ep  ETA 3.1h
+ep   4256/15000  rate=0.60  wait HGT=0.3305 iG=0.3379 (+2.20%)  W/T/L=14/5/13  defer=0.641  dec/ep=290  actor=-0.0092 critic=0.1193 ent=0.727 kl=0.0185  1.05s/ep  ETA 3.1h
+ep   4320/15000  rate=0.65  wait HGT=0.3916 iG=0.4512 (+13.21%)  W/T/L=38/7/19  defer=0.665  dec/ep=366  actor=-0.0135 critic=0.0808 ent=0.676 kl=0.0220  1.05s/ep  ETA 3.1h
+ep   4352/15000  rate=0.69  wait HGT=0.4098 iG=0.4995 (+17.96%)  W/T/L=18/4/10  defer=0.656  dec/ep=384  actor=-0.0108 critic=0.0957 ent=0.745 kl=0.0214  1.05s/ep  ETA 3.1h
+ep   4416/15000  rate=0.62  wait HGT=0.3979 iG=0.4176 (+4.71%)  W/T/L=30/12/22  defer=0.644  dec/ep=329  actor=-0.0118 critic=0.1495 ent=0.764 kl=0.0183  1.06s/ep  ETA 3.1h
+ep   4480/15000  rate=0.65  wait HGT=0.3897 iG=0.4599 (+15.26%)  W/T/L=38/11/15  defer=0.630  dec/ep=337  actor=-0.0076 critic=0.1514 ent=0.764 kl=0.0179  1.06s/ep  ETA 3.1h
+ep   4512/15000  rate=0.58  wait HGT=0.3663 iG=0.3734 (+1.89%)  W/T/L=13/5/14  defer=0.624  dec/ep=263  actor=-0.0109 critic=0.1487 ent=0.738 kl=0.0165  1.06s/ep  ETA 3.1h
+[eval ep 4512] mean wait HGT=0.3775 iGreedy=0.4159 (+9.21%, worst rate -46.6%)
+    0.10:+0.0%  0.20:-3.4%  0.35:-46.6%  0.50:+0.8%  0.65:+29.6%  0.80:+17.6%  1.00:+12.6%  1.20:+17.2%
+ep   4576/15000  rate=0.66  wait HGT=0.3785 iG=0.4613 (+17.94%)  W/T/L=37/9/18  defer=0.637  dec/ep=326  actor=-0.0127 critic=0.1316 ent=0.753 kl=0.0172  1.07s/ep  ETA 3.1h
+ep   4608/15000  rate=0.63  wait HGT=0.3565 iG=0.3991 (+10.68%)  W/T/L=17/4/11  defer=0.592  dec/ep=306  actor=-0.0112 critic=0.1214 ent=0.784 kl=0.0208  1.07s/ep  ETA 3.1h
+ep   4672/15000  rate=0.61  wait HGT=0.3376 iG=0.3711 (+9.04%)  W/T/L=32/10/22  defer=0.622  dec/ep=296  actor=-0.0098 critic=0.1001 ent=0.698 kl=0.0165  1.07s/ep  ETA 3.1h
+ep   4704/15000  rate=0.60  wait HGT=0.2966 iG=0.3412 (+13.07%)  W/T/L=21/5/6  defer=0.647  dec/ep=308  actor=-0.0089 critic=0.1090 ent=0.718 kl=0.0204  1.07s/ep  ETA 3.1h
+ep   4768/15000  rate=0.62  wait HGT=0.3477 iG=0.4012 (+13.32%)  W/T/L=35/11/18  defer=0.607  dec/ep=313  actor=-0.0121 critic=0.1366 ent=0.762 kl=0.0172  1.07s/ep  ETA 3.0h
+ep   4800/15000  rate=0.72  wait HGT=0.5356 iG=0.7170 (+25.31%)  W/T/L=18/5/9  defer=0.605  dec/ep=372  actor=-0.0033 critic=0.2033 ent=0.754 kl=0.0168  1.07s/ep  ETA 3.0h
+ep   4864/15000  rate=0.69  wait HGT=0.3748 iG=0.4490 (+16.54%)  W/T/L=38/11/15  defer=0.609  dec/ep=340  actor=-0.0080 critic=0.0905 ent=0.776 kl=0.0142  1.07s/ep  ETA 3.0h
+ep   4928/15000  rate=0.69  wait HGT=0.4323 iG=0.5640 (+23.36%)  W/T/L=43/9/12  defer=0.548  dec/ep=315  actor=-0.0034 critic=0.5221 ent=0.854 kl=0.0113  1.07s/ep  ETA 3.0h
+ep   4960/15000  rate=0.61  wait HGT=0.3380 iG=0.3103 (-8.95%)  W/T/L=12/6/14  defer=0.515  dec/ep=246  actor=-0.0111 critic=0.1969 ent=0.854 kl=0.0157  1.07s/ep  ETA 3.0h
+ep   5024/15000  rate=0.67  wait HGT=0.4139 iG=0.4561 (+9.25%)  W/T/L=27/10/27  defer=0.514  dec/ep=287  actor=-0.0095 critic=0.1273 ent=0.889 kl=0.0184  1.07s/ep  ETA 3.0h
+[eval ep 5024] mean wait HGT=0.4546 iGreedy=0.4159 (-9.33%, worst rate -90.1%)
+    0.10:+0.0%  0.20:-19.9%  0.35:-60.0%  0.50:-4.2%  0.65:+35.6%  0.80:-90.1%  1.00:+14.0%  1.20:+22.8%
+ep   5056/15000  rate=0.66  wait HGT=0.3649 iG=0.3866 (+5.63%)  W/T/L=15/5/12  defer=0.505  dec/ep=260  actor=-0.0162 critic=0.1153 ent=0.892 kl=0.0198  1.08s/ep  ETA 3.0h
+ep   5120/15000  rate=0.61  wait HGT=0.4205 iG=0.4354 (+3.43%)  W/T/L=25/12/27  defer=0.566  dec/ep=275  actor=-0.0128 critic=0.1922 ent=0.827 kl=0.0180  1.08s/ep  ETA 3.0h
+ep   5152/15000  rate=0.59  wait HGT=0.2584 iG=0.3263 (+20.81%)  W/T/L=18/7/7  defer=0.498  dec/ep=206  actor=-0.0164 critic=0.1919 ent=0.841 kl=0.0166  1.07s/ep  ETA 2.9h
+ep   5216/15000  rate=0.66  wait HGT=0.3473 iG=0.3744 (+7.23%)  W/T/L=33/13/18  defer=0.521  dec/ep=267  actor=-0.0106 critic=0.0923 ent=0.802 kl=0.0217  1.07s/ep  ETA 2.9h
+ep   5280/15000  rate=0.57  wait HGT=0.3251 iG=0.3597 (+9.63%)  W/T/L=36/13/15  defer=0.518  dec/ep=234  actor=-0.0121 critic=0.1863 ent=0.842 kl=0.0145  1.07s/ep  ETA 2.9h
+ep   5312/15000  rate=0.66  wait HGT=0.3665 iG=0.4283 (+14.44%)  W/T/L=24/2/6  defer=0.550  dec/ep=291  actor=-0.0095 critic=0.1654 ent=0.782 kl=0.0259  1.07s/ep  ETA 2.9h
+ep   5376/15000  rate=0.72  wait HGT=0.3720 iG=0.4286 (+13.19%)  W/T/L=37/9/18  defer=0.504  dec/ep=284  actor=-0.0092 critic=0.1379 ent=0.849 kl=0.0299  1.07s/ep  ETA 2.8h
+ep   5408/15000  rate=0.75  wait HGT=0.4439 iG=0.5553 (+20.06%)  W/T/L=19/5/8  defer=0.495  dec/ep=329  actor=0.0008 critic=0.1685 ent=0.822 kl=0.0248  1.07s/ep  ETA 2.8h
+ep   5472/15000  rate=0.68  wait HGT=0.3819 iG=0.4108 (+7.03%)  W/T/L=35/4/25  defer=0.472  dec/ep=275  actor=-0.0137 critic=0.1016 ent=0.828 kl=0.0248  1.06s/ep  ETA 2.8h
+ep   5504/15000  rate=0.66  wait HGT=0.3757 iG=0.4270 (+12.02%)  W/T/L=18/4/10  defer=0.492  dec/ep=260  actor=-0.0100 critic=0.1280 ent=0.815 kl=0.0199  1.06s/ep  ETA 2.8h
+[eval ep 5504] mean wait HGT=0.3641 iGreedy=0.4159 (+12.44%, worst rate -60.7%)
+    0.10:+0.0%  0.20:-60.7%  0.35:-44.9%  0.50:-23.7%  0.65:+34.2%  0.80:+17.9%  1.00:+17.3%  1.20:+34.7%
+ep   5568/15000  rate=0.59  wait HGT=0.3390 iG=0.3974 (+14.71%)  W/T/L=31/12/21  defer=0.517  dec/ep=244  actor=-0.0110 critic=0.2146 ent=0.768 kl=0.0215  1.07s/ep  ETA 2.8h
+ep   5600/15000  rate=0.58  wait HGT=0.3632 iG=0.3666 (+0.93%)  W/T/L=15/3/14  defer=0.507  dec/ep=248  actor=-0.0078 critic=0.1799 ent=0.804 kl=0.0219  1.07s/ep  ETA 2.8h
+ep   5664/15000  rate=0.66  wait HGT=0.3892 iG=0.4572 (+14.87%)  W/T/L=36/8/20  defer=0.505  dec/ep=282  actor=-0.0101 critic=0.1334 ent=0.846 kl=0.0241  1.06s/ep  ETA 2.8h
+ep   5728/15000  rate=0.68  wait HGT=0.4174 iG=0.4753 (+12.18%)  W/T/L=37/10/17  defer=0.490  dec/ep=265  actor=-0.0127 critic=0.2449 ent=0.800 kl=0.0196  1.06s/ep  ETA 2.7h
+ep   5760/15000  rate=0.62  wait HGT=0.3297 iG=0.3562 (+7.43%)  W/T/L=12/7/13  defer=0.406  dec/ep=228  actor=-0.0122 critic=0.1443 ent=0.861 kl=0.0170  1.06s/ep  ETA 2.7h
+ep   5824/15000  rate=0.65  wait HGT=0.3456 iG=0.4139 (+16.49%)  W/T/L=37/10/17  defer=0.448  dec/ep=242  actor=-0.0116 critic=0.2089 ent=0.850 kl=0.0231  1.06s/ep  ETA 2.7h
+ep   5856/15000  rate=0.60  wait HGT=0.3420 iG=0.3669 (+6.76%)  W/T/L=14/4/14  defer=0.398  dec/ep=209  actor=-0.0156 critic=0.1609 ent=0.869 kl=0.0159  1.06s/ep  ETA 2.7h
+ep   5920/15000  rate=0.68  wait HGT=0.4618 iG=0.5222 (+11.56%)  W/T/L=35/5/24  defer=0.440  dec/ep=244  actor=-0.0040 critic=0.3113 ent=0.855 kl=0.0150  1.05s/ep  ETA 2.7h
+ep   5952/15000  rate=0.67  wait HGT=0.4310 iG=0.5031 (+14.33%)  W/T/L=19/3/10  defer=0.481  dec/ep=289  actor=-0.0069 critic=0.1740 ent=0.834 kl=0.0208  1.05s/ep  ETA 2.6h
+ep   6016/15000  rate=0.73  wait HGT=0.4144 iG=0.4982 (+16.81%)  W/T/L=40/7/17  defer=0.499  dec/ep=304  actor=-0.0144 critic=0.1822 ent=0.826 kl=0.0207  1.05s/ep  ETA 2.6h
+[eval ep 6016] mean wait HGT=0.3213 iGreedy=0.4159 (+22.75%, worst rate -0.9%)
+    0.10:+0.0%  0.20:+1.2%  0.35:-0.9%  0.50:+20.0%  0.65:+31.0%  0.80:+19.4%  1.00:+26.4%  1.20:+31.5%
+    new best -> runs/admission_rl_v2/checkpoint_best.pt
+ep   6080/15000  rate=0.65  wait HGT=0.3763 iG=0.4421 (+14.88%)  W/T/L=39/11/14  defer=0.481  dec/ep=255  actor=-0.0052 critic=0.1813 ent=0.839 kl=0.0234  1.06s/ep  ETA 2.6h
+ep   6112/15000  rate=0.70  wait HGT=0.4095 iG=0.4921 (+16.78%)  W/T/L=17/5/10  defer=0.490  dec/ep=288  actor=-0.0197 critic=0.1534 ent=0.842 kl=0.0226  1.06s/ep  ETA 2.6h
+ep   6176/15000  rate=0.68  wait HGT=0.3848 iG=0.4685 (+17.87%)  W/T/L=42/7/15  defer=0.530  dec/ep=295  actor=-0.0158 critic=0.1136 ent=0.873 kl=0.0216  1.06s/ep  ETA 2.6h
+ep   6208/15000  rate=0.73  wait HGT=0.4843 iG=0.6266 (+22.71%)  W/T/L=22/4/6  defer=0.519  dec/ep=310  actor=-0.0058 critic=0.2341 ent=0.877 kl=0.0222  1.06s/ep  ETA 2.6h
+ep   6272/15000  rate=0.66  wait HGT=0.3975 iG=0.4365 (+8.93%)  W/T/L=31/10/23  defer=0.513  dec/ep=280  actor=-0.0094 critic=0.1699 ent=0.881 kl=0.0199  1.06s/ep  ETA 2.6h
+ep   6304/15000  rate=0.76  wait HGT=0.4049 iG=0.4682 (+13.53%)  W/T/L=20/2/10  defer=0.546  dec/ep=340  actor=-0.0086 critic=0.1657 ent=0.809 kl=0.0244  1.06s/ep  ETA 2.6h
+ep   6368/15000  rate=0.69  wait HGT=0.4042 iG=0.4675 (+13.53%)  W/T/L=43/8/13  defer=0.548  dec/ep=313  actor=-0.0096 critic=0.1180 ent=0.818 kl=0.0208  1.06s/ep  ETA 2.5h
+ep   6400/15000  rate=0.65  wait HGT=0.3210 iG=0.4005 (+19.86%)  W/T/L=18/7/7  defer=0.521  dec/ep=253  actor=-0.0115 critic=0.1705 ent=0.845 kl=0.0168  1.06s/ep  ETA 2.5h
+ep   6464/15000  rate=0.59  wait HGT=0.3116 iG=0.3243 (+3.92%)  W/T/L=28/16/20  defer=0.577  dec/ep=257  actor=-0.0135 critic=0.1372 ent=0.764 kl=0.0195  1.06s/ep  ETA 2.5h
+ep   6528/15000  rate=0.63  wait HGT=0.3316 iG=0.3842 (+13.69%)  W/T/L=33/12/19  defer=0.561  dec/ep=286  actor=-0.0106 critic=0.1351 ent=0.776 kl=0.0248  1.06s/ep  ETA 2.5h
+[eval ep 6528] mean wait HGT=0.3446 iGreedy=0.4159 (+17.14%, worst rate -48.6%)
+    0.10:+0.0%  0.20:+15.2%  0.35:-48.6%  0.50:+18.0%  0.65:+35.5%  0.80:+14.3%  1.00:+22.3%  1.20:+32.8%
+ep   6560/15000  rate=0.74  wait HGT=0.4342 iG=0.5443 (+20.23%)  W/T/L=24/4/4  defer=0.604  dec/ep=369  actor=-0.0028 critic=0.1550 ent=0.750 kl=0.0278  1.07s/ep  ETA 2.5h
+ep   6624/15000  rate=0.73  wait HGT=0.4381 iG=0.4991 (+12.21%)  W/T/L=37/5/22  defer=0.575  dec/ep=347  actor=-0.0051 critic=0.1451 ent=0.764 kl=0.0204  1.07s/ep  ETA 2.5h
+ep   6656/15000  rate=0.65  wait HGT=0.3591 iG=0.4586 (+21.71%)  W/T/L=17/8/7  defer=0.552  dec/ep=300  actor=-0.0085 critic=0.1558 ent=0.790 kl=0.0212  1.07s/ep  ETA 2.5h
+ep   6720/15000  rate=0.59  wait HGT=0.3486 iG=0.3526 (+1.14%)  W/T/L=27/12/25  defer=0.477  dec/ep=224  actor=-0.0164 critic=0.1487 ent=0.821 kl=0.0210  1.06s/ep  ETA 2.4h
+ep   6752/15000  rate=0.67  wait HGT=0.4167 iG=0.4459 (+6.55%)  W/T/L=18/4/10  defer=0.549  dec/ep=284  actor=-0.0076 critic=0.1648 ent=0.771 kl=0.0230  1.06s/ep  ETA 2.4h
+ep   6816/15000  rate=0.58  wait HGT=0.3606 iG=0.3571 (-0.97%)  W/T/L=33/7/24  defer=0.532  dec/ep=251  actor=-0.0068 critic=0.1734 ent=0.773 kl=0.0266  1.06s/ep  ETA 2.4h
+ep   6880/15000  rate=0.60  wait HGT=0.3637 iG=0.4033 (+9.82%)  W/T/L=31/10/23  defer=0.530  dec/ep=252  actor=-0.0091 critic=0.1892 ent=0.764 kl=0.0227  1.06s/ep  ETA 2.4h
+ep   6912/15000  rate=0.54  wait HGT=0.2719 iG=0.3306 (+17.77%)  W/T/L=15/8/9  defer=0.585  dec/ep=263  actor=-0.0130 critic=0.1192 ent=0.739 kl=0.0221  1.06s/ep  ETA 2.4h
+ep   6976/15000  rate=0.66  wait HGT=0.3589 iG=0.4145 (+13.41%)  W/T/L=38/10/16  defer=0.536  dec/ep=282  actor=-0.0131 critic=0.1845 ent=0.794 kl=0.0201  1.06s/ep  ETA 2.4h
+ep   7008/15000  rate=0.68  wait HGT=0.4249 iG=0.4285 (+0.82%)  W/T/L=12/4/16  defer=0.496  dec/ep=283  actor=-0.0113 critic=0.1935 ent=0.797 kl=0.0202  1.06s/ep  ETA 2.3h
+[eval ep 7008] mean wait HGT=0.3729 iGreedy=0.4159 (+10.34%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+25.2%  0.35:-44.1%  0.50:+1.0%  0.65:+27.8%  0.80:-1.6%  1.00:+33.1%  1.20:+29.7%
+ep   7072/15000  rate=0.59  wait HGT=0.3261 iG=0.3550 (+8.13%)  W/T/L=28/15/21  defer=0.510  dec/ep=237  actor=-0.0120 critic=0.1309 ent=0.770 kl=0.0252  1.06s/ep  ETA 2.3h
+ep   7104/15000  rate=0.57  wait HGT=0.2779 iG=0.3309 (+16.01%)  W/T/L=14/7/11  defer=0.501  dec/ep=224  actor=-0.0141 critic=0.1562 ent=0.774 kl=0.0257  1.06s/ep  ETA 2.3h
+ep   7168/15000  rate=0.66  wait HGT=0.3767 iG=0.4872 (+22.69%)  W/T/L=37/7/20  defer=0.503  dec/ep=272  actor=-0.0017 critic=0.2764 ent=0.793 kl=0.0262  1.05s/ep  ETA 2.3h
+ep   7200/15000  rate=0.60  wait HGT=0.3344 iG=0.3657 (+8.56%)  W/T/L=14/6/12  defer=0.465  dec/ep=233  actor=-0.0128 critic=0.1832 ent=0.798 kl=0.0212  1.05s/ep  ETA 2.3h
+ep   7264/15000  rate=0.73  wait HGT=0.4292 iG=0.4971 (+13.66%)  W/T/L=38/4/22  defer=0.511  dec/ep=320  actor=-0.0090 critic=0.1099 ent=0.781 kl=0.0191  1.05s/ep  ETA 2.3h
+ep   7328/15000  rate=0.65  wait HGT=0.3924 iG=0.4701 (+16.53%)  W/T/L=29/11/24  defer=0.519  dec/ep=269  actor=-0.0146 critic=0.2382 ent=0.781 kl=0.0220  1.05s/ep  ETA 2.2h
+ep   7360/15000  rate=0.69  wait HGT=0.3680 iG=0.3997 (+7.92%)  W/T/L=17/5/10  defer=0.543  dec/ep=283  actor=-0.0099 critic=0.1608 ent=0.760 kl=0.0310  1.05s/ep  ETA 2.2h
+ep   7424/15000  rate=0.68  wait HGT=0.4494 iG=0.4936 (+8.95%)  W/T/L=31/8/25  defer=0.536  dec/ep=322  actor=-0.0065 critic=0.2439 ent=0.785 kl=0.0253  1.05s/ep  ETA 2.2h
+ep   7456/15000  rate=0.65  wait HGT=0.4188 iG=0.4903 (+14.60%)  W/T/L=18/4/10  defer=0.516  dec/ep=286  actor=-0.0072 critic=0.1672 ent=0.789 kl=0.0234  1.05s/ep  ETA 2.2h
+ep   7520/15000  rate=0.66  wait HGT=0.3881 iG=0.4291 (+9.54%)  W/T/L=27/9/28  defer=0.520  dec/ep=290  actor=-0.0101 critic=0.1292 ent=0.762 kl=0.0272  1.05s/ep  ETA 2.2h
+[eval ep 7520] mean wait HGT=0.3475 iGreedy=0.4159 (+16.43%, worst rate -59.5%)
+    0.10:+0.0%  0.20:+32.4%  0.35:-59.5%  0.50:+15.4%  0.65:+34.3%  0.80:+17.3%  1.00:+24.2%  1.20:+30.7%
+ep   7552/15000  rate=0.59  wait HGT=0.3654 iG=0.3770 (+3.06%)  W/T/L=14/5/13  defer=0.507  dec/ep=251  actor=-0.0162 critic=0.2010 ent=0.785 kl=0.0207  1.06s/ep  ETA 2.2h
+ep   7616/15000  rate=0.70  wait HGT=0.3836 iG=0.4137 (+7.29%)  W/T/L=34/9/21  defer=0.529  dec/ep=314  actor=-0.0085 critic=0.1382 ent=0.830 kl=0.0242  1.06s/ep  ETA 2.2h
+ep   7680/15000  rate=0.69  wait HGT=0.4348 iG=0.4887 (+11.04%)  W/T/L=37/6/21  defer=0.495  dec/ep=278  actor=-0.0113 critic=0.1536 ent=0.806 kl=0.0224  1.05s/ep  ETA 2.1h
+ep   7712/15000  rate=0.65  wait HGT=0.3141 iG=0.3769 (+16.66%)  W/T/L=19/7/6  defer=0.501  dec/ep=256  actor=-0.0328 critic=0.1432 ent=0.814 kl=0.0227  1.05s/ep  ETA 2.1h
+ep   7776/15000  rate=0.61  wait HGT=0.3502 iG=0.3858 (+9.23%)  W/T/L=25/11/28  defer=0.610  dec/ep=304  actor=-0.0062 critic=0.1410 ent=0.663 kl=0.0271  1.05s/ep  ETA 2.1h
+ep   7808/15000  rate=0.69  wait HGT=0.4490 iG=0.4970 (+9.67%)  W/T/L=15/4/13  defer=0.617  dec/ep=342  actor=-0.0059 critic=0.1425 ent=0.695 kl=0.0280  1.05s/ep  ETA 2.1h
+ep   7872/15000  rate=0.72  wait HGT=0.4430 iG=0.5597 (+20.86%)  W/T/L=41/5/18  defer=0.634  dec/ep=392  actor=-0.0059 critic=0.1254 ent=0.699 kl=0.0351  1.06s/ep  ETA 2.1h
+ep   7904/15000  rate=0.70  wait HGT=0.4215 iG=0.5143 (+18.04%)  W/T/L=14/5/13  defer=0.595  dec/ep=348  actor=-0.0035 critic=0.1573 ent=0.761 kl=0.0241  1.06s/ep  ETA 2.1h
+ep   7968/15000  rate=0.65  wait HGT=0.3652 iG=0.4169 (+12.40%)  W/T/L=36/8/20  defer=0.595  dec/ep=315  actor=-0.0062 critic=0.1264 ent=0.748 kl=0.0239  1.06s/ep  ETA 2.1h
+ep   8000/15000  rate=0.63  wait HGT=0.4461 iG=0.4779 (+6.67%)  W/T/L=18/3/11  defer=0.659  dec/ep=365  actor=-0.0101 critic=0.0984 ent=0.671 kl=0.0228  1.06s/ep  ETA 2.1h
+[eval ep 8000] mean wait HGT=0.4145 iGreedy=0.4159 (+0.32%, worst rate -157.2%)
+    0.10:-157.2%  0.20:+25.2%  0.35:-60.2%  0.50:+11.4%  0.65:+38.3%  0.80:-7.8%  1.00:-3.0%  1.20:+16.5%
+ep   8064/15000  rate=0.67  wait HGT=0.4355 iG=0.4632 (+5.99%)  W/T/L=29/8/27  defer=0.625  dec/ep=338  actor=-0.0090 critic=0.1296 ent=0.681 kl=0.0293  1.06s/ep  ETA 2.0h
+ep   8128/15000  rate=0.65  wait HGT=0.3598 iG=0.3588 (-0.28%)  W/T/L=30/9/25  defer=0.649  dec/ep=350  actor=-0.0103 critic=0.1097 ent=0.603 kl=0.0238  1.06s/ep  ETA 2.0h
+ep   8160/15000  rate=0.63  wait HGT=0.3446 iG=0.3944 (+12.65%)  W/T/L=13/8/11  defer=0.628  dec/ep=330  actor=-0.0080 critic=0.1126 ent=0.672 kl=0.0254  1.06s/ep  ETA 2.0h
+ep   8224/15000  rate=0.71  wait HGT=0.4003 iG=0.4580 (+12.60%)  W/T/L=38/4/22  defer=0.592  dec/ep=343  actor=-0.0069 critic=0.1180 ent=0.722 kl=0.0303  1.07s/ep  ETA 2.0h
+ep   8256/15000  rate=0.60  wait HGT=0.3461 iG=0.4190 (+17.40%)  W/T/L=18/6/8  defer=0.558  dec/ep=252  actor=-0.0120 critic=0.2284 ent=0.742 kl=0.0259  1.06s/ep  ETA 2.0h
+ep   8320/15000  rate=0.68  wait HGT=0.3930 iG=0.4582 (+14.24%)  W/T/L=37/7/20  defer=0.609  dec/ep=337  actor=-0.0057 critic=0.1354 ent=0.716 kl=0.0243  1.07s/ep  ETA 2.0h
+ep   8352/15000  rate=0.66  wait HGT=0.4497 iG=0.5258 (+14.49%)  W/T/L=22/4/6  defer=0.687  dec/ep=397  actor=-0.0080 critic=0.1058 ent=0.584 kl=0.0287  1.07s/ep  ETA 2.0h
+ep   8416/15000  rate=0.69  wait HGT=0.3932 iG=0.4795 (+18.00%)  W/T/L=35/13/16  defer=0.684  dec/ep=398  actor=-0.0064 critic=0.1003 ent=0.610 kl=0.0264  1.07s/ep  ETA 2.0h
+ep   8480/15000  rate=0.62  wait HGT=0.3718 iG=0.4247 (+12.47%)  W/T/L=36/7/21  defer=0.686  dec/ep=360  actor=-0.0116 critic=0.1055 ent=0.596 kl=0.0193  1.07s/ep  ETA 1.9h
+ep   8512/15000  rate=0.65  wait HGT=0.4277 iG=0.5061 (+15.49%)  W/T/L=17/3/12  defer=0.697  dec/ep=402  actor=-0.0109 critic=0.0933 ent=0.623 kl=0.0255  1.07s/ep  ETA 1.9h
+[eval ep 8512] mean wait HGT=0.4506 iGreedy=0.4159 (-8.35%, worst rate -132.7%)
+    0.10:-132.7%  0.20:-18.0%  0.35:-57.4%  0.50:-10.0%  0.65:+23.8%  0.80:-14.9%  1.00:-5.3%  1.20:+5.4%
+ep   8576/15000  rate=0.63  wait HGT=0.3704 iG=0.3913 (+5.34%)  W/T/L=28/10/26  defer=0.673  dec/ep=349  actor=-0.0123 critic=0.1187 ent=0.696 kl=0.0175  1.08s/ep  ETA 1.9h
+ep   8608/15000  rate=0.75  wait HGT=0.4166 iG=0.5183 (+19.61%)  W/T/L=19/3/10  defer=0.708  dec/ep=458  actor=-0.0068 critic=0.1363 ent=0.619 kl=0.0294  1.08s/ep  ETA 1.9h
+ep   8672/15000  rate=0.69  wait HGT=0.4069 iG=0.4422 (+7.98%)  W/T/L=34/7/23  defer=0.697  dec/ep=420  actor=-0.0058 critic=0.1580 ent=0.657 kl=0.0230  1.08s/ep  ETA 1.9h
+ep   8704/15000  rate=0.72  wait HGT=0.3830 iG=0.4853 (+21.07%)  W/T/L=21/4/7  defer=0.722  dec/ep=493  actor=-0.0044 critic=0.0907 ent=0.606 kl=0.0230  1.09s/ep  ETA 1.9h
+ep   8768/15000  rate=0.67  wait HGT=0.4478 iG=0.4844 (+7.55%)  W/T/L=33/6/25  defer=0.682  dec/ep=392  actor=-0.0048 critic=0.1267 ent=0.661 kl=0.0240  1.09s/ep  ETA 1.9h
+ep   8800/15000  rate=0.62  wait HGT=0.4441 iG=0.4916 (+9.66%)  W/T/L=15/7/10  defer=0.672  dec/ep=348  actor=-0.0117 critic=0.0989 ent=0.666 kl=0.0230  1.09s/ep  ETA 1.9h
+ep   8864/15000  rate=0.69  wait HGT=0.3969 iG=0.4670 (+15.01%)  W/T/L=37/5/22  defer=0.672  dec/ep=404  actor=-0.0075 critic=0.0898 ent=0.656 kl=0.0328  1.09s/ep  ETA 1.9h
+ep   8928/15000  rate=0.66  wait HGT=0.3778 iG=0.4317 (+12.48%)  W/T/L=32/8/24  defer=0.599  dec/ep=323  actor=-0.0069 critic=0.1296 ent=0.763 kl=0.0287  1.09s/ep  ETA 1.8h
+ep   8960/15000  rate=0.64  wait HGT=0.3639 iG=0.3952 (+7.91%)  W/T/L=20/3/9  defer=0.578  dec/ep=303  actor=-0.0108 critic=0.1091 ent=0.765 kl=0.0207  1.09s/ep  ETA 1.8h
+ep   9024/15000  rate=0.59  wait HGT=0.3449 iG=0.3783 (+8.81%)  W/T/L=24/16/24  defer=0.613  dec/ep=291  actor=-0.0075 critic=0.1824 ent=0.700 kl=0.0195  1.09s/ep  ETA 1.8h
+[eval ep 9024] mean wait HGT=0.3878 iGreedy=0.4159 (+6.75%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-3.5%  0.35:-23.7%  0.50:-5.0%  0.65:+8.3%  0.80:+8.9%  1.00:+23.8%  1.20:+22.4%
+ep   9056/15000  rate=0.73  wait HGT=0.4259 iG=0.5218 (+18.38%)  W/T/L=22/3/7  defer=0.573  dec/ep=353  actor=-0.0059 critic=0.1456 ent=0.752 kl=0.0238  1.09s/ep  ETA 1.8h
+ep   9120/15000  rate=0.68  wait HGT=0.4062 iG=0.4885 (+16.84%)  W/T/L=37/6/21  defer=0.559  dec/ep=321  actor=-0.0051 critic=0.1390 ent=0.756 kl=0.0250  1.09s/ep  ETA 1.8h
+ep   9152/15000  rate=0.62  wait HGT=0.3409 iG=0.3542 (+3.74%)  W/T/L=14/5/13  defer=0.593  dec/ep=300  actor=-0.0134 critic=0.1080 ent=0.740 kl=0.0204  1.09s/ep  ETA 1.8h
+ep   9216/15000  rate=0.68  wait HGT=0.3981 iG=0.4501 (+11.57%)  W/T/L=38/5/21  defer=0.614  dec/ep=344  actor=-0.0063 critic=0.1211 ent=0.713 kl=0.0246  1.09s/ep  ETA 1.8h
+ep   9280/15000  rate=0.65  wait HGT=0.3830 iG=0.4380 (+12.57%)  W/T/L=29/10/25  defer=0.583  dec/ep=312  actor=-0.0068 critic=0.2381 ent=0.692 kl=0.0210  1.09s/ep  ETA 1.7h
+ep   9312/15000  rate=0.68  wait HGT=0.4577 iG=0.5862 (+21.91%)  W/T/L=22/2/8  defer=0.632  dec/ep=373  actor=-0.0046 critic=0.1941 ent=0.685 kl=0.0257  1.09s/ep  ETA 1.7h
+ep   9376/15000  rate=0.67  wait HGT=0.3802 iG=0.4369 (+12.96%)  W/T/L=37/4/23  defer=0.612  dec/ep=348  actor=-0.0121 critic=0.1264 ent=0.716 kl=0.0204  1.09s/ep  ETA 1.7h
+ep   9408/15000  rate=0.61  wait HGT=0.2880 iG=0.3348 (+13.96%)  W/T/L=17/4/11  defer=0.612  dec/ep=278  actor=-0.0116 critic=0.1267 ent=0.688 kl=0.0193  1.09s/ep  ETA 1.7h
+ep   9472/15000  rate=0.62  wait HGT=0.3498 iG=0.4087 (+14.40%)  W/T/L=39/7/18  defer=0.644  dec/ep=326  actor=-0.0093 critic=0.1519 ent=0.663 kl=0.0209  1.09s/ep  ETA 1.7h
+ep   9504/15000  rate=0.66  wait HGT=0.4045 iG=0.4091 (+1.12%)  W/T/L=12/6/14  defer=0.672  dec/ep=394  actor=-0.0110 critic=0.0915 ent=0.639 kl=0.0218  1.09s/ep  ETA 1.7h
+[eval ep 9504] mean wait HGT=0.3766 iGreedy=0.4159 (+9.44%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+0.1%  0.35:-25.4%  0.50:+20.6%  0.65:+24.3%  0.80:+19.1%  1.00:+14.4%  1.20:+18.3%
+ep   9568/15000  rate=0.68  wait HGT=0.3829 iG=0.4327 (+11.51%)  W/T/L=35/9/20  defer=0.643  dec/ep=353  actor=-0.0059 critic=0.1176 ent=0.667 kl=0.0250  1.10s/ep  ETA 1.7h
+ep   9600/15000  rate=0.65  wait HGT=0.3612 iG=0.3992 (+9.53%)  W/T/L=17/6/9  defer=0.672  dec/ep=364  actor=-0.0077 critic=0.1146 ent=0.626 kl=0.0253  1.10s/ep  ETA 1.6h
+ep   9664/15000  rate=0.66  wait HGT=0.3934 iG=0.4522 (+12.99%)  W/T/L=34/9/21  defer=0.640  dec/ep=353  actor=-0.0076 critic=0.1572 ent=0.680 kl=0.0278  1.10s/ep  ETA 1.6h
+ep   9728/15000  rate=0.66  wait HGT=0.3880 iG=0.4702 (+17.48%)  W/T/L=34/6/24  defer=0.632  dec/ep=341  actor=-0.0101 critic=0.0921 ent=0.685 kl=0.0319  1.10s/ep  ETA 1.6h
+ep   9760/15000  rate=0.57  wait HGT=0.4304 iG=0.4433 (+2.91%)  W/T/L=10/5/17  defer=0.603  dec/ep=256  actor=-0.0095 critic=0.2261 ent=0.725 kl=0.0220  1.10s/ep  ETA 1.6h
+ep   9824/15000  rate=0.69  wait HGT=0.3930 iG=0.4741 (+17.12%)  W/T/L=42/7/15  defer=0.628  dec/ep=362  actor=-0.0038 critic=0.1386 ent=0.675 kl=0.0243  1.10s/ep  ETA 1.6h
+ep   9856/15000  rate=0.84  wait HGT=0.5527 iG=0.5953 (+7.16%)  W/T/L=19/0/13  defer=0.638  dec/ep=487  actor=-0.0038 critic=0.1328 ent=0.682 kl=0.0255  1.10s/ep  ETA 1.6h
+ep   9920/15000  rate=0.64  wait HGT=0.3761 iG=0.3860 (+2.57%)  W/T/L=29/10/25  defer=0.618  dec/ep=308  actor=-0.0102 critic=0.1521 ent=0.714 kl=0.0200  1.10s/ep  ETA 1.6h
+ep   9952/15000  rate=0.60  wait HGT=0.3250 iG=0.3940 (+17.52%)  W/T/L=18/5/9  defer=0.660  dec/ep=309  actor=-0.0107 critic=0.1252 ent=0.641 kl=0.0254  1.10s/ep  ETA 1.5h
+ep  10016/15000  rate=0.59  wait HGT=0.3719 iG=0.3922 (+5.19%)  W/T/L=29/13/22  defer=0.584  dec/ep=282  actor=-0.0083 critic=0.1787 ent=0.716 kl=0.0249  1.10s/ep  ETA 1.5h
+[eval ep 10016] mean wait HGT=0.3668 iGreedy=0.4159 (+11.80%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-13.0%  0.35:-8.7%  0.50:+3.3%  0.65:+21.4%  0.80:+12.4%  1.00:+19.0%  1.20:+28.5%
+ep  10080/15000  rate=0.66  wait HGT=0.3810 iG=0.4068 (+6.34%)  W/T/L=36/8/20  defer=0.593  dec/ep=326  actor=-0.0092 critic=0.1141 ent=0.736 kl=0.0253  1.10s/ep  ETA 1.5h
+ep  10112/15000  rate=0.54  wait HGT=0.3101 iG=0.3094 (-0.22%)  W/T/L=12/8/12  defer=0.620  dec/ep=288  actor=-0.0124 critic=0.1041 ent=0.733 kl=0.0263  1.10s/ep  ETA 1.5h
+ep  10176/15000  rate=0.63  wait HGT=0.3489 iG=0.3889 (+10.28%)  W/T/L=33/12/19  defer=0.616  dec/ep=318  actor=-0.0127 critic=0.1432 ent=0.758 kl=0.0233  1.10s/ep  ETA 1.5h
+ep  10208/15000  rate=0.72  wait HGT=0.4548 iG=0.5373 (+15.35%)  W/T/L=17/4/11  defer=0.570  dec/ep=326  actor=-0.0078 critic=0.2379 ent=0.784 kl=0.0228  1.10s/ep  ETA 1.5h
+ep  10272/15000  rate=0.62  wait HGT=0.3540 iG=0.3837 (+7.74%)  W/T/L=33/9/22  defer=0.554  dec/ep=270  actor=-0.0125 critic=0.1927 ent=0.802 kl=0.0217  1.10s/ep  ETA 1.4h
+ep  10304/15000  rate=0.62  wait HGT=0.4010 iG=0.4169 (+3.80%)  W/T/L=17/7/8  defer=0.554  dec/ep=277  actor=-0.0081 critic=0.1891 ent=0.783 kl=0.0188  1.10s/ep  ETA 1.4h
+ep  10368/15000  rate=0.74  wait HGT=0.4505 iG=0.4718 (+4.50%)  W/T/L=33/5/26  defer=0.537  dec/ep=329  actor=-0.0077 critic=0.1400 ent=0.822 kl=0.0184  1.10s/ep  ETA 1.4h
+ep  10400/15000  rate=0.83  wait HGT=0.5269 iG=0.6332 (+16.79%)  W/T/L=24/2/6  defer=0.576  dec/ep=403  actor=-0.0042 critic=0.1316 ent=0.789 kl=0.0226  1.10s/ep  ETA 1.4h
+ep  10464/15000  rate=0.60  wait HGT=0.3343 iG=0.3911 (+14.53%)  W/T/L=32/14/18  defer=0.592  dec/ep=285  actor=-0.0058 critic=0.2321 ent=0.710 kl=0.0170  1.10s/ep  ETA 1.4h
+ep  10528/15000  rate=0.70  wait HGT=0.3717 iG=0.4505 (+17.50%)  W/T/L=39/11/14  defer=0.609  dec/ep=345  actor=-0.0074 critic=0.1198 ent=0.699 kl=0.0287  1.10s/ep  ETA 1.4h
+[eval ep 10528] mean wait HGT=0.3477 iGreedy=0.4159 (+16.40%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-3.1%  0.35:-10.8%  0.50:+21.7%  0.65:+27.6%  0.80:+24.8%  1.00:+17.6%  1.20:+30.3%
+ep  10560/15000  rate=0.68  wait HGT=0.3903 iG=0.4253 (+8.23%)  W/T/L=19/4/9  defer=0.620  dec/ep=362  actor=-0.0048 critic=0.1086 ent=0.719 kl=0.0232  1.11s/ep  ETA 1.4h
+ep  10624/15000  rate=0.63  wait HGT=0.3335 iG=0.4205 (+20.69%)  W/T/L=35/12/17  defer=0.629  dec/ep=339  actor=-0.0041 critic=0.1519 ent=0.692 kl=0.0247  1.11s/ep  ETA 1.3h
+ep  10656/15000  rate=0.64  wait HGT=0.3638 iG=0.4027 (+9.68%)  W/T/L=16/3/13  defer=0.556  dec/ep=293  actor=-0.0057 critic=0.1459 ent=0.751 kl=0.0187  1.11s/ep  ETA 1.3h
+ep  10720/15000  rate=0.62  wait HGT=0.3493 iG=0.4279 (+18.36%)  W/T/L=37/13/14  defer=0.584  dec/ep=296  actor=-0.0095 critic=0.1638 ent=0.726 kl=0.0211  1.10s/ep  ETA 1.3h
+ep  10752/15000  rate=0.60  wait HGT=0.3133 iG=0.3910 (+19.88%)  W/T/L=20/6/6  defer=0.632  dec/ep=293  actor=-0.0082 critic=0.1386 ent=0.683 kl=0.0189  1.10s/ep  ETA 1.3h
+ep  10816/15000  rate=0.66  wait HGT=0.3380 iG=0.4203 (+19.57%)  W/T/L=41/10/13  defer=0.603  dec/ep=322  actor=-0.0091 critic=0.1657 ent=0.760 kl=0.0267  1.10s/ep  ETA 1.3h
+ep  10880/15000  rate=0.79  wait HGT=0.4386 iG=0.5204 (+15.72%)  W/T/L=46/3/15  defer=0.647  dec/ep=451  actor=-0.0051 critic=0.0884 ent=0.708 kl=0.0191  1.11s/ep  ETA 1.3h
+ep  10912/15000  rate=0.64  wait HGT=0.3965 iG=0.4684 (+15.34%)  W/T/L=17/6/9  defer=0.653  dec/ep=370  actor=-0.0050 critic=0.1475 ent=0.674 kl=0.0184  1.11s/ep  ETA 1.3h
+ep  10976/15000  rate=0.71  wait HGT=0.3959 iG=0.4770 (+17.00%)  W/T/L=39/7/18  defer=0.626  dec/ep=342  actor=-0.0086 critic=0.1445 ent=0.734 kl=0.0191  1.11s/ep  ETA 1.2h
+ep  11008/15000  rate=0.50  wait HGT=0.2748 iG=0.2906 (+5.46%)  W/T/L=13/7/12  defer=0.595  dec/ep=222  actor=-0.0122 critic=0.1888 ent=0.707 kl=0.0190  1.11s/ep  ETA 1.2h
+[eval ep 11008] mean wait HGT=0.3735 iGreedy=0.4159 (+10.18%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-13.0%  0.35:-44.1%  0.50:-8.5%  0.65:+42.2%  0.80:+9.4%  1.00:+17.0%  1.20:+33.0%
+ep  11072/15000  rate=0.67  wait HGT=0.4218 iG=0.4642 (+9.13%)  W/T/L=38/6/20  defer=0.577  dec/ep=313  actor=-0.0123 critic=0.1306 ent=0.720 kl=0.0179  1.11s/ep  ETA 1.2h
+ep  11104/15000  rate=0.67  wait HGT=0.4164 iG=0.4910 (+15.20%)  W/T/L=21/3/8  defer=0.578  dec/ep=310  actor=-0.0098 critic=0.1587 ent=0.754 kl=0.0215  1.11s/ep  ETA 1.2h
+ep  11168/15000  rate=0.65  wait HGT=0.3759 iG=0.4438 (+15.31%)  W/T/L=37/7/20  defer=0.582  dec/ep=296  actor=-0.0088 critic=0.2177 ent=0.720 kl=0.0125  1.11s/ep  ETA 1.2h
+ep  11200/15000  rate=0.58  wait HGT=0.3546 iG=0.3664 (+3.23%)  W/T/L=16/6/10  defer=0.622  dec/ep=305  actor=-0.0179 critic=0.1376 ent=0.693 kl=0.0161  1.11s/ep  ETA 1.2h
+ep  11264/15000  rate=0.66  wait HGT=0.4067 iG=0.4478 (+9.19%)  W/T/L=32/8/24  defer=0.626  dec/ep=336  actor=-0.0051 critic=0.1352 ent=0.665 kl=0.0173  1.11s/ep  ETA 1.2h
+ep  11328/15000  rate=0.65  wait HGT=0.3632 iG=0.3821 (+4.94%)  W/T/L=31/10/23  defer=0.667  dec/ep=361  actor=-0.0083 critic=0.1056 ent=0.627 kl=0.0184  1.11s/ep  ETA 1.1h
+ep  11360/15000  rate=0.68  wait HGT=0.3754 iG=0.4093 (+8.30%)  W/T/L=16/5/11  defer=0.673  dec/ep=377  actor=-0.0024 critic=0.1002 ent=0.628 kl=0.0214  1.11s/ep  ETA 1.1h
+ep  11424/15000  rate=0.67  wait HGT=0.3529 iG=0.3921 (+9.99%)  W/T/L=38/11/15  defer=0.685  dec/ep=406  actor=-0.0112 critic=0.0819 ent=0.618 kl=0.0213  1.11s/ep  ETA 1.1h
+ep  11456/15000  rate=0.61  wait HGT=0.4599 iG=0.4530 (-1.53%)  W/T/L=13/3/16  defer=0.645  dec/ep=337  actor=-0.0069 critic=0.1455 ent=0.680 kl=0.0199  1.11s/ep  ETA 1.1h
+ep  11520/15000  rate=0.61  wait HGT=0.2972 iG=0.3543 (+16.12%)  W/T/L=30/13/21  defer=0.682  dec/ep=345  actor=-0.0087 critic=0.0896 ent=0.598 kl=0.0213  1.11s/ep  ETA 1.1h
+[eval ep 11520] mean wait HGT=0.4162 iGreedy=0.4159 (-0.09%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-3.7%  0.35:-57.4%  0.50:-1.4%  0.65:+34.6%  0.80:-4.5%  1.00:+8.6%  1.20:+16.5%
+ep  11552/15000  rate=0.72  wait HGT=0.4015 iG=0.4636 (+13.39%)  W/T/L=19/4/9  defer=0.664  dec/ep=428  actor=-0.0064 critic=0.0695 ent=0.651 kl=0.0210  1.12s/ep  ETA 1.1h
+ep  11616/15000  rate=0.60  wait HGT=0.3456 iG=0.3988 (+13.34%)  W/T/L=30/12/22  defer=0.666  dec/ep=330  actor=-0.0030 critic=0.1480 ent=0.643 kl=0.0153  1.13s/ep  ETA 1.1h
+ep  11680/15000  rate=0.66  wait HGT=0.4717 iG=0.4790 (+1.52%)  W/T/L=29/12/23  defer=0.654  dec/ep=386  actor=-0.0032 critic=0.1016 ent=0.680 kl=0.0225  1.13s/ep  ETA 1.0h
+ep  11712/15000  rate=0.72  wait HGT=0.4178 iG=0.4322 (+3.33%)  W/T/L=12/3/17  defer=0.639  dec/ep=395  actor=-0.0057 critic=0.1103 ent=0.687 kl=0.0196  1.13s/ep  ETA 1.0h
+ep  11776/15000  rate=0.74  wait HGT=0.4675 iG=0.4878 (+4.16%)  W/T/L=28/5/31  defer=0.707  dec/ep=475  actor=-0.0092 critic=0.1055 ent=0.626 kl=0.0202  1.14s/ep  ETA 1.0h
+ep  11808/15000  rate=0.71  wait HGT=0.4884 iG=0.5130 (+4.78%)  W/T/L=16/4/12  defer=0.694  dec/ep=448  actor=-0.0071 critic=0.0854 ent=0.657 kl=0.0190  1.14s/ep  ETA 1.0h
+ep  11872/15000  rate=0.69  wait HGT=0.4059 iG=0.4294 (+5.49%)  W/T/L=32/6/26  defer=0.688  dec/ep=417  actor=-0.0092 critic=0.0881 ent=0.653 kl=0.0187  1.14s/ep  ETA 1.0h
+ep  11904/15000  rate=0.56  wait HGT=0.3208 iG=0.3258 (+1.54%)  W/T/L=16/3/13  defer=0.654  dec/ep=281  actor=-0.0106 critic=0.1857 ent=0.669 kl=0.0153  1.15s/ep  ETA 1.0h
+ep  11968/15000  rate=0.66  wait HGT=0.3931 iG=0.4326 (+9.14%)  W/T/L=32/10/22  defer=0.683  dec/ep=406  actor=-0.0075 critic=0.1141 ent=0.669 kl=0.0170  1.15s/ep  ETA 1.0h
+ep  12000/15000  rate=0.68  wait HGT=0.3658 iG=0.4299 (+14.92%)  W/T/L=18/3/11  defer=0.616  dec/ep=323  actor=-0.0083 critic=0.1376 ent=0.727 kl=0.0198  1.16s/ep  ETA 1.0h
+[eval ep 12000] mean wait HGT=0.3664 iGreedy=0.4159 (+11.90%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+15.2%  0.35:-51.6%  0.50:-11.0%  0.65:+34.1%  0.80:+15.7%  1.00:+28.0%  1.20:+32.0%
+ep  12064/15000  rate=0.70  wait HGT=0.4100 iG=0.4658 (+12.00%)  W/T/L=37/9/18  defer=0.672  dec/ep=413  actor=-0.0088 critic=0.1129 ent=0.649 kl=0.0226  1.17s/ep  ETA 1.0h
+ep  12128/15000  rate=0.78  wait HGT=0.4286 iG=0.5424 (+20.97%)  W/T/L=45/6/13  defer=0.706  dec/ep=546  actor=-0.0040 critic=0.0798 ent=0.629 kl=0.0259  1.17s/ep  ETA 0.9h
+ep  12160/15000  rate=0.63  wait HGT=0.2682 iG=0.3607 (+25.65%)  W/T/L=19/5/8  defer=0.712  dec/ep=405  actor=-0.0081 critic=0.0628 ent=0.596 kl=0.0210  1.18s/ep  ETA 0.9h
+ep  12224/15000  rate=0.59  wait HGT=0.3183 iG=0.4191 (+24.05%)  W/T/L=35/19/10  defer=0.709  dec/ep=390  actor=-0.0058 critic=0.1268 ent=0.602 kl=0.0203  1.18s/ep  ETA 0.9h
+ep  12256/15000  rate=0.65  wait HGT=0.3512 iG=0.3995 (+12.10%)  W/T/L=17/3/12  defer=0.724  dec/ep=417  actor=-0.0095 critic=0.0788 ent=0.576 kl=0.0203  1.18s/ep  ETA 0.9h
+ep  12320/15000  rate=0.61  wait HGT=0.3349 iG=0.3708 (+9.70%)  W/T/L=33/12/19  defer=0.691  dec/ep=351  actor=-0.0102 critic=0.1740 ent=0.647 kl=0.0180  1.18s/ep  ETA 0.9h
+ep  12352/15000  rate=0.64  wait HGT=0.3190 iG=0.4338 (+26.45%)  W/T/L=19/7/6  defer=0.723  dec/ep=417  actor=-0.0070 critic=0.1062 ent=0.609 kl=0.0225  1.18s/ep  ETA 0.9h
+ep  12416/15000  rate=0.57  wait HGT=0.3103 iG=0.3527 (+12.03%)  W/T/L=34/12/18  defer=0.661  dec/ep=310  actor=-0.0079 critic=0.1219 ent=0.627 kl=0.0219  1.18s/ep  ETA 0.8h
+ep  12480/15000  rate=0.65  wait HGT=0.4651 iG=0.5044 (+7.80%)  W/T/L=29/8/27  defer=0.648  dec/ep=373  actor=-0.0067 critic=0.1475 ent=0.681 kl=0.0186  1.18s/ep  ETA 0.8h
+ep  12512/15000  rate=0.56  wait HGT=0.3578 iG=0.3727 (+3.99%)  W/T/L=13/6/13  defer=0.605  dec/ep=270  actor=-0.0098 critic=0.1270 ent=0.720 kl=0.0207  1.18s/ep  ETA 0.8h
+[eval ep 12512] mean wait HGT=0.4091 iGreedy=0.4159 (+1.63%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+33.6%  0.35:-69.3%  0.50:-11.1%  0.65:+32.2%  0.80:-10.3%  1.00:+9.2%  1.20:+30.6%
+ep  12576/15000  rate=0.65  wait HGT=0.3809 iG=0.4456 (+14.52%)  W/T/L=39/10/15  defer=0.599  dec/ep=325  actor=-0.0081 critic=0.2055 ent=0.727 kl=0.0242  1.18s/ep  ETA 0.8h
+ep  12608/15000  rate=0.69  wait HGT=0.4144 iG=0.3795 (-9.21%)  W/T/L=12/4/16  defer=0.621  dec/ep=348  actor=-0.0086 critic=0.1166 ent=0.692 kl=0.0247  1.18s/ep  ETA 0.8h
+ep  12672/15000  rate=0.67  wait HGT=0.3850 iG=0.4718 (+18.40%)  W/T/L=38/14/12  defer=0.623  dec/ep=370  actor=-0.0040 critic=0.0788 ent=0.671 kl=0.0234  1.18s/ep  ETA 0.8h
+ep  12704/15000  rate=0.62  wait HGT=0.3946 iG=0.4090 (+3.53%)  W/T/L=15/5/12  defer=0.567  dec/ep=290  actor=-0.0101 critic=0.1340 ent=0.748 kl=0.0227  1.18s/ep  ETA 0.8h
+ep  12768/15000  rate=0.58  wait HGT=0.3484 iG=0.3509 (+0.69%)  W/T/L=23/17/24  defer=0.609  dec/ep=279  actor=-0.0108 critic=0.1001 ent=0.664 kl=0.0241  1.18s/ep  ETA 0.7h
+ep  12800/15000  rate=0.71  wait HGT=0.3840 iG=0.5031 (+23.67%)  W/T/L=18/3/11  defer=0.590  dec/ep=348  actor=-0.0064 critic=0.2044 ent=0.719 kl=0.0245  1.18s/ep  ETA 0.7h
+ep  12864/15000  rate=0.69  wait HGT=0.4347 iG=0.4974 (+12.60%)  W/T/L=36/8/20  defer=0.564  dec/ep=324  actor=-0.0121 critic=0.1392 ent=0.729 kl=0.0194  1.18s/ep  ETA 0.7h
+ep  12928/15000  rate=0.61  wait HGT=0.3297 iG=0.3700 (+10.88%)  W/T/L=33/15/16  defer=0.558  dec/ep=276  actor=-0.0055 critic=0.1194 ent=0.740 kl=0.0344  1.18s/ep  ETA 0.7h
+ep  12960/15000  rate=0.62  wait HGT=0.4682 iG=0.4524 (-3.51%)  W/T/L=14/4/14  defer=0.542  dec/ep=273  actor=-0.0121 critic=0.1602 ent=0.754 kl=0.0230  1.18s/ep  ETA 0.7h
+ep  13024/15000  rate=0.65  wait HGT=0.4568 iG=0.4574 (+0.15%)  W/T/L=28/5/31  defer=0.541  dec/ep=296  actor=-0.0077 critic=0.2801 ent=0.753 kl=0.0221  1.18s/ep  ETA 0.6h
+[eval ep 13024] mean wait HGT=0.4283 iGreedy=0.4159 (-3.00%, worst rate -247.1%)
+    0.10:-247.1%  0.20:-41.0%  0.35:-66.0%  0.50:-4.8%  0.65:+25.6%  0.80:-26.3%  1.00:+18.9%  1.20:+24.6%
+ep  13056/15000  rate=0.61  wait HGT=0.3373 iG=0.3451 (+2.24%)  W/T/L=14/6/12  defer=0.561  dec/ep=278  actor=-0.0113 critic=0.1318 ent=0.742 kl=0.0201  1.18s/ep  ETA 0.6h
+ep  13120/15000  rate=0.60  wait HGT=0.3446 iG=0.3270 (-5.38%)  W/T/L=24/10/30  defer=0.591  dec/ep=289  actor=-0.0159 critic=0.1453 ent=0.676 kl=0.0188  1.18s/ep  ETA 0.6h
+ep  13152/15000  rate=0.74  wait HGT=0.4470 iG=0.5111 (+12.55%)  W/T/L=17/3/12  defer=0.640  dec/ep=427  actor=-0.0066 critic=0.1276 ent=0.637 kl=0.0285  1.18s/ep  ETA 0.6h
+ep  13216/15000  rate=0.67  wait HGT=0.4432 iG=0.4579 (+3.21%)  W/T/L=32/9/23  defer=0.658  dec/ep=391  actor=-0.0075 critic=0.0792 ent=0.637 kl=0.0235  1.18s/ep  ETA 0.6h
+ep  13280/15000  rate=0.60  wait HGT=0.3434 iG=0.4040 (+14.99%)  W/T/L=35/13/16  defer=0.628  dec/ep=310  actor=-0.0106 critic=0.1127 ent=0.662 kl=0.0186  1.18s/ep  ETA 0.6h
+ep  13312/15000  rate=0.63  wait HGT=0.3837 iG=0.4194 (+8.51%)  W/T/L=16/5/11  defer=0.628  dec/ep=338  actor=-0.0106 critic=0.1202 ent=0.665 kl=0.0203  1.18s/ep  ETA 0.6h
+ep  13376/15000  rate=0.66  wait HGT=0.4307 iG=0.4360 (+1.23%)  W/T/L=29/9/26  defer=0.653  dec/ep=346  actor=-0.0123 critic=0.1051 ent=0.634 kl=0.0217  1.18s/ep  ETA 0.5h
+ep  13408/15000  rate=0.63  wait HGT=0.3757 iG=0.4451 (+15.58%)  W/T/L=15/7/10  defer=0.659  dec/ep=352  actor=-0.0066 critic=0.1019 ent=0.623 kl=0.0299  1.18s/ep  ETA 0.5h
+ep  13472/15000  rate=0.61  wait HGT=0.3603 iG=0.3702 (+2.67%)  W/T/L=30/11/23  defer=0.651  dec/ep=332  actor=-0.0152 critic=0.0895 ent=0.642 kl=0.0226  1.18s/ep  ETA 0.5h
+ep  13504/15000  rate=0.66  wait HGT=0.3542 iG=0.4013 (+11.73%)  W/T/L=20/4/8  defer=0.663  dec/ep=366  actor=-0.0097 critic=0.0881 ent=0.614 kl=0.0201  1.18s/ep  ETA 0.5h
+[eval ep 13504] mean wait HGT=0.4005 iGreedy=0.4159 (+3.70%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+46.2%  0.35:-51.3%  0.50:-11.3%  0.65:+26.7%  0.80:-7.1%  1.00:+22.9%  1.20:+20.9%
+ep  13568/15000  rate=0.64  wait HGT=0.3720 iG=0.4080 (+8.82%)  W/T/L=43/6/15  defer=0.655  dec/ep=339  actor=-0.0085 critic=0.1123 ent=0.622 kl=0.0193  1.18s/ep  ETA 0.5h
+ep  13600/15000  rate=0.62  wait HGT=0.3812 iG=0.3907 (+2.45%)  W/T/L=15/4/13  defer=0.669  dec/ep=346  actor=-0.0084 critic=0.1137 ent=0.588 kl=0.0219  1.18s/ep  ETA 0.5h
+ep  13664/15000  rate=0.63  wait HGT=0.3671 iG=0.4015 (+8.56%)  W/T/L=31/12/21  defer=0.719  dec/ep=415  actor=-0.0077 critic=0.0794 ent=0.561 kl=0.0248  1.18s/ep  ETA 0.4h
+ep  13728/15000  rate=0.69  wait HGT=0.3876 iG=0.4654 (+16.72%)  W/T/L=42/8/14  defer=0.674  dec/ep=383  actor=-0.0062 critic=0.1020 ent=0.608 kl=0.0188  1.18s/ep  ETA 0.4h
+ep  13760/15000  rate=0.66  wait HGT=0.3699 iG=0.4234 (+12.64%)  W/T/L=16/6/10  defer=0.695  dec/ep=397  actor=-0.0084 critic=0.0860 ent=0.576 kl=0.0230  1.18s/ep  ETA 0.4h
+ep  13824/15000  rate=0.63  wait HGT=0.3384 iG=0.4179 (+19.02%)  W/T/L=36/13/15  defer=0.672  dec/ep=346  actor=-0.0046 critic=0.1146 ent=0.587 kl=0.0241  1.18s/ep  ETA 0.4h
+ep  13856/15000  rate=0.63  wait HGT=0.3199 iG=0.3532 (+9.42%)  W/T/L=17/6/9  defer=0.685  dec/ep=368  actor=-0.0098 critic=0.0779 ent=0.621 kl=0.0213  1.18s/ep  ETA 0.4h
+ep  13920/15000  rate=0.70  wait HGT=0.4257 iG=0.4496 (+5.31%)  W/T/L=30/10/24  defer=0.703  dec/ep=454  actor=-0.0043 critic=0.0762 ent=0.568 kl=0.0207  1.18s/ep  ETA 0.4h
+ep  13952/15000  rate=0.57  wait HGT=0.3069 iG=0.3507 (+12.47%)  W/T/L=16/9/7  defer=0.665  dec/ep=319  actor=-0.0054 critic=0.1296 ent=0.664 kl=0.0219  1.18s/ep  ETA 0.3h
+ep  14016/15000  rate=0.64  wait HGT=0.3960 iG=0.4295 (+7.81%)  W/T/L=34/7/23  defer=0.655  dec/ep=359  actor=-0.0061 critic=0.1123 ent=0.685 kl=0.0324  1.18s/ep  ETA 0.3h
+[eval ep 14016] mean wait HGT=0.3549 iGreedy=0.4159 (+14.67%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+3.6%  0.35:-0.7%  0.50:-8.3%  0.65:+28.0%  0.80:+21.2%  1.00:+18.9%  1.20:+28.8%
+ep  14080/15000  rate=0.66  wait HGT=0.3815 iG=0.4219 (+9.56%)  W/T/L=32/8/24  defer=0.587  dec/ep=307  actor=-0.0122 critic=0.1193 ent=0.687 kl=0.0205  1.19s/ep  ETA 0.3h
+ep  14112/15000  rate=0.70  wait HGT=0.3289 iG=0.3747 (+12.22%)  W/T/L=16/3/13  defer=0.573  dec/ep=322  actor=-0.0094 critic=0.0905 ent=0.724 kl=0.0218  1.19s/ep  ETA 0.3h
+ep  14176/15000  rate=0.66  wait HGT=0.3978 iG=0.4455 (+10.72%)  W/T/L=35/7/22  defer=0.566  dec/ep=309  actor=-0.0058 critic=0.1374 ent=0.737 kl=0.0276  1.19s/ep  ETA 0.3h
+ep  14208/15000  rate=0.62  wait HGT=0.3792 iG=0.4453 (+14.85%)  W/T/L=19/4/9  defer=0.549  dec/ep=274  actor=-0.0087 critic=0.1497 ent=0.755 kl=0.0254  1.18s/ep  ETA 0.3h
+ep  14272/15000  rate=0.61  wait HGT=0.2978 iG=0.3290 (+9.46%)  W/T/L=33/9/22  defer=0.538  dec/ep=263  actor=-0.0105 critic=0.1153 ent=0.792 kl=0.0160  1.18s/ep  ETA 0.2h
+ep  14304/15000  rate=0.64  wait HGT=0.4047 iG=0.4636 (+12.70%)  W/T/L=22/2/8  defer=0.549  dec/ep=280  actor=-0.0038 critic=0.1919 ent=0.761 kl=0.0216  1.18s/ep  ETA 0.2h
+ep  14368/15000  rate=0.62  wait HGT=0.3635 iG=0.3932 (+7.57%)  W/T/L=37/8/19  defer=0.523  dec/ep=255  actor=-0.0047 critic=0.1528 ent=0.779 kl=0.0221  1.18s/ep  ETA 0.2h
+ep  14400/15000  rate=0.70  wait HGT=0.4945 iG=0.5584 (+11.45%)  W/T/L=21/4/7  defer=0.553  dec/ep=339  actor=-0.0051 critic=0.1330 ent=0.771 kl=0.0214  1.18s/ep  ETA 0.2h
+ep  14464/15000  rate=0.64  wait HGT=0.4305 iG=0.4437 (+2.97%)  W/T/L=31/9/24  defer=0.538  dec/ep=273  actor=-0.0081 critic=0.1487 ent=0.773 kl=0.0207  1.18s/ep  ETA 0.2h
+ep  14528/15000  rate=0.71  wait HGT=0.4094 iG=0.4767 (+14.12%)  W/T/L=33/9/22  defer=0.535  dec/ep=308  actor=-0.0095 critic=0.1736 ent=0.756 kl=0.0238  1.18s/ep  ETA 0.2h
+[eval ep 14528] mean wait HGT=0.3738 iGreedy=0.4159 (+10.10%, worst rate -247.1%)
+    0.10:-247.1%  0.20:+36.3%  0.35:-71.1%  0.50:-4.8%  0.65:+36.5%  0.80:+16.3%  1.00:+22.0%  1.20:+32.0%
+ep  14560/15000  rate=0.57  wait HGT=0.3332 iG=0.3305 (-0.84%)  W/T/L=14/8/10  defer=0.559  dec/ep=241  actor=-0.0133 critic=0.1426 ent=0.715 kl=0.0153  1.18s/ep  ETA 0.1h
+ep  14624/15000  rate=0.66  wait HGT=0.3609 iG=0.3746 (+3.65%)  W/T/L=29/12/23  defer=0.560  dec/ep=313  actor=-0.0087 critic=0.1134 ent=0.751 kl=0.0229  1.18s/ep  ETA 0.1h
+ep  14656/15000  rate=0.68  wait HGT=0.4136 iG=0.4614 (+10.37%)  W/T/L=16/4/12  defer=0.568  dec/ep=315  actor=-0.0075 critic=0.1618 ent=0.727 kl=0.0225  1.18s/ep  ETA 0.1h
+ep  14720/15000  rate=0.65  wait HGT=0.3932 iG=0.4223 (+6.88%)  W/T/L=29/10/25  defer=0.600  dec/ep=341  actor=-0.0068 critic=0.1318 ent=0.696 kl=0.0295  1.18s/ep  ETA 0.1h
+ep  14752/15000  rate=0.65  wait HGT=0.4160 iG=0.4497 (+7.49%)  W/T/L=13/4/15  defer=0.625  dec/ep=353  actor=-0.0062 critic=0.1912 ent=0.655 kl=0.0224  1.18s/ep  ETA 0.1h
+ep  14816/15000  rate=0.69  wait HGT=0.4620 iG=0.5185 (+10.89%)  W/T/L=37/4/23  defer=0.658  dec/ep=394  actor=-0.0017 critic=0.1598 ent=0.626 kl=0.0211  1.18s/ep  ETA 0.1h
+ep  14880/15000  rate=0.63  wait HGT=0.3278 iG=0.3913 (+16.21%)  W/T/L=35/9/20  defer=0.690  dec/ep=390  actor=-0.0043 critic=0.0852 ent=0.575 kl=0.0258  1.18s/ep  ETA 0.0h
+ep  14912/15000  rate=0.82  wait HGT=0.5392 iG=0.5674 (+4.98%)  W/T/L=18/3/11  defer=0.672  dec/ep=517  actor=-0.0050 critic=0.0962 ent=0.609 kl=0.0303  1.18s/ep  ETA 0.0h
+ep  14976/15000  rate=0.68  wait HGT=0.4158 iG=0.4607 (+9.73%)  W/T/L=34/8/22  defer=0.663  dec/ep=381  actor=-0.0060 critic=0.1150 ent=0.623 kl=0.0192  1.18s/ep  ETA 0.0h
+ep  15000/15000  rate=0.50  wait HGT=0.3452 iG=0.3663 (+5.76%)  W/T/L=13/4/7  defer=0.701  dec/ep=283  actor=-0.0132 critic=0.1431 ent=0.570 kl=0.0189  1.18s/ep  ETA 0.0h
+[eval ep 15000] mean wait HGT=0.4116 iGreedy=0.4159 (+1.02%, worst rate -48.2%)
+    0.10:-39.3%  0.20:+12.2%  0.35:-48.2%  0.50:-37.4%  0.65:+13.5%  0.80:+1.6%  1.00:+10.6%  1.20:+18.2%
+Done in 4.94h. Best eval mean wait 0.3213 -> runs/admission_rl_v2/checkpoint_best.pt

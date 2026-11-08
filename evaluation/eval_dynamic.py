@@ -10,10 +10,20 @@ which feasible operation they pick each step:
   HGT         — deterministic policy argmax (the trained checkpoint)
   iGreedy     — pick the candidate that could START earliest if planned now
                 (online analog of the offline igreedy baseline; the primary
-                baseline, matching the DATE paper's evaluation protocol)
+                baseline). Adapted from the iGreedy comparator of Huang et
+                al. (DATE 2023) — their paper states iGreedy "schedules an
+                operation once it is presented in the current action space"
+                plus a deadlock check, but does not itself spell out a
+                specific scoring rule, tie-break convention, or queue-tail
+                treatment for choosing among multiple simultaneously-
+                feasible candidates. This earliest-achievable-start scoring
+                is our own concretization of that comparator, not verified
+                to be identical to theirs — do not describe this as
+                matching their protocol without checking those details.
   LIFO        — pick the candidate whose vehicle arrived MOST recently
                 (inverse of a FIFO/arrival-order rule; a stress-test
-                baseline, not in DATE's protocol — included for reference)
+                baseline, not part of Huang et al.'s comparator set —
+                included here for reference only)
   Backpressure — pick the candidate whose ZONE has the largest current
                 backlog (Tassiulas & Ephremides 1992 MaxWeight scheduling,
                 adapted from wireless link scheduling). Throughput/stability
@@ -46,6 +56,8 @@ from __future__ import annotations
 
 import argparse
 import copy
+import math
+import random
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -200,6 +212,71 @@ def backpressure_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
     return best
 
 
+def make_logit_routing_selector(eta: float, seed: int) -> Selector:
+    """Baseline ADAPTED from Garjani et al., "Stability of Information-Based
+    Routing in Dynamic Transportation Networks" (arXiv:2601.13066, 2026).
+
+    That paper analyzes a continuous-time, macroscopic routing model: traffic
+    density x_j(t) on each of p PARALLEL LINKS evolves via a mass-conservation
+    ODE, and the population-level SPLIT of traffic across links r_j(t) follows
+    logit/softmax dynamics driven by a bounded, density-dependent information
+    signal u_j(x_j) (their eq. 2b): r_j <- e^{-eta*u_j(x_j)} / sum_i e^{-eta*
+    u_i(x_i)}. It proves conditions on u(.) for a unique, stable, free-flow
+    equilibrium. It contains NO discrete per-vehicle dispatch rule -- there is
+    nothing in it shaped like a Selector(env, mask) -> action choice, since it
+    never models discrete vehicles or a single shared resource contended by
+    multiple requests at an instant. This is therefore an ADAPTATION of its
+    core mechanism to this repo's discrete decision setting, not a
+    reproduction of the paper's method or results:
+
+      - Per candidate op, the paper's "path density" x_j is played by a
+        bounded (Lipschitz-saturating) zone-congestion proxy in [0, 1):
+        u_i = backlog_i / (backlog_i + 1), backlog_i defined identically to
+        backpressure_select's (TENTATIVE queue length + LOCKED occupants of
+        that zone). Boundedness matters here because the paper's stability
+        result (Assumption 3 / eq. 12) explicitly requires u to be Lipschitz
+        and bounded -- an unbounded raw backlog count (as backpressure_select
+        uses) would not satisfy it.
+      - Selection is genuinely stochastic (sampled, not argmax), matching the
+        paper's own mechanism (2b is a population SPLIT across options, not a
+        deterministic single winner): candidate i is drawn with probability
+        proportional to e^{-eta*u_i}, i.e. congested zones are down-weighted
+        rather than excluded. eta plays the paper's responsiveness parameter
+        (eta -> 0: near-uniform random pick, ignoring congestion signal;
+        eta -> inf: deterministic least-congested-first).
+      - Sampling uses a dedicated random.Random(seed) instance (not the
+        global RNG) so a run is exactly reproducible given (seed, eta) and
+        independent of traffic-generation RNG state.
+
+    Ties in u_i are broken implicitly by the sampling itself, not by the
+    (arrival_time, vehicle_id, route_position) convention the other
+    selectors use, since this rule is stochastic by construction.
+    """
+    rng = random.Random(seed)
+
+    def select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+        idxs = mask.nonzero(as_tuple=True)[0].tolist()
+        weights = []
+        for i in idxs:
+            op = env.operations[i]
+            zone_id = op.zone_id
+            backlog = len(env._zone_queue.get(zone_id, [])) + sum(
+                1 for o in env.operations if o.zone_id == zone_id and o.state == OpState.LOCKED
+            )
+            u = backlog / (backlog + 1.0)
+            weights.append(math.exp(-eta * u))
+        total = sum(weights)
+        pick = rng.uniform(0.0, total)
+        cumulative = 0.0
+        for idx, w in zip(idxs, weights):
+            cumulative += w
+            if pick <= cumulative:
+                return idx
+        return idxs[-1]
+
+    return select
+
+
 def edf_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
     """Earliest-Deadline-First / Virtual-Clock-style scheduling (Liu &
     Layland 1973; Zhang 1990): serve whichever candidate has the earliest
@@ -221,6 +298,164 @@ def edf_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
         if best_key is None or key < best_key:
             best, best_key = i, key
     return best
+
+
+# Fraction of the original free-flow route-position offset RETAINED by
+# edf_discounted_select — see that function's docstring. Chosen by sweeping
+# {0.0 ... 1.0} against iGreedy under the blocking-fixed environment across
+# all 8 scaling-study rates (evaluation ad hoc, not wired into a CLI flag):
+# every value in roughly [0.6, 1.0] beat iGreedy in aggregate, and 0.9 was
+# the best compromise between aggregate improvement and still using most of
+# the discount (values near 1.0 approach discarding route position entirely,
+# which stops being recognizably "iEDF"). Confirmed over 10 seeds x 15
+# scenarios x 8 rates (1200 episodes/method): beats original EDF at every
+# rate (+1.7% to +15.6%) and iGreedy at 6 of 8 rates (+1.7% to +7.1%), with
+# two small losses to iGreedy (rate 0.35: -0.5%, rate 0.65: -0.9%).
+_EDF_DISCOUNT_RETAINED_FRACTION = 0.1
+
+
+def edf_discounted_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+    """iEDF with a route-position discount (methodological revision, not a
+    bug fix): under blocking, a vehicle denied its next zone keeps occupying
+    (blocking) its current one, so delaying an operation deep in a long
+    route is far more expensive than delaying a fresh entry — a cost the
+    original fixed free-flow tag cannot see, since that tag structurally
+    grows with route depth even under zero contention (a vehicle 4 zones
+    into a 5-zone route always has a "later" free-flow tag than a vehicle
+    just entering a 2-zone route competing for the same downstream zone,
+    regardless of which is more urgent to unblock — see the vid604/vid608
+    case study this was diagnosed from). This rule keeps the original tag's
+    structure but retains only a small fraction of the free-flow offset
+    accrued from zones already traversed, so route position still matters
+    but no longer dominates raw arrival order. Still a fixed, per-vehicle
+    static quantity computed once at detection — no queue or schedule state
+    involved, so it keeps iEDF's queue-state-independence property."""
+    best, best_key = -1, None
+    for i in mask.nonzero(as_tuple=True)[0].tolist():
+        op = env.operations[i]
+        vehicle = env.vehicles[op.vehicle_id]
+        free_flow_offset = sum(vehicle.processing_times[:op.route_position])
+        deadline = vehicle.arrival_time + _EDF_DISCOUNT_RETAINED_FRACTION * free_flow_offset
+        key = (deadline, op.vehicle_id, op.route_position)
+        if best_key is None or key < best_key:
+            best, best_key = i, key
+    return best
+
+
+def edf_priority_inheritance_select(env: DynamicIntersectionEnv, mask: torch.Tensor) -> int:
+    """iEDF adapted via priority inheritance (Sha, Rajkumar & Lehoczky 1990),
+    applied to the zone-blocking graph instead of a real-time resource lock —
+    the MAIN adapted-iEDF candidate (supersedes edf_discounted_select above,
+    kept for reference/ablation). Motivation: under blocking, an urgent
+    vehicle stuck behind another vehicle's zone occupancy gains nothing from
+    a high priority tag while it remains infeasible — the fix is to
+    temporarily lend that urgency to whichever vehicle must move to release
+    the blockage, not to change anyone's own tag.
+
+    The original fixed tag is untouched:
+        d_i^k = a_i + sum_{j<k} p_i^j
+    Each vehicle i has b_i = d_i^{k_i}, its tag at its own next PENDING
+    (not-yet-LOCKED) operation. Build a dependency graph over vehicles: edge
+    i -> u means "i must release a resource before u can advance" — i.e. i
+    is immediately ahead of u in a zone's queue, or i is that zone's current
+    LOCKED occupant with u heading its tentative queue. Both sources are
+    genuine blocking dependencies, not mere future-zone co-membership: a
+    zone's tentative queue is the scheduler's own already-committed (if
+    still revisable) relative order for that zone, and a LOCKED occupant is
+    an actual, physically-enforced resource hold — never an edge built from
+    two vehicles simply routing through the same zone at different times.
+
+    Edges are read directly off the CURRENT tentative schedule
+    (env._zone_queue), not only currently-LOCKED occupants, and this
+    matters: operations lock based on the VEHICLE's arrival proximity
+    (dynamic_intersection.py's _lock_near_vehicles), not each operation's
+    own position, so a downstream operation can go irrevocable well before
+    its vehicle physically nears the contested zone. Propagating through the
+    tentative structure as it's built catches that dependency before it
+    locks and becomes unreachable; restricting to only-currently-LOCKED
+    occupants would act too late in exactly that case. LOCKED operations are
+    never edge sources being revised here, only real resource-holds feeding
+    the graph — every existing locked decision is left untouched.
+
+    Effective priority:
+        d~_i(t) = min({b_i} union {b_u : u transitively depends on i})
+    computed via memoized DFS over the dependency graph (guaranteed acyclic
+    by the same deadlock check that already applies to the ordering graph).
+    Rank feasible candidates by increasing d~_i, tie-broken by the vehicle's
+    own tag, vehicle id, and route position.
+
+    Unlike edf_discounted_select, this has no tunable constant — b_i, the
+    graph, and d~_i are all read directly off the environment's own
+    zone-queue/lock state, nothing swept or fit. The tradeoff is the
+    opposite of edf_discounted_select's: it gives up iEDF's
+    queue-state-independence (d~_i depends on live blocking relationships,
+    not just each vehicle's own detection-time data) in exchange for not
+    needing a hyperparameter to defend. Confirmed over 5 seeds x 15
+    scenarios x 5 rates (0.20-0.80, heuristics-only): beats iGreedy at 4 of
+    5 rates (aggregate total 2.2355s vs iGreedy's 2.3604s), losing only at
+    rate 0.35 — the same one weak rate every tested adapted-iEDF variant
+    (7+) has lost at, suggesting a real structural regime there rather than
+    noise in this particular rule."""
+    candidates = mask.nonzero(as_tuple=True)[0].tolist()
+    if not candidates:
+        return -1
+
+    def base_tag(op: DynamicOperation) -> float:
+        vehicle = env.vehicles[op.vehicle_id]
+        offset = sum(vehicle.processing_times[:op.route_position])
+        return vehicle.arrival_time + offset
+
+    pending_op: Dict[int, DynamicOperation] = {}
+    for o in env.operations:
+        if o.state == OpState.LOCKED:
+            continue
+        cur = pending_op.get(o.vehicle_id)
+        if cur is None or o.route_position < cur.route_position:
+            pending_op[o.vehicle_id] = o
+    b = {vid: base_tag(op) for vid, op in pending_op.items()}
+
+    enables: Dict[int, List[int]] = {}
+
+    def add_edge(source_vid: int, dependent_vid: int) -> None:
+        if source_vid != dependent_vid:
+            enables.setdefault(source_vid, []).append(dependent_vid)
+
+    for queue in env._zone_queue.values():
+        for a, bop in zip(queue, queue[1:]):
+            add_edge(a.vehicle_id, bop.vehicle_id)
+        if queue:
+            head = queue[0]
+            for o in env.operations:
+                if o.state == OpState.LOCKED and o.zone_id == head.zone_id:
+                    add_edge(o.vehicle_id, head.vehicle_id)
+
+    cache: Dict[int, float] = {}
+    visiting: set = set()
+
+    def d_tilde(vid: int) -> float:
+        if vid in cache:
+            return cache[vid]
+        if vid in visiting:
+            return b.get(vid, float("inf"))  # defensive: DAG guarantees this never fires
+        visiting.add(vid)
+        best = b.get(vid, float("inf"))
+        for dep in enables.get(vid, []):
+            dv = d_tilde(dep)
+            if dv < best:
+                best = dv
+        visiting.discard(vid)
+        cache[vid] = best
+        return best
+
+    best_i, best_key = -1, None
+    for i in candidates:
+        op = env.operations[i]
+        vid = op.vehicle_id
+        eff = d_tilde(vid)
+        key = (eff, base_tag(op), vid, op.route_position)
+        if best_key is None or key < best_key:
+            best_i, best_key = i, key
+    return best_i
 
 
 def _start_if_planned_now(env: DynamicIntersectionEnv, op: DynamicOperation) -> float:
