@@ -14,7 +14,7 @@ model:
   defer_init_bias: -2.0
 
 train:
-  num_episodes: 15000
+  num_episodes: 4000
   rate_min: 0.1
   rate_max: 1.2
   rollout_episodes: 32      # episodes per PPO update

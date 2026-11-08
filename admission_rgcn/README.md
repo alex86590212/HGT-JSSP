@@ -49,7 +49,7 @@ Options:
 | `--config` | YAML file (default `admission_rgcn/config.yaml`) |
 | `--output` | Output directory (default `runs/admission_rgcn`) |
 | `--resume PATH` | Continue from a `checkpoint_last.pt` |
-| `--episodes N` | Override `train.num_episodes` (default 15000) |
+| `--episodes N` | Override `train.num_episodes` (default 4000) |
 | `--workers N` | Rollout processes (default 4) |
 | `--no-defer` | Order-only policy, i.e. `env.allow_defer=false` |
 | `--seed N` | Seed for initialization and the training scenario stream |
