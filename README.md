@@ -1,6 +1,6 @@
 # R-GCN Admission Control for Gap-Free Intersection Management
 
-This is the source code of the research work on gap-free whole-route admission at an unsignalized intersection with a Relational GCN (R-GCN) policy trained with PPO. The controller reserves every conflict zone along a vehicle's route before the vehicle enters, and the policy decides which pending vehicle to admit, or whether to defer. The paper source is in `paper_rgcn/`; the details of the R-GCN package are in [admission_rgcn/README.md](admission_rgcn/README.md).
+This is the source code of the research work on gap-free whole-route admission at an unsignalized intersection with a Relational GCN (R-GCN) policy trained with PPO. The controller reserves every conflict zone along a vehicle's route before the vehicle enters, and the policy decides which pending vehicle to admit, or whether to defer. The details of the R-GCN package are in [admission_rgcn/README.md](admission_rgcn/README.md).
 
 ## Installation
 
@@ -40,28 +40,29 @@ Evaluate a trained checkpoint against the baselines with `admission_rgcn.evaluat
 ```
 PYTHONPATH=. python3 -m admission_rgcn.evaluate \
   --checkpoint runs/admission_rgcn/checkpoint_best.pt \
+  --seeds 1 2 3 \
   --output-csv runs/admission_rgcn/eval_final.csv
 ```
-The default protocol uses 8 arrival rates (0.10 to 1.20), seeds 0 to 2, and 15 scenarios per seed and rate.
+The evaluation uses 8 arrival rates (0.10 to 1.20), scenario seeds 1 to 3, and 15 scenarios per seed and rate, i.e. 45 episodes per rate. Seed 0 is used to select the best checkpoint during training, so it is left out of the evaluation. These are scenario seeds, which are separate from the training seeds: the study trains 10 independent policies (see the ablation below), and each one is evaluated on the same 45 episodes per rate.
 
 | Argument | Type | Description |
 | :------- | :--- | :---------- |
 | `checkpoint` | str | trained checkpoint to evaluate |
 | `rates`, `seeds`, `n-scenarios` | list, list, int | evaluation grid |
 | `baselines` | list | any of `igreedy backpressure lifo` (iGreedy is always included) |
-| `wstar` | flag | also solve the restricted-information optimum `W*` with CP-SAT (slow) |
+| `wstar` | flag | also compute the receding-horizon CP-SAT reference `W*` (slow) |
 | `wstar-time-limit` | float | seconds per CP-SAT solve (default: 5) |
 | `workers` | int | number of evaluation processes (default: 4) |
 | `output-csv` | str | per-rate results |
 
-## Baseline and Optimal Solutions
+## Baselines and CP-SAT Reference
 
 The baselines (iGreedy, Backpressure and LIFO) run in the same environment as the learned policy. To evaluate the baselines alone, without a trained model,
 ```
 PYTHONPATH=. python3 evaluation/eval_gapfree_admission.py \
   --output-csv gapfree_admission_results.csv
 ```
-The optimal solution `W*` is computed with CP-SAT by passing `--wstar` to `admission_rgcn.evaluate`.
+The CP-SAT reference `W*` is computed by passing `--wstar` to `admission_rgcn.evaluate`. It uses different commitment and cutoff rules from the online controller, so differences to it are not optimality gaps.
 
 ## Ablation Study
 
@@ -76,18 +77,8 @@ PYTHONPATH=. python3 -m admission_rgcn.summarize_ablation \
 ```
 Each run is stored in `runs/ablation/<defer|nodefer>_s<seed>/`. Best checkpoints are selected on scenario seed 0, so the sweep evaluates on seeds 1 to 3.
 
-## Paper Figures and Tables
-
-Run these from `paper_rgcn/`, since the scripts use relative paths.
-```
-cd paper_rgcn
-python3 make_scaling_plot.py
-python3 build_tables.py
-```
-
 ## Repository Layout
 
 * `admission_rgcn/`: R-GCN policy, PPO training, evaluation and ablation.
 * `dynamic_scheduler/`: gap-free admission environment, traffic generator, baselines and the CP-SAT solver for `W*`.
 * `evaluation/`: evaluation scripts for the baselines.
-* `paper_rgcn/`: paper source, scaling plot and table scripts.
